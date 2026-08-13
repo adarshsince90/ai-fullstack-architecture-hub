@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
 [![Zero Dependencies](https://img.shields.io/badge/Dependencies-Zero-success.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
-[![GitHub Pages Ready](https://img.shields.io/badge/Deployment-GitHub%20Pages-blueviolet.svg)](#-deployment)
+[![GitHub Pages Ready](https://img.shields.io/badge/Deployment-GitHub%20Pages-blueviolet.svg)](https://adarshsince90.github.io/ai-fullstack-architecture-hub/)
 
 > An interactive, production-grade knowledge base & visual simulation system for **Senior Full-Stack Engineers, Lead Software Engineers, and Systems Architects** (10+ years depth across .NET 8/10, Cloud Native AWS/Azure, Distributed Systems, Modern Frontend, and AI Enablement).
 
@@ -12,6 +12,7 @@
 ## 🧭 Live Interactive Hub & Architecture
 
 Access the interactive dashboard containing the **Master Mind Map**, **Quick Recap Checklist (292 Terms)**, and **9 Visual Playgrounds**:
+https://adarshsince90.github.io/ai-fullstack-architecture-hub/
 
 ```bash
 # Clone the repository
@@ -133,6 +134,8 @@ The repository features 9 standalone client-side visual tools designed to build 
 ---
 
 ## 🌐 Deployment (GitHub Pages)
+
+https://adarshsince90.github.io/ai-fullstack-architecture-hub/
 
 This repository is built with **zero external framework dependencies** (pure vanilla HTML5, CSS3, and modern ES6 JavaScript). It deploys natively to GitHub Pages in seconds:
 
