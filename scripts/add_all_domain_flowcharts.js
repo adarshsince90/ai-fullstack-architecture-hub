@@ -1,12 +1,66 @@
 const fs = require('fs');
 const path = require('path');
 
-const filePath = path.join(__dirname, '..', 'docs', 'profile', 'Definitions.md');
-let content = fs.readFileSync(filePath, 'utf-8');
+const targetFiles = [
+  path.join(__dirname, '..', 'docs', 'Definitions.md'),
+  path.join(__dirname, '..', 'docs', 'profile', 'Definitions.md')
+];
 
 const newFlowcharts = {
+  '📌 CORE .NET': `> **ASP.NET Core Systems Execution Flow**:
+> 📖 **Deep Guides**: [C# Internals](guides/01_dotnet_backend/01_csharp_internals.md) | [Web API & Middleware](guides/01_dotnet_backend/02_aspnetcore_webapi.md) | [EF Core Optimization](guides/01_dotnet_backend/03_efcore_optimization.md)
+> \`\`\`text
+> [Incoming HTTP Request] ──► [Middleware Request Pipeline]
+>                                     │ (DI Scope Resolved)
+>                                     ▼
+>                             [Controller / Minimal API]
+>                                     │ (Async/Await Task)
+>                                     ▼
+>                             [Domain Logic & EF Core ORM]
+>                                     │
+>                                     ▼
+>                             [Background / Hosted Services]
+> \`\`\``,
+
+  '📌 FRONTEND': `> **Modern Frontend Engineering Architecture Flow**:
+> 📖 **Deep Guides**: [JS Event Loop](guides/05_frontend_engineering/03_js_core_event_loop.md) | [Angular Architecture](guides/05_frontend_engineering/05_angular_architecture.md) | [React Fiber & VDOM](guides/05_frontend_engineering/07_react_fiber_reconciliation.md) | [Redux Toolkit Flow](guides/05_frontend_engineering/08_react_hooks_redux_toolkit.md)
+> \`\`\`text
+> [HTML5 Semantic DOM & CSS3 Layouts]
+>                 │
+>                 ▼
+> [JS V8 Engine: Call Stack, Event Loop & Microtasks]
+>                 │
+>                 ▼
+> [Component Engine: Angular Signals / React Fiber]
+>                 │
+>                 ▼
+> [State Management: Redux RTK Event-Sourcing / RxJS]
+> \`\`\``,
+
+  '📌 DATABASES': `> **Architectural Data Systems Lifecycle**:
+> 📖 **Deep Guides**: [SQL & Postgres Engine Tuning](guides/04_security_database/03_sql_query_tuning.md) | [EF Core Optimization](guides/01_dotnet_backend/03_efcore_optimization.md) | [DynamoDB Single-Table Design](guides/04_security_database/04_dynamodb_data_modeling.md)
+> \`\`\`text
+> [1. Data Modeling & Normalization]
+>        │
+>        ├───────────────────────────────┐
+>        ▼                               ▼
+> [Relational Engine]           [NoSQL Key-Value / Doc]
+> (SQL Server / PostgreSQL)     (DynamoDB Single-Table)
+>        │                               │
+>        ▼                               ▼
+> [Indexing: B-Tree/GIN/Vector] [Partition (PK) & Sort (SK)]
+>        │                               │
+>        ▼                               ▼
+> [ORM Access: EF Core / Npgsql] [Direct HTTP / AWS SDK]
+>        │                               │
+>        └───────────────┬───────────────┘
+>                        │
+>                        ▼
+>     [Multi-Tier Caching: Redis & MemoryCache]
+> \`\`\``,
+
   '📌 MICROSERVICES': `> **Microservices Architectural Topology & Resilience Flow**:
-> 📖 **Deep Guides**: [Microservices Architecture](guides/02_distributed_systems/01_microservices_architecture.md) | [Saga & Outbox Patterns](guides/02_distributed_systems/03_saga_outbox_resiliency.md)
+> 📖 **Deep Guides**: [Microservices Architecture](guides/02_distributed_systems/01_microservices_decomposition.md) | [Saga & Outbox Patterns](guides/02_distributed_systems/03_saga_outbox_resiliency.md)
 > \`\`\`text
 > [Client Request] ──► [API Gateway / Service Mesh]
 >                             │
@@ -53,8 +107,27 @@ const newFlowcharts = {
 >                      [Search Engine: Elastic / Vector DB]                              [Async Queue: SQS / Kafka]
 > \`\`\``,
 
+  '📌 DISTRIBUTED SYSTEMS': `> **Enterprise Distributed Systems Architecture Flow**:
+> 📖 **Deep Guides**: [Microservices Architecture](guides/02_distributed_systems/01_microservices_decomposition.md) | [DDD & CQRS Event Sourcing](guides/02_distributed_systems/02_ddd_cqrs_event_sourcing.md) | [Distributed Saga & Outbox](guides/02_distributed_systems/03_saga_outbox_resiliency.md)
+> \`\`\`text
+> [Client Request] ──► [API Gateway / Rate Limiter]
+>                             │
+>                             ▼
+>                     [Bounded Context Microservices]
+>                             │
+>              ┌──────────────┴──────────────┐
+>              ▼                             ▼
+>    [CQRS Write Model]             [CQRS Read Model]
+>    (Saga & Outbox Pattern)        (Denormalized Cache / Elastic)
+>              │                             │
+>              └──────────────┬──────────────┘
+>                             │
+>                             ▼
+>             [Distributed Tracing: OpenTelemetry]
+> \`\`\``,
+
   '📌 MESSAGING & INTEGRATION': `> **Asynchronous Messaging & Event-Driven Integration Topology**:
-> 📖 **Deep Guides**: [Distributed Saga & Resiliency](guides/02_distributed_systems/03_saga_outbox_resiliency.md) | [Microservices Architecture](guides/02_distributed_systems/01_microservices_architecture.md)
+> 📖 **Deep Guides**: [Distributed Saga & Resiliency](guides/02_distributed_systems/03_saga_outbox_resiliency.md) | [Microservices Architecture](guides/02_distributed_systems/01_microservices_decomposition.md)
 > \`\`\`text
 > [Publisher Service] ──► [Message Exchange / Event Bus] ──► [Topic Queues]
 >                                  │                               │
@@ -122,24 +195,45 @@ const newFlowcharts = {
 >                                                            │ (Stateless JWT Scope Claims)
 >                                                            ▼
 >                                                [RBAC / ABAC Authorizing & Secret Vault]
+> \`\`\``,
+
+  '📌 AI ENABLEMENT': `> **Enterprise RAG & Vector Search Systems Flow**:
+> 📖 **Deep Guides**: [RAG & Vector Search Pipelines](guides/06_ai_engineering/01_rag_vector_search.md) | [Azure Enterprise Services](guides/03_cloud_devops/02_azure_enterprise.md)
+> \`\`\`text
+> [User Prompt] ──► [Embedding Generator]
+>                           │
+>                           ▼
+>             [Vector DB: pgvector / Azure Search]
+>                           │ (Cosine Similarity Top-K)
+>                           ▼
+>             [Grounded Prompt Augmentation]
+>                           │
+>                           ▼
+>             [Azure OpenAI LLM Response Generation]
 > \`\`\``
 };
 
-Object.entries(newFlowcharts).forEach(([sectionHeader, flowchartText]) => {
-  const headerMarker = `## ${sectionHeader}`;
-  const headerIdx = content.indexOf(headerMarker);
-  if (headerIdx !== -1) {
-    // Check if flowchart already exists right after header
-    const nextLineIdx = content.indexOf('\n', headerIdx);
-    const textAfterHeader = content.substring(nextLineIdx, nextLineIdx + 100);
-    if (!textAfterHeader.includes('> **')) {
-      // Insert flowchart right below section header
-      const replacement = `${headerMarker}\n\n${flowchartText}\n`;
-      content = content.replace(headerMarker, replacement);
-      console.log(`✅ Added flowchart for section: ${sectionHeader}`);
+targetFiles.forEach(filePath => {
+  if (!fs.existsSync(filePath)) return;
+  let content = fs.readFileSync(filePath, 'utf-8');
+
+  Object.entries(newFlowcharts).forEach(([sectionHeader, flowchartText]) => {
+    const headerMarker = `## ${sectionHeader}`;
+    const headerIdx = content.indexOf(headerMarker);
+    if (headerIdx !== -1) {
+      // Check if flowchart already exists right after header
+      const nextLineIdx = content.indexOf('\n', headerIdx);
+      const textAfterHeader = content.substring(nextLineIdx, nextLineIdx + 120);
+      if (!textAfterHeader.includes('> **')) {
+        // Insert flowchart right below section header
+        const replacement = `${headerMarker}\n\n${flowchartText}\n`;
+        content = content.replace(headerMarker, replacement);
+        console.log(`✅ Added flowchart for section: ${sectionHeader} in ${path.basename(filePath)}`);
+      }
     }
-  }
+  });
+
+  fs.writeFileSync(filePath, content, 'utf-8');
 });
 
-fs.writeFileSync(filePath, content, 'utf-8');
 console.log('✅ Finished adding execution flow diagrams to all domain sections');

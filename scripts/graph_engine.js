@@ -44,8 +44,11 @@ class MindMapGraphEngine {
     this.canvas.className = 'graph-canvas';
     this.container.appendChild(this.canvas);
 
+    this.boundResizeHandler = () => this.resizeCanvas();
+    this.boundMouseUpHandler = (e) => this.onMouseUp(e);
+
     this.resizeCanvas();
-    window.addEventListener('resize', () => this.resizeCanvas());
+    window.addEventListener('resize', this.boundResizeHandler);
 
     this.initEventListeners();
     this.animFrameId = null;
@@ -262,6 +265,37 @@ class MindMapGraphEngine {
     };
   }
 
+  // Smooth Camera Focus Interpolation onto a cluster of nodes with optimal legible zoom
+  focusOnCluster(nodes, defaultZoom = 1.30) {
+    if (!nodes || nodes.length === 0) return;
+
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    nodes.forEach(n => {
+      if (n.x < minX) minX = n.x;
+      if (n.x > maxX) maxX = n.x;
+      if (n.y < minY) minY = n.y;
+      if (n.y > maxY) maxY = n.y;
+    });
+
+    const avgX = (minX + maxX) / 2;
+    const avgY = (minY + maxY) / 2;
+    const spanX = Math.max(320, maxX - minX);
+    const spanY = Math.max(320, maxY - minY);
+
+    // Calculate ideal zoom so all texts and connections in cluster are 100% clearly visible
+    const idealZoomX = (this.width * 0.72) / spanX;
+    const idealZoomY = (this.height * 0.72) / spanY;
+    const targetZoom = Math.min(1.50, Math.max(1.18, Math.min(idealZoomX, idealZoomY)));
+
+    const dummyNode = { x: avgX, y: avgY };
+    this.focusedNode = dummyNode;
+    this.targetCamera = {
+      x: this.width / 2 - avgX * targetZoom,
+      y: this.height / 2 - avgY * targetZoom,
+      zoom: targetZoom
+    };
+  }
+
   renderSciFiGrid() {
     const gridSize = 60;
     this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
@@ -329,7 +363,8 @@ class MindMapGraphEngine {
     // Draw Laser Edges
     this.links.forEach(l => {
       const isCross = l.type === 'cross_link';
-      const isHighlighted = activeHighlight && (l.source.id === activeHighlight.id || l.target.id === activeHighlight.id);
+      const isCategoryLink = l.source.isFilteredHighlight || l.target.isFilteredHighlight;
+      const isHighlighted = (activeHighlight && (l.source.id === activeHighlight.id || l.target.id === activeHighlight.id)) || isCategoryLink;
 
       this.ctx.beginPath();
       this.ctx.moveTo(l.source.x, l.source.y);
@@ -385,8 +420,8 @@ class MindMapGraphEngine {
       this.ctx.fill();
 
       // Laser Aura Outer Ring
-      this.ctx.lineWidth = (isHovered || isFocused) ? 3.5 : (isRoot ? 3 : (isConnected ? 2.2 : 1.4));
-      this.ctx.strokeStyle = (isHovered || isFocused) ? '#ffffff' : (isRoot ? colors.glow : (isConnected ? colors.border : colors.glow));
+      this.ctx.lineWidth = (isHovered || isFocused) ? 3.5 : (isRoot ? 3 : (isConnected || n.isFilteredHighlight ? 2.2 : 1.4));
+      this.ctx.strokeStyle = (isHovered || isFocused) ? '#ffffff' : (isRoot ? colors.glow : (isConnected || n.isFilteredHighlight ? colors.border : colors.glow));
       this.ctx.stroke();
 
       // Center Sci-Fi Glowing Core Point
@@ -396,7 +431,7 @@ class MindMapGraphEngine {
       this.ctx.fill();
 
       // Subtle Text Label Filter
-      const isHighlightedNode = isHovered || isFocused || isConnected;
+      const isHighlightedNode = isHovered || isFocused || isConnected || n.isFilteredHighlight;
       const isDomainOrRoot = isRoot || n.level === 'Domain Pillar';
 
       if (isHighlightedNode || isDomainOrRoot || this.camera.zoom > 1.3) {
@@ -474,13 +509,36 @@ class MindMapGraphEngine {
   }
 
   startAnimation() {
+    if (this.animFrameId) return; // Prevent duplicate animation loop registration
     const loop = () => {
       this.stepPhysics();
       this.render();
       this.animFrameId = requestAnimationFrame(loop);
     };
-    if (this.animFrameId) cancelAnimationFrame(this.animFrameId);
     loop();
+  }
+
+  stopAnimation() {
+    if (this.animFrameId) {
+      cancelAnimationFrame(this.animFrameId);
+      this.animFrameId = null;
+    }
+  }
+
+  destroy() {
+    this.stopAnimation();
+    if (this.boundResizeHandler) {
+      window.removeEventListener('resize', this.boundResizeHandler);
+    }
+    if (this.boundMouseUpHandler) {
+      window.removeEventListener('mouseup', this.boundMouseUpHandler);
+    }
+    if (this.canvas && this.canvas.parentNode) {
+      this.canvas.parentNode.removeChild(this.canvas);
+    }
+    this.nodes = [];
+    this.links = [];
+    this.nodeMap.clear();
   }
 
   // Camera Zoom API
@@ -507,7 +565,7 @@ class MindMapGraphEngine {
   initEventListeners() {
     this.canvas.addEventListener('mousedown', (e) => this.onMouseDown(e));
     this.canvas.addEventListener('mousemove', (e) => this.onMouseMove(e));
-    window.addEventListener('mouseup', (e) => this.onMouseUp(e));
+    window.addEventListener('mouseup', this.boundMouseUpHandler);
     this.canvas.addEventListener('wheel', (e) => this.onWheel(e));
   }
 

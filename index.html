@@ -1,17 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Master Full-Stack & Systems Engineering Interview Hub</title>
-  <meta name="description" content="Master Engineering Mind Map, Curated Learning Paths, Interactive Simulators and Guides for Senior Full Stack & Lead Engineers.">
+  <meta name="description"
+    content="Master Engineering Mind Map, Curated Learning Paths, Interactive Simulators and Guides for Senior Full Stack & Lead Engineers.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=1.1.0">
   <!-- Markdown Renderer for dynamic guide viewing -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
+
 <body>
   <div class="app-container">
     <!-- Top Global Header -->
@@ -23,73 +30,119 @@
           <div class="app-subtitle">Senior / Lead Software Engineer & Architecture Prep Hub</div>
         </div>
       </div>
-      
-      <!-- Top Global Search Box -->
+
+      <!-- Top Global Search Box (Centered) -->
       <div class="search-box">
-        <input type="text" id="topic-search" placeholder="🔍 Search any topic, pattern, or keyword..." oninput="app.filterTopics(this.value)">
+        <input type="text" id="topic-search" placeholder="🔍 Search any topic, pattern, or keyword..."
+          oninput="app.filterTopics(this.value)">
       </div>
 
+      <!-- Top Right Header Actions with Hover Text Expansion -->
       <div class="header-actions">
-        <button class="btn btn-primary" id="recap-btn" onclick="app.showRecapView()">
-          ⚡ Quick Recap (Interactive)
+        <button class="btn btn-primary nav-btn-icon" id="recap-btn" onclick="app.showRecapView()" title="Quick Recap (Interactive)">
+          <span class="nav-icon">📝</span><span class="nav-text">Quick Recap (Interactive)</span>
         </button>
-        <button class="btn btn-outline" id="graph-dashboard-btn" onclick="app.showGraphDashboardView()">
-          🌐 Graph Dashboard
+        <button class="btn btn-outline nav-btn-icon" id="graph-dashboard-btn" onclick="app.showGraphDashboardView()" title="Graph Dashboard">
+          <span class="nav-icon">🌐</span><span class="nav-text">Graph Dashboard</span>
         </button>
-        <button class="btn btn-outline" id="mindmap-toggle-btn" onclick="app.showMindmapView()">
-          🧭 Learning Paths
+        <button class="btn btn-outline nav-btn-icon" id="mindmap-toggle-btn" onclick="app.showMindmapView()" title="Learning Paths">
+          <span class="nav-icon">🧭</span><span class="nav-text">Learning Paths</span>
         </button>
-        <button class="btn btn-outline" id="simulators-btn" onclick="app.showSimulatorsView()">
-          ⚡ Simulators
+        <button class="btn btn-outline nav-btn-icon" id="simulators-btn" onclick="app.showSimulatorsView()" title="Simulators">
+          <span class="nav-icon">⚡</span><span class="nav-text">Simulators</span>
         </button>
       </div>
     </header>
 
-    <!-- Main Dynamic Container -->
-    <main class="main-content" id="main-content">
-      
+    <!-- Application Body with Global Left Sidebar (Collapsed by default) -->
+    <div class="app-layout-body global-sidebar-collapsed" id="app-layout-body">
+      <!-- Global Collapsible Left Navigation Menu Bar -->
+      <aside class="global-left-sidebar" id="global-left-sidebar">
+        <div class="gnav-top-header">
+          <button class="gnav-toggle-btn" id="global-sidebar-toggle-btn" onclick="app.toggleGlobalSidebar()" title="Toggle Navigation Menu">
+            <span class="toggle-icon">☰</span>
+            <span class="toggle-label">Navigation Menu</span>
+          </button>
+        </div>
+        <div class="gnav-list">
+          <button class="gnav-item-btn active" id="gnav-recap" onclick="app.showRecapView()" data-tooltip="Quick Recap (Interactive)">
+            <span class="gnav-icon">📝</span>
+            <span class="gnav-text">Quick Recap</span>
+          </button>
+          <button class="gnav-item-btn" id="gnav-graph" onclick="app.showGraphDashboardView()" data-tooltip="Graph Dashboard">
+            <span class="gnav-icon">🌐</span>
+            <span class="gnav-text">Graph Dashboard</span>
+          </button>
+          <button class="gnav-item-btn" id="gnav-paths" onclick="app.showMindmapView()" data-tooltip="Learning Paths">
+            <span class="gnav-icon">🧭</span>
+            <span class="gnav-text">Learning Paths</span>
+          </button>
+          <button class="gnav-item-btn" id="gnav-simulators" onclick="app.showSimulatorsView()" data-tooltip="Simulators">
+            <span class="gnav-icon">⚡</span>
+            <span class="gnav-text">Simulators</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Dynamic Container -->
+      <main class="main-content" id="main-content">
+
       <!-- Global Search Deep Guide Matches Banner -->
       <div class="search-results-overlay" id="global-search-results" style="display: none;">
         <!-- Rendered dynamically by app.js -->
       </div>
-      
+
       <!-- 0. GRAPH DASHBOARD VIEW -->
       <section id="graph-dashboard-view" class="view-section" style="display: none;">
-        <!-- Top Sticky View Axis Switcher & Controls Toolbar -->
-        <div class="graph-toolbar">
-          <div class="toolbar-group">
-            <span class="toolbar-label">Taxonomy Axis:</span>
-            <button class="btn btn-sm btn-axis active" id="btn-axis-tech" onclick="app.setGraphViewAxis('techDomain')">⚡ Tech Stack</button>
-            <button class="btn btn-sm btn-axis" id="btn-axis-sdlc" onclick="app.setGraphViewAxis('sdlcPhase')">🔄 SDLC View</button>
-            <button class="btn btn-sm btn-axis" id="btn-axis-arch" onclick="app.setGraphViewAxis('archLayer')">🏗️ System Layer</button>
-          </div>
-
-          <div class="toolbar-group">
-            <input type="text" id="graph-search" class="graph-search-input" placeholder="🔍 Highlight node..." oninput="app.filterGraphNodes(this.value)">
-            <button class="btn btn-sm btn-outline" onclick="app.zoomGraphIn()" title="Zoom In">➕ Zoom In</button>
-            <button class="btn btn-sm btn-outline" onclick="app.zoomGraphOut()" title="Zoom Out">➖ Zoom Out</button>
-            <button class="btn btn-sm btn-outline" onclick="app.resetGraphCamera()" title="Center Camera">🎯 Reset</button>
-          </div>
-        </div>
-
         <div class="graph-dashboard-header">
           <div class="graph-title-section">
             <div class="section-badge">🌐 MULTI-CONNECTED MIND MAP GRAPH</div>
             <h2 class="banner-title">Interactive Topology Dashboard</h2>
-            <p class="section-desc">Dynamic physics-driven 200+ node graph. Zoom, drag liquid bubbles, and toggle layout taxonomies live.</p>
+            <p class="section-desc">Dynamic physics-driven 200+ node graph. Zoom, drag liquid bubbles, and toggle layout
+              taxonomies live.</p>
           </div>
         </div>
 
-        <!-- Color Legend Bar -->
-        <div class="graph-legend-bar">
-          <span class="legend-title">Domain Color Code:</span>
-          <span class="legend-chip legend-root">● Center Epicenter</span>
-          <span class="legend-chip legend-backend">● Backend (.NET)</span>
-          <span class="legend-chip legend-distributed">● Distributed Systems</span>
-          <span class="legend-chip legend-cloud">● Cloud & DevOps</span>
-          <span class="legend-chip legend-security">● Security & Data</span>
-          <span class="legend-chip legend-frontend">● Frontend</span>
-          <span class="legend-chip legend-ai">● AI Engineering</span>
+        <!-- Combined Sticky Controls & Domain Color Legend (Fixed below main header during scroll) -->
+        <div class="graph-sticky-controls">
+          <!-- Taxonomy Axis Switcher & View Controls Toolbar -->
+          <div class="graph-toolbar">
+            <div class="toolbar-group">
+              <span class="toolbar-label">Taxonomy Axis:</span>
+              <button class="btn btn-sm btn-axis active" id="btn-axis-tech"
+                onclick="app.setGraphViewAxis('techDomain')">⚡ Tech Stack</button>
+              <button class="btn btn-sm btn-axis" id="btn-axis-sdlc" onclick="app.setGraphViewAxis('sdlcPhase')">🔄 SDLC
+                View</button>
+              <button class="btn btn-sm btn-axis" id="btn-axis-arch" onclick="app.setGraphViewAxis('archLayer')">🏗️
+                System Layer</button>
+            </div>
+
+            <div class="toolbar-group">
+              <select id="graph-category-select" class="graph-select-input"
+                onchange="app.onCategorySelectChange(this.value)">
+                <option value="">📁 Filter Category Section...</option>
+              </select>
+              <select id="graph-topic-select" class="graph-select-input" onchange="app.onTopicSelectChange(this.value)">
+                <option value="">🎯 Focus Topic Node...</option>
+              </select>
+              <button class="btn btn-sm btn-outline" onclick="app.zoomGraphIn()" title="Zoom In">➕ Zoom In</button>
+              <button class="btn btn-sm btn-outline" onclick="app.zoomGraphOut()" title="Zoom Out">➖ Zoom Out</button>
+              <button class="btn btn-sm btn-outline" onclick="app.resetGraphCamera()" title="Center Camera">🎯
+                Reset</button>
+            </div>
+          </div>
+
+          <!-- Color Legend Bar -->
+          <div class="graph-legend-bar">
+            <span class="legend-title">Domain Color Code:</span>
+            <span class="legend-chip legend-root">● Center Epicenter</span>
+            <span class="legend-chip legend-backend">● Backend (.NET)</span>
+            <span class="legend-chip legend-distributed">● Distributed Systems</span>
+            <span class="legend-chip legend-cloud">● Cloud & DevOps</span>
+            <span class="legend-chip legend-security">● Security & Data</span>
+            <span class="legend-chip legend-frontend">● Frontend</span>
+            <span class="legend-chip legend-ai">● AI Engineering</span>
+          </div>
         </div>
 
         <div class="graph-canvas-wrapper" id="graph-canvas-container">
@@ -99,7 +152,7 @@
 
       <!-- 1. MIND MAP & LEARNING PATHS VIEW -->
       <section id="mindmap-view" class="view-section" style="display: none;">
-        
+
         <!-- Hero Learning Paths Selector -->
         <div class="paths-banner">
           <div class="section-badge">🧭 RECOMMENDED LEARNING PATHS</div>
@@ -115,7 +168,8 @@
             <div>
               <div class="section-badge">🌳 CORE ENGINEERING DOMAINS</div>
               <h2 class="section-title">6 Core Engineering Domains</h2>
-              <p class="section-desc">Click any node to explore in-depth architectural guides, runnable code templates, and interactive simulators.</p>
+              <p class="section-desc">Click any node to explore in-depth architectural guides, runnable code templates,
+                and interactive simulators.</p>
             </div>
           </div>
 
@@ -144,7 +198,9 @@
           <div class="recap-header-left">
             <div class="section-badge">⚡ UNIFIED MASTER KNOWLEDGE BASE</div>
             <h2 class="section-title">Senior Technical Definitions & Readiness Checklist</h2>
-            <p class="section-desc">Unified master repository combining 4-5 lines of architectural depth with structured 4-part interview explanations across all 19 engineering domains. Check off topics as you master them to track interview readiness.</p>
+            <p class="section-desc">Unified master repository combining 4-5 lines of architectural depth with structured
+              4-part interview explanations across all 19 engineering domains. Check off topics as you master them to
+              track interview readiness.</p>
           </div>
         </div>
 
@@ -154,17 +210,19 @@
           <div class="recap-toc-chips-row" id="recap-toc-chips">
             <!-- Rendered dynamically by app.js -->
           </div>
-          
+
           <!-- Last Row: Progress bar on left, Expand/Collapse on right -->
           <div class="recap-toc-bottom-row">
             <div class="recap-stats-box-inline">
               <span class="recap-progress-text-inline">
-                <span id="recap-completed-count">0</span>/<span id="recap-total-count">0</span> (<span id="recap-percentage">0%</span>)
+                <span id="recap-completed-count">0</span>/<span id="recap-total-count">0</span> (<span
+                  id="recap-percentage">0%</span>)
               </span>
               <div class="recap-progress-bar-inline">
                 <div class="recap-progress-fill" id="recap-progress-fill" style="width: 0%;"></div>
               </div>
-              <button class="btn btn-sm btn-outline btn-reset-inline" onclick="app.resetRecapProgress()" title="Reset Progress Checklist">↺ Reset</button>
+              <button class="btn btn-sm btn-outline btn-reset-inline" onclick="app.resetRecapProgress()"
+                title="Reset Progress Checklist">↺ Reset</button>
             </div>
             <div class="recap-toc-actions">
               <button class="btn btn-sm btn-outline" onclick="app.toggleAllRecapSections(true)">▾ Expand All</button>
@@ -181,11 +239,14 @@
               <div class="recap-tree-title-row">
                 <div class="recap-tree-title">🗂️ Master Architecture Tree</div>
                 <div class="recap-tree-quick-toggles">
-                  <button class="tree-mini-btn" title="Expand All Domains" onclick="app.toggleAllTreeDomains(true)">▾ Expand</button>
-                  <button class="tree-mini-btn" title="Collapse All to Headlines" onclick="app.toggleAllTreeDomains(false)">▸ Headlines</button>
+                  <button class="tree-mini-btn" title="Expand All Domains" onclick="app.toggleAllTreeDomains(true)">▾
+                    Expand</button>
+                  <button class="tree-mini-btn" title="Collapse All to Headlines"
+                    onclick="app.toggleAllTreeDomains(false)">▸ Headlines</button>
                 </div>
               </div>
-              <input type="text" id="recap-tree-search" class="recap-tree-search" placeholder="🔍 Filter keywords..." oninput="app.filterRecapTree(this.value)">
+              <input type="text" id="recap-tree-search" class="recap-tree-search" placeholder="🔍 Filter keywords..."
+                oninput="app.filterRecapTree(this.value)">
             </div>
             <div class="recap-tree-nav" id="recap-tree-nav">
               <!-- Rendered dynamically by app.js -->
@@ -206,7 +267,8 @@
         <div class="simulators-header">
           <div class="section-badge">⚡ VISUAL PLAYGROUNDS</div>
           <h2 class="section-title">Interactive Engineering Simulators</h2>
-          <p class="section-desc">Verify deep execution mechanics visually—from Distributed Saga Transactions to JS Event Loops and React Fiber Diffing.</p>
+          <p class="section-desc">Verify deep execution mechanics visually—from Distributed Saga Transactions to JS
+            Event Loops and React Fiber Diffing.</p>
         </div>
 
         <!-- Section 1: Backend & Systems Architecture -->
@@ -216,17 +278,21 @@
             <span class="sim-group-badge">2 Simulators</span>
           </div>
           <div class="simulators-grid">
-            <div class="sim-card" onclick="app.launchSimulator('interactive/01_dotnet_backend/aspnet_middleware_di_simulator.html', 'ASP.NET Core Middleware & DI Captive Dependency Simulator')">
+            <div class="sim-card"
+              onclick="app.launchSimulator('interactive/01_dotnet_backend/aspnet_middleware_di_simulator.html', 'ASP.NET Core Middleware & DI Captive Dependency Simulator')">
               <div class="sim-icon">🧠</div>
               <div class="sim-title">ASP.NET Core Middleware & DI Scope Simulator</div>
-              <div class="sim-desc">Simulate bidirectional HTTP middleware execution, short-circuiting, and the Singleton-to-Scoped Captive Dependency trap.</div>
+              <div class="sim-desc">Simulate bidirectional HTTP middleware execution, short-circuiting, and the
+                Singleton-to-Scoped Captive Dependency trap.</div>
               <span class="sim-tag">Backend & .NET</span>
             </div>
 
-            <div class="sim-card" onclick="app.launchSimulator('interactive/02_distributed_systems/distributed_saga_simulator.html', 'Distributed Saga & Compensating Actions')">
+            <div class="sim-card"
+              onclick="app.launchSimulator('interactive/02_distributed_systems/distributed_saga_simulator.html', 'Distributed Saga & Compensating Actions')">
               <div class="sim-icon">⚡</div>
               <div class="sim-title">Distributed Saga Orchestrator</div>
-              <div class="sim-desc">Simulate distributed multi-service checkout workflows, inventory failures, and compensating rollbacks.</div>
+              <div class="sim-desc">Simulate distributed multi-service checkout workflows, inventory failures, and
+                compensating rollbacks.</div>
               <span class="sim-tag">Distributed Systems</span>
             </div>
           </div>
@@ -241,10 +307,12 @@
             <span class="sim-group-badge">1 Simulator</span>
           </div>
           <div class="simulators-grid">
-            <div class="sim-card" onclick="app.launchSimulator('interactive/04_security_database/oauth2_pkce_token_flow_simulator.html', 'OAuth 2.0 PKCE & JWT Simulator')">
+            <div class="sim-card"
+              onclick="app.launchSimulator('interactive/04_security_database/oauth2_pkce_token_flow_simulator.html', 'OAuth 2.0 PKCE & JWT Simulator')">
               <div class="sim-icon">🔐</div>
               <div class="sim-title">OAuth 2.0 PKCE & JWT Flow Simulator</div>
-              <div class="sim-desc">Simulate SHA-256 S256 code challenge generation, token exchange, and intercepted code attack mitigation.</div>
+              <div class="sim-desc">Simulate SHA-256 S256 code challenge generation, token exchange, and intercepted
+                code attack mitigation.</div>
               <span class="sim-tag">Security & Identity</span>
             </div>
           </div>
@@ -259,38 +327,48 @@
             <span class="sim-group-badge">5 Simulators</span>
           </div>
           <div class="simulators-grid">
-            <div class="sim-card" onclick="app.launchSimulator('interactive/05_frontend_engineering/browser_event_loop_simulator.html', 'JS Event Loop & Microtasks')">
+            <div class="sim-card"
+              onclick="app.launchSimulator('interactive/05_frontend_engineering/browser_event_loop_simulator.html', 'JS Event Loop & Microtasks')">
               <div class="sim-icon">🔄</div>
               <div class="sim-title">Browser Event Loop & Microtasks</div>
-              <div class="sim-desc">Step-by-step visual execution of Call Stack, Web APIs, Microtask Queue (Promises), and Macrotasks.</div>
+              <div class="sim-desc">Step-by-step visual execution of Call Stack, Web APIs, Microtask Queue (Promises),
+                and Macrotasks.</div>
               <span class="sim-tag">Frontend Core</span>
             </div>
 
-            <div class="sim-card" onclick="app.launchSimulator('interactive/05_frontend_engineering/react_rendering_visualizer.html', 'React Fiber Re-render Visualizer')">
+            <div class="sim-card"
+              onclick="app.launchSimulator('interactive/05_frontend_engineering/react_rendering_visualizer.html', 'React Fiber Re-render Visualizer')">
               <div class="sim-icon">⚛️</div>
               <div class="sim-title">React Fiber & Reconciliation Tree</div>
-              <div class="sim-desc">Visualize state bubbling, prop drilling, and how React.memo / memoization skips sub-tree reconciliations.</div>
+              <div class="sim-desc">Visualize state bubbling, prop drilling, and how React.memo / memoization skips
+                sub-tree reconciliations.</div>
               <span class="sim-tag">React Deep-Dive</span>
             </div>
 
-            <div class="sim-card" onclick="app.launchSimulator('interactive/05_frontend_engineering/angular_signals_reactivity_simulator.html', 'Angular Signals vs React Virtual DOM')">
+            <div class="sim-card"
+              onclick="app.launchSimulator('interactive/05_frontend_engineering/angular_signals_reactivity_simulator.html', 'Angular Signals vs React Virtual DOM')">
               <div class="sim-icon">🅰️</div>
               <div class="sim-title">Signals vs React Virtual DOM Simulator</div>
-              <div class="sim-desc">Compare Angular Signals fine-grained reactivity vs React top-down Virtual DOM Fiber re-render cascades.</div>
+              <div class="sim-desc">Compare Angular Signals fine-grained reactivity vs React top-down Virtual DOM Fiber
+                re-render cascades.</div>
               <span class="sim-tag">Multi-Framework</span>
             </div>
 
-            <div class="sim-card" onclick="app.launchSimulator('interactive/05_frontend_engineering/redux_flow_simulator.html', 'Redux Event-Sourcing State Machine')">
+            <div class="sim-card"
+              onclick="app.launchSimulator('interactive/05_frontend_engineering/redux_flow_simulator.html', 'Redux Event-Sourcing State Machine')">
               <div class="sim-icon">📦</div>
               <div class="sim-title">Redux Toolkit State Flow & Immer</div>
-              <div class="sim-desc">Inspect action dispatching, middleware interception, and immutable draft mutations using Immer.</div>
+              <div class="sim-desc">Inspect action dispatching, middleware interception, and immutable draft mutations
+                using Immer.</div>
               <span class="sim-tag">State Management</span>
             </div>
 
-            <div class="sim-card" onclick="app.launchSimulator('interactive/05_frontend_engineering/transpile_pipeline_visualizer.html', 'Compiler & Transpiler Pipeline')">
+            <div class="sim-card"
+              onclick="app.launchSimulator('interactive/05_frontend_engineering/transpile_pipeline_visualizer.html', 'Compiler & Transpiler Pipeline')">
               <div class="sim-icon">⚙️</div>
               <div class="sim-title">esbuild / PostCSS Transpile Pipeline</div>
-              <div class="sim-desc">Step through AST parsing, JSX compilation, CSS post-processing, and bundle minification.</div>
+              <div class="sim-desc">Step through AST parsing, JSX compilation, CSS post-processing, and bundle
+                minification.</div>
               <span class="sim-tag">Tooling & Build</span>
             </div>
           </div>
@@ -305,45 +383,63 @@
             <span class="sim-group-badge">1 Simulator</span>
           </div>
           <div class="simulators-grid">
-            <div class="sim-card" onclick="app.launchSimulator('interactive/06_ai_engineering/rag_pipeline_simulator.html', 'RAG & Vector Search Simulator')">
+            <div class="sim-card"
+              onclick="app.launchSimulator('interactive/06_ai_engineering/rag_pipeline_simulator.html', 'RAG & Vector Search Simulator')">
               <div class="sim-icon">🤖</div>
               <div class="sim-title">RAG & Vector Search Simulator</div>
-              <div class="sim-desc">Simulate document chunking, Cosine distance vector search, prompt augmentation, and grounded citations.</div>
+              <div class="sim-desc">Simulate document chunking, Cosine distance vector search, prompt augmentation, and
+                grounded citations.</div>
               <span class="sim-tag">AI & LLM Architecture</span>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- Global Simulator Modal / Frame Container -->
-      <div class="simulator-frame-modal" id="sim-modal" style="display: none;">
-        <div class="sim-modal-header">
-          <h3 id="sim-modal-title">Simulator</h3>
-          <button class="btn btn-sm btn-outline" onclick="app.closeSimulator()">✕ Close Simulator</button>
+      <!-- Global Simulator Modal Overlay / Glassmorphic Frame Container -->
+      <div class="simulator-frame-modal" id="sim-modal" style="display: none;" onclick="if(event.target===this) app.closeSimulator()">
+        <div class="sim-modal-container">
+          <div class="sim-modal-header">
+            <div class="sim-modal-header-left">
+              <span class="sim-modal-icon">⚡</span>
+              <h3 id="sim-modal-title">Simulator</h3>
+            </div>
+            <div class="sim-modal-header-actions">
+              <button class="btn btn-sm btn-accent" id="sim-modal-return-btn" onclick="app.closeSimulator()" style="display: none;">← Return to Topic</button>
+              <button class="btn btn-sm btn-outline" onclick="app.closeSimulator()">✕ Close Simulator</button>
+            </div>
+          </div>
+          <iframe id="sim-iframe" class="sim-iframe" src=""></iframe>
         </div>
-        <iframe id="sim-iframe" class="sim-iframe" src=""></iframe>
       </div>
 
     </main>
+  </div> <!-- end app-layout-body -->
 
     <!-- Floating Bottom-Right AI Assistant Widget Panel (Non-blocking) -->
     <div class="ai-widget-panel" id="ai-widget-panel" style="display: none;">
       <div class="ai-drawer-header">
-        <div class="ai-drawer-title">
-          <span>🤖</span>
-          <div>
-            <h3>AI Prep Tutor (BYOK)</h3>
-            <div class="ai-drawer-subtitle">
-              <span class="ai-status-dot missing" id="ai-key-status-dot"></span>
-              <span id="ai-key-status-label">Configure API Key</span>
+        <div class="ai-drawer-header-top">
+          <div class="ai-drawer-title">
+            <span class="ai-icon">🤖</span>
+            <div class="ai-title-group">
+              <h3 class="ai-title-text">AI Prep Tutor</h3>
+              <span class="ai-byok-tag">(BYOK)</span>
             </div>
+          </div>
+          <div class="ai-status-badge">
+            <span class="ai-status-dot missing" id="ai-key-status-dot"></span>
+            <span id="ai-key-status-label">Configure API Key</span>
           </div>
         </div>
         <div class="ai-header-actions">
-          <button class="btn btn-sm btn-outline" id="ai-expand-btn" onclick="app.toggleAiWidth()" title="Toggle Wide Immersive / Compact Mode">↔️ Expand</button>
-          <button class="btn btn-sm btn-outline" onclick="app.toggleAiSettings()" title="API Key & Provider Settings">⚙️ Settings</button>
-          <button class="btn btn-sm btn-outline" onclick="app.clearAiChatHistory()" title="Clear Chat Conversation History">🗑️ Clear</button>
-          <button class="btn btn-sm btn-outline" onclick="app.toggleAiAssistant()" title="Minimize Chat">✕</button>
+          <button class="btn btn-sm btn-outline" id="ai-expand-btn" onclick="app.toggleAiWidth()"
+            title="Toggle Wide Immersive / Compact Mode">↔️ Expand</button>
+          <button class="btn btn-sm btn-outline" onclick="app.toggleAiSettings()" title="API Key & Provider Settings">⚙️
+            Settings</button>
+          <button class="btn btn-sm btn-outline" onclick="app.clearAiChatHistory()"
+            title="Clear Chat Conversation History">🗑️ Clear</button>
+          <button class="btn btn-sm btn-outline ai-close-btn" onclick="app.toggleAiAssistant()"
+            title="Minimize Chat">✕</button>
         </div>
       </div>
 
@@ -355,26 +451,33 @@
             <option value="openai">OpenAI (GPT-4o / 4o-mini)</option>
             <option value="openrouter">OpenRouter (Claude / DeepSeek)</option>
           </select>
-          <input type="password" id="ai-api-key" placeholder="Paste Groq API Key (gsk_...)..." oninput="app.saveAiKey(this.value)">
+          <input type="password" id="ai-api-key" placeholder="Paste Groq API Key (gsk_...)..."
+            oninput="app.saveAiKey(this.value)">
         </div>
-        <div class="key-hint">💡 Keys are stored in browser memory (`sessionStorage`) only. Sent directly to provider endpoints without backend servers.</div>
+        <div class="key-hint">💡 Keys are stored in browser memory (`sessionStorage`) only. Sent directly to provider
+          endpoints without backend servers.</div>
       </div>
 
       <div class="ai-chat-body" id="ai-chat-body">
         <div class="ai-msg bot-msg">
           <div class="msg-sender">🤖 Interview Coach</div>
-          <div class="msg-content">Hello! I am your AI Software Engineering Interview Coach. Ask me any question, request system design mock interviews, or ask for clarifications on any of the 292 terms in this repository!</div>
+          <div class="msg-content">Hello! I am your AI Software Engineering Interview Coach. Ask me any question,
+            request system design mock interviews, or ask for clarifications on any of the 292 terms in this repository!
+          </div>
         </div>
       </div>
 
       <!-- Active Context Bar -->
       <div class="ai-context-bar" id="ai-context-bar" style="display: none;">
         <span id="ai-context-label">📍 Active Context: General Engineering</span>
-        <button class="btn-context-chip" id="ai-context-btn" onclick="app.askAboutActiveContext()">⚡ Ask AI about this topic</button>
+        <button class="btn-context-chip" id="ai-context-btn" onclick="app.askAboutActiveContext()">⚡ Ask AI about this
+          topic</button>
       </div>
 
       <div class="ai-chat-input-row">
-        <textarea id="ai-chat-input" placeholder="Ask a question or request a mock interview (e.g. 'Explain Saga vs Outbox pattern')..." rows="2" onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); app.sendAiMessage(); }"></textarea>
+        <textarea id="ai-chat-input"
+          placeholder="Ask a question or request a mock interview (e.g. 'Explain Saga vs Outbox pattern')..." rows="2"
+          onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); app.sendAiMessage(); }"></textarea>
         <button class="btn btn-primary" onclick="app.sendAiMessage()">Send 🚀</button>
       </div>
     </div>
@@ -393,7 +496,8 @@
 
     <!-- Floating Controls at Bottom Right (Top button sits to the left of AI Tutor button) -->
     <div class="floating-right-controls">
-      <button class="back-to-top-btn" id="back-to-top-btn" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })" title="Scroll to Top">
+      <button class="back-to-top-btn" id="back-to-top-btn" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
+        title="Scroll to Top">
         ⬆️ Top
       </button>
       <button class="ai-fab-btn" id="ai-fab-btn" onclick="app.toggleAiAssistant()" title="Toggle AI Study Tutor">
@@ -403,7 +507,8 @@
   </div>
 
   <!-- Frosted Glass Graph Node Drawer / Modal -->
-  <div class="graph-modal-overlay" id="graph-node-modal" style="display: none;" onclick="if(event.target===this) app.closeGraphModal()">
+  <div class="graph-modal-overlay" id="graph-node-modal" style="display: none;"
+    onclick="if(event.target===this) app.closeGraphModal()">
     <div class="graph-modal-content">
       <button class="graph-modal-close" onclick="app.closeGraphModal()">&times;</button>
       <div class="graph-modal-header">
@@ -412,7 +517,7 @@
         <div class="gmodal-subtitle" id="gmodal-domain">Domain</div>
       </div>
       <div class="graph-modal-body">
-        
+
         <!-- Rich 4-Part Recap Definition Container -->
         <div class="gmodal-recap-box" id="gmodal-recap-box">
           <div class="recap-section-item">
@@ -432,7 +537,7 @@
             <p id="gmodal-tradeoffs">-</p>
           </div>
         </div>
-        
+
         <div class="gmodal-taxonomies">
           <div class="gtax-pill">🔄 <strong>SDLC:</strong> <span id="gmodal-sdlc">-</span></div>
           <div class="gtax-pill">⚡ <strong>Domain:</strong> <span id="gmodal-tech">-</span></div>
@@ -440,14 +545,16 @@
         </div>
 
         <div class="gmodal-actions">
-          <button class="btn btn-primary" id="gmodal-guide-btn" onclick="app.openGraphNodeGuide()">📖 Open Comprehensive Guide</button>
+          <button class="btn btn-primary" id="gmodal-guide-btn" onclick="app.openGraphNodeGuide()">📖 Open Comprehensive
+            Guide</button>
         </div>
       </div>
     </div>
   </div>
 
-  <script src="config.js"></script>
-  <script src="scripts/graph_engine.js"></script>
-  <script src="app.js"></script>
+  <script src="config.js?v=1.1.0"></script>
+  <script src="scripts/graph_engine.js?v=1.1.0"></script>
+  <script src="app.js?v=1.1.0"></script>
 </body>
+
 </html>
