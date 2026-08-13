@@ -196,6 +196,169 @@ test('docs/graph_topology.json exists and contains valid technical nodes with ta
   }
 });
 
+// 11. Cache-Busting Version Query Parameter Integrity
+test('index.html contains cache-busting query strings on script and style assets', () => {
+  const indexContent = fs.readFileSync(path.join(rootDir, 'index.html'), 'utf8');
+  assert.ok(indexContent.includes('styles.css?v='), 'styles.css must include ?v= cache-busting tag');
+  assert.ok(indexContent.includes('config.js?v='), 'config.js must include ?v= cache-busting tag');
+  assert.ok(indexContent.includes('graph_engine.js?v='), 'graph_engine.js must include ?v= cache-busting tag');
+  assert.ok(indexContent.includes('app.js?v='), 'app.js must include ?v= cache-busting tag');
+});
+
+// 12. HTML Inline app.* Event Handlers Correspond to Defined App Methods
+test('All app.* inline handlers in index.html match defined MasterPrepApp methods', () => {
+  const indexContent = fs.readFileSync(path.join(rootDir, 'index.html'), 'utf8');
+  const appJsContent = fs.readFileSync(path.join(rootDir, 'app.js'), 'utf8');
+
+  const handlerRegex = /(?:onclick|onchange|oninput)=["']app\.([a-zA-Z0-9_]+)\([^)]*\)["']/g;
+  let match;
+  const methodsFound = new Set();
+  while ((match = handlerRegex.exec(indexContent)) !== null) {
+    const methodName = match[1];
+    methodsFound.add(methodName);
+    const hasMethodInAppJs = appJsContent.includes(`${methodName}(`) || appJsContent.includes(`${methodName} =`);
+    assert.ok(hasMethodInAppJs, `Method app.${methodName} called in index.html is missing in app.js`);
+  }
+  assert.ok(methodsFound.size >= 8, `Expected at least 8 app.* handler methods, found ${methodsFound.size}`);
+});
+
+// 13. Graph Camera & State Preservation Safeguards
+test('app.js preserves graph camera zoom/pan transform when navigating back from guides', () => {
+  const appJsContent = fs.readFileSync(path.join(rootDir, 'app.js'), 'utf8');
+
+  // Verify showGraphDashboardView does NOT call resetCamera() unconditionally
+  const showGraphDashboardMatch = appJsContent.match(/async showGraphDashboardView\(\) \{[\s\S]*?\n  \}/);
+  assert.ok(showGraphDashboardMatch, 'showGraphDashboardView method must exist in app.js');
+  
+  const showGraphDashboardBody = showGraphDashboardMatch[0];
+  assert.strictEqual(
+    showGraphDashboardBody.includes('this.graphEngine.resetCamera()'),
+    false,
+    'showGraphDashboardView must NOT reset camera state unconditionally on view navigation'
+  );
+
+  // Verify window.app explicit global assignment
+  assert.ok(appJsContent.includes('window.app = app;'), 'app.js must explicitly bind window.app = app');
+});
+
+// 14. Graph Engine API & Legibility Methods Integrity
+test('scripts/graph_engine.js contains focusOnCluster, focusOnNode, and legibility filter logic', () => {
+  const engineContent = fs.readFileSync(path.join(rootDir, 'scripts/graph_engine.js'), 'utf8');
+  assert.ok(engineContent.includes('focusOnCluster('), 'MindMapGraphEngine must include focusOnCluster method');
+  assert.ok(engineContent.includes('focusOnNode('), 'MindMapGraphEngine must include focusOnNode method');
+  assert.ok(engineContent.includes('resetCamera('), 'MindMapGraphEngine must include resetCamera method');
+  assert.ok(engineContent.includes('isFilteredHighlight'), 'MindMapGraphEngine must render text pills for isFilteredHighlight nodes');
+});
+
+// 15. Dynamic Category & Topic Dropdown Controls Integrity
+test('index.html and app.js include graph-category-select and graph-topic-select controls', () => {
+  const indexContent = fs.readFileSync(path.join(rootDir, 'index.html'), 'utf8');
+  const appJsContent = fs.readFileSync(path.join(rootDir, 'app.js'), 'utf8');
+
+  assert.ok(indexContent.includes('id="graph-category-select"'), 'index.html must contain graph-category-select element');
+  assert.ok(indexContent.includes('id="graph-topic-select"'), 'index.html must contain graph-topic-select element');
+  assert.ok(appJsContent.includes('populateGraphCategoryDropdown('), 'app.js must include populateGraphCategoryDropdown method');
+  assert.ok(appJsContent.includes('populateGraphTopicDropdown('), 'app.js must include populateGraphTopicDropdown method');
+  assert.ok(appJsContent.includes('onCategorySelectChange('), 'app.js must include onCategorySelectChange handler');
+  assert.ok(appJsContent.includes('onTopicSelectChange('), 'app.js must include onTopicSelectChange handler');
+});
+
+// 16. Quick Recap Top 25 Fast-Track Portal & De-Duplication Integrity
+test('Definitions.md contains single canonical topic cards and Fast-Track Portal links', () => {
+  const recapContent = fs.readFileSync(path.join(rootDir, 'docs/Definitions.md'), 'utf8');
+  
+  // Verify Fast-Track Index header exists
+  assert.ok(
+    recapContent.includes('## 📌 Executive Fast-Track Index (Top 25 Core Topics)'),
+    'Definitions.md must contain ## 📌 Executive Fast-Track Index (Top 25 Core Topics)'
+  );
+
+  // Verify Top 25 portal contains anchor links
+  assert.ok(
+    recapContent.includes('[01. C#](#sec-core-net-c-)'),
+    'Fast-track portal must contain anchor link for C#'
+  );
+  assert.ok(
+    recapContent.includes('[08. Microservices](#sec-microservices-microservices-architecture)'),
+    'Fast-track portal must contain anchor link for Microservices'
+  );
+  assert.ok(
+    recapContent.includes('[20. Angular 8-17](#sec-frontend-angular-8-17)'),
+    'Fast-track portal must contain anchor link for Angular'
+  );
+  assert.ok(
+    recapContent.includes('[25. RAG / Azure OpenAI](#sec-ai-enablement-rag)'),
+    'Fast-track portal must contain anchor link for RAG'
+  );
+
+  // Verify topics are NOT duplicated under Top 25 section
+  const top25SectionText = recapContent.substring(
+    recapContent.indexOf('## 📌 Executive Fast-Track Index'),
+    recapContent.indexOf('## 📌 CORE .NET')
+  );
+  assert.strictEqual(
+    top25SectionText.includes('- **What It Is**:'),
+    false,
+    'Top 25 section must not contain duplicate full topic definition cards (- **What It Is**:)'
+  );
+});
+
+// 17. Quick Recap Empty Section Intro Safeguard & 4-Tier Card Lookup Engine
+test('app.js includes safeguards against empty recap-section-intro and 4-tier card resolution engine', () => {
+  const appJsContent = fs.readFileSync(path.join(rootDir, 'app.js'), 'utf8');
+
+  // Verify empty section intro safeguard
+  assert.ok(
+    appJsContent.includes('sectionIntroHtml.replace(/<[^>]*>/g, \'\').trim().length > 0'),
+    'app.js must check for non-empty text content before rendering recap-section-intro'
+  );
+
+  // Verify 4-tier card resolution engine
+  assert.ok(
+    appJsContent.includes('document.getElementById(cleanTarget)'),
+    'app.js must check direct card element ID for quick-recap internal links'
+  );
+  assert.ok(
+    appJsContent.includes('scrollIntoView({ behavior: \'smooth\', block: \'center\' })'),
+    'app.js must smoothly scroll target topic card to the center of the viewport'
+  );
+});
+
+// 18. Simulator Modal Overlay & Topic Scroll Restoration Engine
+test('app.js and index.html support glassmorphic overlay modal and topic scroll restoration', () => {
+  const appJsContent = fs.readFileSync(path.join(rootDir, 'app.js'), 'utf8');
+  const indexHtmlContent = fs.readFileSync(path.join(rootDir, 'index.html'), 'utf8');
+  const stylesCssContent = fs.readFileSync(path.join(rootDir, 'styles.css'), 'utf8');
+
+  // Verify launchSimulator origin tracking and modal display flex
+  assert.ok(
+    appJsContent.includes('this.simOriginCardId = originCardId'),
+    'launchSimulator must record originCardId for scroll restoration'
+  );
+  assert.ok(
+    appJsContent.includes("modal.style.display = 'flex'"),
+    'launchSimulator must set modal style to flex display'
+  );
+
+  // Verify ESC key listener in app.js
+  assert.ok(
+    appJsContent.includes("e.key === 'Escape'"),
+    'app.js must support ESC key shortcut to close simulator modal'
+  );
+
+  // Verify CSS fixed viewport overlay with high z-index
+  assert.ok(
+    stylesCssContent.includes('position: fixed') && stylesCssContent.includes('z-index: 2500'),
+    'styles.css must style simulator-frame-modal as fixed high z-index overlay'
+  );
+
+  // Verify index.html backdrop click handler
+  assert.ok(
+    indexHtmlContent.includes('onclick="if(event.target===this) app.closeSimulator()"'),
+    'index.html must handle backdrop clicks to dismiss modal'
+  );
+});
+
 console.log('\n--- Summary ---');
 if (failures === 0) {
   console.log('🎉 ALL SMOKE TESTS PASSED CLEANLY!\n');
@@ -204,3 +367,4 @@ if (failures === 0) {
   console.error(`❌ ${failures} TEST(S) FAILED!\n`);
   process.exit(1);
 }
+

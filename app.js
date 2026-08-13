@@ -11,7 +11,7 @@ class MasterPrepApp {
     this.guideOrigin = 'mindmap'; // Tracks which view opened the guide: 'recap', 'mindmap', or 'simulators'
     this.guideOriginScrollY = 0; // Scroll position to restore on back
     this.guideOriginElementId = null; // Element ID to highlight on back
-    
+
     const checklistKey = this.config.storage?.recapChecklist || 'master_prep_recap_checklist';
     this.recapChecked = JSON.parse(localStorage.getItem(checklistKey) || '{}');
     this.simulatorMap = this.config.simulators || {};
@@ -39,6 +39,7 @@ class MasterPrepApp {
       this.renderDomainsTree();
       this.renderRecapDocument();
       this.initScrollListener();
+      this.initGlobalSidebarState();
       this.loadAiChatHistory();
     } catch (err) {
       console.error('Failed to load schemas:', err);
@@ -115,10 +116,10 @@ class MasterPrepApp {
     container.innerHTML = this.schema.domains.map(domain => {
       // Check if domain matches query
       let matches = domain.name.toLowerCase().includes(query) || domain.description.toLowerCase().includes(query);
-      
+
       let subtopicsHtml = '';
       if (domain.subtopics) {
-        const filtered = domain.subtopics.filter(sub => 
+        const filtered = domain.subtopics.filter(sub =>
           !query || matches || sub.name.toLowerCase().includes(query)
         );
         if (filtered.length > 0) matches = true;
@@ -139,7 +140,7 @@ class MasterPrepApp {
       } else if (domain.levels) {
         // Multi-level for Frontend Engineering
         subtopicsHtml = domain.levels.map(level => {
-          const filteredTopics = level.topics.filter(t => 
+          const filteredTopics = level.topics.filter(t =>
             !query || matches || t.name.toLowerCase().includes(query)
           );
           if (filteredTopics.length > 0) matches = true;
@@ -186,7 +187,7 @@ class MasterPrepApp {
   // Live Global Topic & Quick Recap Filtering
   filterTopics(query) {
     const q = (query || '').toLowerCase().trim();
-    
+
     // 1. Filter Mindmap Tree
     this.renderDomainsTree(q);
 
@@ -245,8 +246,8 @@ class MasterPrepApp {
         </div>
         <div class="search-results-grid">
           ${matches.map(m => {
-            const matchedHeader = m.headers.find(h => h.toLowerCase().includes(q)) || 'General Overview';
-            return `
+        const matchedHeader = m.headers.find(h => h.toLowerCase().includes(q)) || 'General Overview';
+        return `
               <div class="search-match-card" onclick="app.openGuide('${m.path}', '${m.domainDir || 'Guide'}', '${m.title}')">
                 <div class="search-match-title">
                   <span>📖</span> ${m.title}
@@ -254,7 +255,7 @@ class MasterPrepApp {
                 <div class="search-match-header">Matched section: <strong>${matchedHeader}</strong></div>
               </div>
             `;
-          }).join('')}
+      }).join('')}
         </div>
       `;
     } else {
@@ -270,6 +271,8 @@ class MasterPrepApp {
       const response = await fetch(guidePath);
       if (!response.ok) throw new Error(`Guide file not found: ${guidePath}`);
       const markdown = await response.text();
+
+      if (this.graphEngine) this.graphEngine.stopAnimation();
 
       const isGuideViewerVisible = document.getElementById('guide-viewer-section').style.display === 'block';
 
@@ -395,10 +398,10 @@ class MasterPrepApp {
   // Navigate back from guide to the originating view, restoring scroll + highlight
   goBackFromGuide() {
     switch (this.guideOrigin) {
-      case 'recap':      this.showRecapView(); break;
-      case 'simulators': this.showSimulatorsView(); break;
-      case 'graph':      this.showGraphDashboardView(); break;
-      default:           this.showMindmapView(); break;
+      case 'recap': this.showRecapView(true); break;
+      case 'simulators': this.showSimulatorsView(true); break;
+      case 'graph': this.showGraphDashboardView(true); break;
+      default: this.showMindmapView(true); break;
     }
 
     // Restore scroll position after the view switch renders
@@ -470,7 +473,7 @@ class MasterPrepApp {
         simHtml = `
           <div class="recap-sim-callout" style="margin-top: 0.8rem; padding: 0.6rem 0.8rem; background: rgba(6, 182, 212, 0.08); border: 1px solid rgba(6, 182, 212, 0.25); border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
             <span style="font-size: 0.85rem; color: var(--accent-cyan); font-weight: 500;">⚡ Interactive Playground Available</span>
-            <button class="btn btn-sm btn-accent" style="padding: 0.25rem 0.65rem; font-size: 0.8rem;" onclick="app.launchSimulator('${matchedSim.url}', '${matchedSim.title}')">
+            <button class="btn btn-sm btn-accent" style="padding: 0.25rem 0.65rem; font-size: 0.8rem;" onclick="app.launchSimulator('${matchedSim.url}', '${matchedSim.title}', 'recap-card-${topicId}')">
               ${matchedSim.label}
             </button>
           </div>
@@ -507,7 +510,7 @@ class MasterPrepApp {
       if (line.startsWith('## ')) {
         flushSection();
         currentSection = line.replace('## ', '').trim();
-        currentSectionId = 'sec-' + currentSection.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        currentSectionId = 'sec-' + currentSection.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
         sectionsList.push({ id: currentSectionId, name: currentSection });
         treeData.push({ sectionId: currentSectionId, sectionName: currentSection, topics: [] });
         sectionHeaderLines = [];
@@ -525,8 +528,13 @@ class MasterPrepApp {
         `;
       } else if (line.startsWith('### ')) {
         if (!currentTopic && sectionHeaderLines.length > 0) {
-          const sectionIntroHtml = marked.parse(sectionHeaderLines.join('\n'));
-          html += `<div class="recap-section-intro">${sectionIntroHtml}</div>`;
+          const rawIntro = sectionHeaderLines.join('\n').trim();
+          if (rawIntro) {
+            const sectionIntroHtml = (window.marked && window.marked.parse) ? marked.parse(rawIntro) : rawIntro;
+            if (sectionIntroHtml && sectionIntroHtml.replace(/<[^>]*>/g, '').trim().length > 0) {
+              html += `<div class="recap-section-intro">${sectionIntroHtml}</div>`;
+            }
+          }
           sectionHeaderLines = [];
         }
         flushTopic();
@@ -577,27 +585,78 @@ class MasterPrepApp {
       link.title = 'Click to open guide in viewer';
     });
 
+    // Intercept strategy guide links so they open the Strategy & Observability SPA view
+    container.querySelectorAll('a[href*="strategy/index.html"]').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        app.showStrategyView();
+      });
+      link.style.cursor = 'pointer';
+      link.title = 'Click to open Enterprise Observability & Strategy Guide';
+    });
+
     // Intercept internal topic links (href^="#") so they jump to & highlight target card
     container.querySelectorAll('a[href^="#"]').forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
-        const rawTarget = link.getAttribute('href').replace('#', '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        const href = link.getAttribute('href');
+        if (!href || href === '#') return;
         
-        // Find matching topic cards in DOM; prefer domain section cards over Top 25
-        const allMatchingCards = Array.from(document.querySelectorAll(`[id*="-${rawTarget}"], [id="recap-card-${rawTarget}"]`));
-        const preferredCard = allMatchingCards.find(c => !c.id.includes('top-25')) || allMatchingCards[0];
+        const cleanTarget = href.replace(/^#/, '').trim();
+        const targetSlug = cleanTarget.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        const allCards = Array.from(container.querySelectorAll('.recap-topic-card'));
         
-        if (preferredCard) {
-          const sectionGroup = preferredCard.closest('.recap-section-group');
+        // 1. Direct ID match (e.g. recap-card-sec-microservices-microservices-architecture)
+        let targetCard = document.getElementById(cleanTarget) || 
+                         document.getElementById(`recap-card-${cleanTarget}`) ||
+                         allCards.find(c => c.id === `recap-card-${cleanTarget}`);
+
+        // 2. Flexible slug search (handles sec- or sec-- or topic slug endings)
+        if (!targetCard && targetSlug) {
+          const strippedSlug = targetSlug.replace(/^sec-[^-]*-*/, '');
+          targetCard = allCards.find(c => {
+            const cardSlug = c.id.replace(/^recap-card-sec-[^-]*-*/, '');
+            return cardSlug.includes(strippedSlug) || strippedSlug.includes(cardSlug);
+          });
+        }
+
+        // 3. Match by link text (e.g. "Microservices", "PostgreSQL", "RAG", "C#")
+        if (!targetCard) {
+          const rawText = link.textContent.replace(/^[⚡\d\s.#-]+/, '').trim().toLowerCase();
+          const cleanText = rawText.replace(/\(.*?\)/g, '').trim(); // e.g. "JavaScript (ES6+)" -> "javascript"
+          if (cleanText) {
+            targetCard = allCards.find(c => {
+              const titleEl = c.querySelector('.recap-topic-title');
+              if (!titleEl) return false;
+              const titleText = titleEl.textContent.trim().toLowerCase();
+              return titleText === cleanText || titleText.startsWith(cleanText) || cleanText.startsWith(titleText);
+            });
+          }
+        }
+
+        // 4. Keyword fuzzy fallback
+        if (!targetCard && targetSlug) {
+          const keywords = targetSlug.split('-').filter(k => k.length > 2 && k !== 'sec');
+          targetCard = allCards.find(c => {
+            const titleEl = c.querySelector('.recap-topic-title');
+            if (!titleEl) return false;
+            const titleText = titleEl.textContent.toLowerCase();
+            return keywords.some(kw => titleText.includes(kw));
+          });
+        }
+
+        if (targetCard) {
+          const sectionGroup = targetCard.closest('.recap-section-group');
           if (sectionGroup) sectionGroup.classList.remove('collapsed');
           
-          preferredCard.scrollIntoView({ behavior: 'smooth' });
-          preferredCard.style.borderColor = 'var(--accent-cyan)';
-          preferredCard.style.boxShadow = '0 0 16px rgba(6, 182, 212, 0.4)';
+          targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          targetCard.style.transition = 'box-shadow 0.3s ease, border-color 0.3s ease';
+          targetCard.style.borderColor = 'var(--accent-cyan)';
+          targetCard.style.boxShadow = '0 0 24px rgba(6, 182, 212, 0.75)';
           setTimeout(() => {
-            preferredCard.style.borderColor = '';
-            preferredCard.style.boxShadow = '';
-          }, 1600);
+            targetCard.style.borderColor = '';
+            targetCard.style.boxShadow = '';
+          }, 2200);
         }
       });
       link.style.cursor = 'pointer';
@@ -613,7 +672,7 @@ class MasterPrepApp {
     const query = filterText.toLowerCase();
 
     const domainHtml = this.treeData.map(domain => {
-      const filteredTopics = domain.topics.filter(t => 
+      const filteredTopics = domain.topics.filter(t =>
         !query || t.name.toLowerCase().includes(query) || domain.sectionName.toLowerCase().includes(query)
       );
 
@@ -632,20 +691,87 @@ class MasterPrepApp {
               </div>
             ` : ''}
             ${filteredTopics.map(t => {
-              const isChecked = !!this.recapChecked[t.id];
-              return `
+        const isChecked = !!this.recapChecked[t.id];
+        return `
                 <div class="recap-tree-item-link ${isChecked ? 'checked' : ''}" id="tree-link-${t.id}" onclick="app.scrollToRecapTopic('${domain.sectionId}', '${t.id}')">
                   <span>${t.name}</span>
                   <span class="recap-tree-status-dot"></span>
                 </div>
               `;
-            }).join('')}
+      }).join('')}
           </div>
         </div>
       `;
     }).join('');
 
     treeContainer.innerHTML = domainHtml;
+  }
+
+  // Toggle Global App Navigation Left Sidebar
+  toggleGlobalSidebar(forceState) {
+    const bodyLayout = document.getElementById('app-layout-body');
+    const collapseBtn = document.getElementById('global-sidebar-collapse-btn');
+    if (!bodyLayout) return;
+
+    const shouldCollapse = forceState !== undefined ? forceState : !bodyLayout.classList.contains('global-sidebar-collapsed');
+
+    if (shouldCollapse) {
+      bodyLayout.classList.add('global-sidebar-collapsed');
+      if (collapseBtn) collapseBtn.title = 'Expand Menu';
+    } else {
+      bodyLayout.classList.remove('global-sidebar-collapsed');
+      if (collapseBtn) collapseBtn.title = 'Collapse Menu';
+    }
+  }
+
+  initGlobalSidebarState() {
+    const savedState = localStorage.getItem('global_sidebar_collapsed');
+    const shouldCollapse = savedState === null ? true : savedState === 'true';
+    this.toggleGlobalSidebar(shouldCollapse);
+  }
+
+  collapseGlobalSidebar() {
+    this.toggleGlobalSidebar(true);
+  }
+
+  expandGlobalSidebar() {
+    this.toggleGlobalSidebar(false);
+  }
+
+  updateGlobalNavActive(viewId) {
+    const gnavMap = {
+      'recap-view': 'gnav-recap',
+      'graph-dashboard-view': 'gnav-graph',
+      'mindmap-view': 'gnav-paths',
+      'simulators-view': 'gnav-simulators'
+    };
+    const headerMap = {
+      'recap-view': 'recap-btn',
+      'graph-dashboard-view': 'graph-dashboard-btn',
+      'mindmap-view': 'mindmap-toggle-btn',
+      'simulators-view': 'simulators-btn'
+    };
+
+    document.querySelectorAll('.gnav-item-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.header-actions .btn').forEach(btn => {
+      btn.classList.remove('btn-primary');
+      btn.classList.add('btn-outline');
+    });
+
+    const activeGnavId = gnavMap[viewId];
+    if (activeGnavId) {
+      const activeGnavBtn = document.getElementById(activeGnavId);
+      if (activeGnavBtn) activeGnavBtn.classList.add('active');
+    }
+
+    const activeHeaderId = headerMap[viewId];
+    if (activeHeaderId) {
+      const activeHeaderBtn = document.getElementById(activeHeaderId);
+      if (activeHeaderBtn) {
+        activeHeaderBtn.classList.remove('btn-outline');
+        activeHeaderBtn.classList.add('btn-primary');
+      }
+    }
   }
 
   // Toggle Single Domain in Tree Sidebar
@@ -700,7 +826,7 @@ class MasterPrepApp {
 
     const intro = sectionEl.querySelector('.recap-section-intro');
     const targetEl = intro || sectionEl;
-    
+
     targetEl.scrollIntoView({ behavior: 'smooth' });
     targetEl.style.borderColor = 'var(--accent-cyan)';
     targetEl.style.boxShadow = '0 0 22px rgba(6, 182, 212, 0.6)';
@@ -842,8 +968,9 @@ class MasterPrepApp {
   }
 
   // Switch to Quick Recap View
-  showRecapView() {
-    this.updateHeaderActiveButton('recap-btn');
+  showRecapView(isBackNavigation = false) {
+    if (this.graphEngine) this.graphEngine.stopAnimation();
+    this.updateGlobalNavActive('recap-view');
     const graphView = document.getElementById('graph-dashboard-view');
     if (graphView) graphView.style.display = 'none';
     document.getElementById('guide-viewer-section').style.display = 'none';
@@ -854,27 +981,37 @@ class MasterPrepApp {
     this.updateBreadcrumb([
       { text: 'Master Knowledge Base & Quick Recap', active: true }
     ]);
+
+    if (!isBackNavigation) {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
   }
 
   // Switch to Mindmap View
-  showMindmapView() {
-    this.updateHeaderActiveButton('mindmap-toggle-btn');
+  showMindmapView(isBackNavigation = false) {
+    if (this.graphEngine) this.graphEngine.stopAnimation();
+    this.updateGlobalNavActive('mindmap-view');
     const graphView = document.getElementById('graph-dashboard-view');
     if (graphView) graphView.style.display = 'none';
     document.getElementById('guide-viewer-section').style.display = 'none';
     document.getElementById('simulators-view').style.display = 'none';
     document.getElementById('recap-view').style.display = 'none';
     document.getElementById('mindmap-view').style.display = 'block';
-    
+
     this.updateBreadcrumb([
       { text: 'Master Knowledge Base', action: 'app.showRecapView()' },
       { text: 'Learning Paths', active: true }
     ]);
+
+    if (!isBackNavigation) {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
   }
 
   // Switch to Simulators View
-  showSimulatorsView() {
-    this.updateHeaderActiveButton('simulators-btn');
+  showSimulatorsView(isBackNavigation = false) {
+    if (this.graphEngine) this.graphEngine.stopAnimation();
+    this.updateGlobalNavActive('simulators-view');
     const graphView = document.getElementById('graph-dashboard-view');
     if (graphView) graphView.style.display = 'none';
     document.getElementById('guide-viewer-section').style.display = 'none';
@@ -886,11 +1023,16 @@ class MasterPrepApp {
       { text: 'Master Knowledge Base', action: 'app.showRecapView()' },
       { text: 'Interactive Simulators', active: true }
     ]);
+
+    if (!isBackNavigation) {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
   }
 
-  // Switch to Graph Dashboard View
+  // Switch to Graph Dashboard View (Preserving zoom level, camera position & active category filters)
   async showGraphDashboardView() {
-    this.updateHeaderActiveButton('graph-dashboard-btn');
+    const isBackNavigation = arguments[0] === true;
+    this.updateGlobalNavActive('graph-dashboard-view');
     document.getElementById('guide-viewer-section').style.display = 'none';
     document.getElementById('mindmap-view').style.display = 'none';
     document.getElementById('recap-view').style.display = 'none';
@@ -902,11 +1044,29 @@ class MasterPrepApp {
       { text: 'Interactive Graph Dashboard', active: true }
     ]);
 
-    if (!this.graphEngine) {
+    const isFirstLoad = !this.graphEngine;
+    if (isFirstLoad) {
       await this.initGraphEngine();
     } else {
       this.graphEngine.resizeCanvas();
+      this.graphEngine.startAnimation();
     }
+
+    // Restore scroll position when returning from guide; center canvas only on initial load or non-back navigation
+    setTimeout(() => {
+      if (isBackNavigation && this.guideOrigin === 'graph' && this.guideOriginScrollY) {
+        window.scrollTo({ top: this.guideOriginScrollY, behavior: 'smooth' });
+      } else {
+        const graphCanvasContainer = document.getElementById('graph-canvas-container');
+        if (graphCanvasContainer) {
+          graphCanvasContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+      if (this.graphEngine) {
+        this.graphEngine.resizeCanvas();
+        this.graphEngine.startAnimation();
+      }
+    }, 50);
   }
 
   // Initialize Canvas Graph Engine
@@ -914,14 +1074,17 @@ class MasterPrepApp {
     try {
       const topologyRes = await fetch('docs/graph_topology.json');
       if (!topologyRes.ok) throw new Error('Failed to load docs/graph_topology.json');
-      const topologyData = await topologyRes.json();
+      this.topologyData = await topologyRes.json();
 
       this.graphEngine = new MindMapGraphEngine('graph-canvas-container', {
         initialViewAxis: 'techDomain',
         onNodeClick: (node) => this.openGraphNodeModal(node)
       });
 
-      this.graphEngine.loadData(topologyData);
+      this.graphEngine.loadData(this.topologyData);
+      this.activeGraphAxis = 'techDomain';
+      this.populateGraphCategoryDropdown('techDomain');
+      this.populateGraphTopicDropdown();
     } catch (err) {
       console.error('Failed to initialize Graph Engine:', err);
     }
@@ -929,12 +1092,99 @@ class MasterPrepApp {
 
   setGraphViewAxis(axisKey) {
     if (!this.graphEngine) return;
+    this.activeGraphAxis = axisKey;
     this.graphEngine.setViewAxis(axisKey);
 
     document.querySelectorAll('.btn-axis').forEach(btn => btn.classList.remove('active'));
     if (axisKey === 'sdlcPhase') document.getElementById('btn-axis-sdlc')?.classList.add('active');
     else if (axisKey === 'techDomain') document.getElementById('btn-axis-tech')?.classList.add('active');
     else if (axisKey === 'archLayer') document.getElementById('btn-axis-arch')?.classList.add('active');
+
+    this.populateGraphCategoryDropdown(axisKey);
+    this.onCategorySelectChange('');
+  }
+
+  // Populate dynamic category section dropdown based on active view axis
+  populateGraphCategoryDropdown(axisKey) {
+    const catSelect = document.getElementById('graph-category-select');
+    if (!catSelect) return;
+
+    let categories = [];
+    let defaultLabel = '📁 All Sections';
+
+    if (axisKey === 'techDomain') {
+      defaultLabel = '📁 All Tech Domains';
+      categories = this.topologyData?.taxonomyCategories?.techDomains || [
+        'Backend', 'System Design', 'Cloud/DevOps', 'Security/Data', 'Frontend', 'AI'
+      ];
+    } else if (axisKey === 'sdlcPhase') {
+      defaultLabel = '🔄 All SDLC Phases';
+      categories = this.topologyData?.taxonomyCategories?.sdlcPhases || [
+        'Requirements & Domain', 'Design & Architecture', 'Development', 'Testing & Quality', 'Security & Compliance', 'Deployment & Ops', 'Maintenance & Ops'
+      ];
+    } else if (axisKey === 'archLayer') {
+      defaultLabel = '🏗️ All System Layers';
+      categories = this.topologyData?.taxonomyCategories?.archLayers || [
+        'Presentation Layer', 'API & Gateway Layer', 'Application/Domain Layer', 'Persistence Layer', 'Infrastructure Layer'
+      ];
+    }
+
+    catSelect.innerHTML = `<option value="">${defaultLabel}</option>` +
+      categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+  }
+
+  // Populate dynamic topic node dropdown (filtered by category or showing all)
+  populateGraphTopicDropdown(nodesToDisplay = null) {
+    const topicSelect = document.getElementById('graph-topic-select');
+    if (!topicSelect) return;
+
+    const nodes = nodesToDisplay || (this.graphEngine ? this.graphEngine.nodes : []);
+    const sortedNodes = [...nodes].filter(n => n.name).sort((a, b) => a.name.localeCompare(b.name));
+
+    topicSelect.innerHTML = `<option value="">🎯 Focus Topic Node...</option>` +
+      sortedNodes.map(n => `<option value="${n.id}">${n.name}</option>`).join('');
+  }
+
+  // Handle Category Section Selection
+  onCategorySelectChange(categoryVal) {
+    if (!this.graphEngine) return;
+    const activeAxis = this.activeGraphAxis || 'techDomain';
+
+    if (!categoryVal) {
+      this.graphEngine.nodes.forEach(n => {
+        n.radius = n.val ? Math.max(12, n.val * 0.9) : 14;
+      });
+      this.graphEngine.resetCamera();
+      this.populateGraphTopicDropdown();
+      return;
+    }
+
+    const matchingNodes = this.graphEngine.nodes.filter(n =>
+      n.taxonomies && n.taxonomies[activeAxis] === categoryVal
+    );
+
+    this.graphEngine.nodes.forEach(n => {
+      if (n.taxonomies && n.taxonomies[activeAxis] === categoryVal) {
+        n.radius = Math.max(18, (n.val || 14) * 1.35);
+      } else {
+        n.radius = Math.max(8, (n.val || 14) * 0.65);
+      }
+    });
+
+    if (matchingNodes.length > 0) {
+      this.graphEngine.focusOnCluster(matchingNodes, 0.92);
+      this.populateGraphTopicDropdown(matchingNodes);
+    }
+  }
+
+  // Handle Specific Topic Node Selection
+  onTopicSelectChange(nodeId) {
+    if (!this.graphEngine || !nodeId) return;
+    const targetNode = this.graphEngine.nodes.find(n => n.id === nodeId);
+    if (targetNode) {
+      this.graphEngine.focusOnNode(targetNode);
+      this.openGraphNodeModal(targetNode);
+    }
   }
 
   filterGraphNodes(query) {
@@ -958,7 +1208,14 @@ class MasterPrepApp {
   }
 
   resetGraphCamera() {
-    if (this.graphEngine) this.graphEngine.resetCamera();
+    if (this.graphEngine) {
+      this.graphEngine.resetCamera();
+      const catSelect = document.getElementById('graph-category-select');
+      const topicSelect = document.getElementById('graph-topic-select');
+      if (catSelect) catSelect.value = '';
+      if (topicSelect) topicSelect.value = '';
+      this.onCategorySelectChange('');
+    }
   }
 
   // Parse 4-Part Executive Definition from Definitions.md for a given topic
@@ -1038,23 +1295,74 @@ class MasterPrepApp {
     this.openGuide(targetGuide, node.clusterId || 'Guide', node.name);
   }
 
-  // Launch Simulator in Modal / Iframe
-  launchSimulator(simUrl, title) {
+  // Launch Simulator in Glassmorphic Overlay Modal with Origin State Tracking
+  launchSimulator(simUrl, title, originCardId = null) {
     const modal = document.getElementById('sim-modal');
     const iframe = document.getElementById('sim-iframe');
     const titleEl = document.getElementById('sim-modal-title');
+    const returnBtn = document.getElementById('sim-modal-return-btn');
 
-    titleEl.textContent = `⚡ Running: ${title}`;
-    iframe.src = simUrl;
-    modal.style.display = 'block';
-    modal.scrollIntoView({ behavior: 'smooth' });
+    // Record origin context for seamless scroll restoration
+    this.simOriginScrollY = window.scrollY;
+    this.simOriginCardId = originCardId;
+
+    if (titleEl) titleEl.textContent = `Running: ${title}`;
+    if (iframe) iframe.src = simUrl;
+    if (modal) modal.style.display = 'flex';
+
+    if (returnBtn) {
+      if (originCardId) {
+        returnBtn.style.display = 'inline-flex';
+        returnBtn.textContent = '← Return to Topic';
+      } else {
+        returnBtn.style.display = 'none';
+      }
+    }
+
+    // Bind ESC key to close modal
+    if (this._simEscHandler) {
+      window.removeEventListener('keydown', this._simEscHandler);
+    }
+    this._simEscHandler = (e) => {
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        this.closeSimulator();
+      }
+    };
+    window.addEventListener('keydown', this._simEscHandler);
   }
 
   closeSimulator() {
     const modal = document.getElementById('sim-modal');
     const iframe = document.getElementById('sim-iframe');
-    iframe.src = '';
-    modal.style.display = 'none';
+    if (iframe) iframe.src = '';
+    if (modal) modal.style.display = 'none';
+
+    if (this._simEscHandler) {
+      window.removeEventListener('keydown', this._simEscHandler);
+      this._simEscHandler = null;
+    }
+
+    // If launched from a quick recap topic card, restore scroll & focus target card
+    const targetCardId = this.simOriginCardId;
+    if (targetCardId) {
+      const targetCard = document.getElementById(targetCardId);
+      if (targetCard) {
+        const sectionGroup = targetCard.closest('.recap-section-group');
+        if (sectionGroup) sectionGroup.classList.remove('collapsed');
+
+        requestAnimationFrame(() => {
+          targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          targetCard.style.transition = 'box-shadow 0.3s ease, border-color 0.3s ease';
+          targetCard.style.borderColor = 'var(--accent-cyan)';
+          targetCard.style.boxShadow = '0 0 24px rgba(6, 182, 212, 0.75)';
+          setTimeout(() => {
+            targetCard.style.borderColor = '';
+            targetCard.style.boxShadow = '';
+          }, 2200);
+        });
+      }
+    }
+    this.simOriginCardId = null;
   }
 
   // Update Breadcrumb Tracker
@@ -1076,13 +1384,16 @@ class MasterPrepApp {
     const container = document.querySelector('.app-container');
     if (!panel) return;
     const isVisible = panel.style.display !== 'none';
-    
+
     if (isVisible) {
       panel.style.display = 'none';
       if (container) container.classList.remove('ai-panel-open');
     } else {
       panel.style.display = 'flex';
       if (container) container.classList.add('ai-panel-open');
+
+      // Auto-collapse global left menu automatically when AI chatbot is opened
+      this.collapseGlobalSidebar();
 
       const storageKey = this.config.storage?.aiApiKey || 'ai_prep_key';
       const savedKey = sessionStorage.getItem(storageKey) || '';
@@ -1272,7 +1583,7 @@ class MasterPrepApp {
 
     const providerConfig = this.config.ai?.providers?.[providerId] || {};
     let systemPrompt = this.config.ai?.systemPrompt || `You are an expert Senior/Lead Software Engineer Interview Coach.`;
-    
+
     if (this.activeContext && this.activeContext.title) {
       systemPrompt += ` The candidate is currently studying/viewing: "${this.activeContext.title}". Frame your explanation in the context of this topic where relevant.`;
     }
@@ -1321,3 +1632,6 @@ class MasterPrepApp {
 
 // Global App Instance
 const app = new MasterPrepApp();
+window.app = app;
+window.MasterPrepApp = MasterPrepApp;
+

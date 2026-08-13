@@ -7,7 +7,7 @@ window.APP_CONFIG = {
   repoName: 'ai-fullstack-architecture-hub',
   repoUrl: 'https://github.com/adarshsince90/ai-fullstack-architecture-hub',
   version: '1.0.0',
-  
+
   // Content & Schema Data Paths
   paths: {
     mindmapSchema: 'docs/mindmap_schema.json',
