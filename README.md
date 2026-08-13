@@ -12,6 +12,7 @@
 ## 🧭 Live Interactive Hub & Architecture
 
 Access the interactive dashboard containing the **Master Mind Map**, **Quick Recap Checklist (292 Terms)**, and **9 Visual Playgrounds**:
+https://adarshsince90.github.io/ai-fullstack-architecture-hub/
 
 ```bash
 # Clone the repository
@@ -133,6 +134,8 @@ The repository features 9 standalone client-side visual tools designed to build 
 ---
 
 ## 🌐 Deployment (GitHub Pages)
+
+https://adarshsince90.github.io/ai-fullstack-architecture-hub/
 
 This repository is built with **zero external framework dependencies** (pure vanilla HTML5, CSS3, and modern ES6 JavaScript). It deploys natively to GitHub Pages in seconds:
 
