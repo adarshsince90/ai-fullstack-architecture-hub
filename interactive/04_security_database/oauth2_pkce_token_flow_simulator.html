@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OAuth 2.0 PKCE & JWT Cryptographic Flow Simulator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0b0f19;
+      --card-bg: #111827;
+      --card-border: #1f2937;
+      --accent-blue: #38bdf8;
+      --accent-purple: #a855f7;
+      --accent-green: #22c55e;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+    body { background: var(--bg-dark); color: var(--text-main); padding: 1.5rem; }
+
+    .sim-header {
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 1rem;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 9999px;
+      background: rgba(168, 85, 247, 0.15);
+      color: var(--accent-purple);
+      border: 1px solid var(--accent-purple);
+      margin-bottom: 0.5rem;
+    }
+    h1 { font-size: 1.6rem; font-weight: 800; color: #fff; margin-bottom: 0.25rem; }
+    p.desc { color: var(--text-muted); font-size: 0.9rem; }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 1.5rem;
+    }
+    @media (max-width: 1000px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .panel-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    /* PKCE Cryptographic Visualizer Box */
+    .crypto-box {
+      background: #070a12;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 0.9rem;
+      margin-bottom: 1rem;
+    }
+    .crypto-label { font-size: 0.75rem; color: var(--text-muted); font-family: 'Fira Code', monospace; margin-bottom: 0.2rem; }
+    .crypto-val { font-family: 'Fira Code', monospace; font-size: 0.85rem; color: var(--accent-blue); word-break: break-all; margin-bottom: 0.6rem; }
+    .crypto-math { font-size: 0.75rem; color: var(--accent-amber); font-family: 'Fira Code', monospace; }
+
+    /* Flow Steps */
+    .flow-steps-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+    .flow-step {
+      background: #1a2234;
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      padding: 0.8rem 1rem;
+      transition: all 0.25s ease;
+    }
+    .flow-step.active {
+      border-color: var(--accent-blue);
+      background: rgba(56, 189, 248, 0.12);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.25);
+    }
+    .flow-step.success {
+      border-color: var(--accent-green);
+      background: rgba(34, 197, 94, 0.12);
+    }
+    .flow-step.attack-failed {
+      border-color: var(--accent-rose);
+      background: rgba(244, 63, 94, 0.15);
+      box-shadow: 0 0 15px rgba(244, 63, 94, 0.3);
+    }
+    .step-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem; }
+    .step-num { font-family: 'Fira Code', monospace; font-size: 0.75rem; color: var(--accent-purple); font-weight: 700; }
+    .step-title { font-weight: 600; font-size: 0.9rem; }
+    .step-desc { font-size: 0.78rem; color: var(--text-muted); font-family: 'Fira Code', monospace; }
+
+    /* Controls */
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--card-border);
+    }
+    .btn {
+      padding: 0.5rem 0.9rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: var(--accent-blue); color: #000; }
+    .btn-primary:hover { background: #7dd3fc; }
+    .btn-outline { background: transparent; border-color: var(--card-border); color: #fff; }
+    .btn-outline:hover { background: #1e293b; }
+    .btn-danger { background: rgba(244, 63, 94, 0.2); border-color: var(--accent-rose); color: var(--accent-rose); }
+    .btn-danger:hover { background: rgba(244, 63, 94, 0.4); }
+
+    /* JWT Inspector */
+    .jwt-display {
+      background: #070a12;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 0.9rem;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem;
+      margin-bottom: 1rem;
+      word-break: break-all;
+    }
+    .jwt-header { color: #f43f5e; }
+    .jwt-payload { color: #38bdf8; }
+    .jwt-sig { color: #22c55e; }
+
+    .jwt-decoded-box {
+      background: #0d1322;
+      border: 1px solid #1f2937;
+      border-radius: 8px;
+      padding: 0.9rem;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.78rem;
+      overflow-y: auto;
+      max-height: 240px;
+    }
+    .json-key { color: #a855f7; }
+    .json-str { color: #22c55e; }
+    .json-num { color: #f59e0b; }
+
+    .attack-alert {
+      margin-top: 1rem;
+      background: rgba(244, 63, 94, 0.15);
+      border: 1px solid var(--accent-rose);
+      border-radius: 8px;
+      padding: 0.9rem;
+      font-size: 0.85rem;
+      display: none;
+    }
+    .attack-alert.active { display: block; animation: pulse 1.5s infinite; }
+  </style>
+</head>
+<body>
+
+  <div class="sim-header">
+    <span class="badge">ENTERPRISE IDENTITY & SECURITY</span>
+    <h1>OAuth 2.0 PKCE & JWT Cryptographic Flow Simulator</h1>
+    <p class="desc">Generate high-entropy PKCE code verifiers, simulate the S256 SHA-256 challenge exchange, inspect parsed JWT claims, and simulate malicious code interception attacks.</p>
+  </div>
+
+  <div class="grid-2">
+    
+    <!-- LEFT: Protocol Flow -->
+    <div class="panel">
+      <div class="panel-title">🔐 OAuth 2.0 Authorization Code Flow + PKCE (RFC 7636)</div>
+      
+      <div class="crypto-box">
+        <div class="crypto-label">1. Private Client-Generated Code Verifier (In-Memory Only):</div>
+        <div class="crypto-val" id="disp-verifier">dBjftJeZ4CVP-mB92Kx6y7z8a1b2c3d4e5f6g7h8i9j0</div>
+        <div class="crypto-label">2. Computed Public Code Challenge (Sent over network):</div>
+        <div class="crypto-val" id="disp-challenge" style="color: var(--accent-green);">E9Melhoa2OwvFrGMTJguCH5ZwW64DMAb3vEDmLIEZaM</div>
+        <div class="crypto-math">Calculation: BASE64URL(SHA256(code_verifier))</div>
+      </div>
+
+      <div class="flow-steps-container">
+        <div class="flow-step" id="step-1">
+          <div class="step-header">
+            <span class="step-title">Step 1: Authorization Request</span>
+            <span class="step-num">GET /authorize</span>
+          </div>
+          <div class="step-desc">Client passes <code>client_id</code>, <code>redirect_uri</code>, and <code>code_challenge</code> with method <code>S256</code>.</div>
+        </div>
+
+        <div class="flow-step" id="step-2">
+          <div class="step-header">
+            <span class="step-title">Step 2: User Login & Auth Code Grant</span>
+            <span class="step-num">HTTP 302 Redirect</span>
+          </div>
+          <div class="step-desc">Identity Provider validates credentials & returns temporary <code>authorization_code</code>.</div>
+        </div>
+
+        <div class="flow-step" id="step-3">
+          <div class="step-header">
+            <span class="step-title">Step 3: Secure Token Exchange</span>
+            <span class="step-num">POST /oauth/token</span>
+          </div>
+          <div class="step-desc">Client passes <code>authorization_code</code> + plain <code>code_verifier</code> directly via backchannel.</div>
+        </div>
+
+        <div class="flow-step" id="step-4">
+          <div class="step-header">
+            <span class="step-title">Step 4: Cryptographic Validation & Token Issuance</span>
+            <span class="step-num">200 OK (JWT)</span>
+          </div>
+          <div class="step-desc">Auth Server verifies <code>SHA256(verifier) == challenge</code> & returns signed RS256 JWT.</div>
+        </div>
+      </div>
+
+      <div class="controls-row">
+        <button class="btn btn-primary" onclick="sim.runAuthFlow()">▶ Execute Legitimate PKCE Flow</button>
+        <button class="btn btn-danger" onclick="sim.simulateAttack()">🥷 Simulate Interception Attack</button>
+        <button class="btn btn-outline" onclick="sim.generateNewKeys()">🎲 New Keys</button>
+      </div>
+
+      <div class="attack-alert" id="attack-alert-box">
+        <strong>🛡️ ATTACK MITIGATED BY PKCE!</strong>
+        <p style="margin-top: 0.3rem;">
+          The attacker intercepted the <code>authorization_code</code>, but attempted token exchange with a fake/missing <code>code_verifier</code>.
+          <br>• <strong>Auth Server Rejection</strong>: <code>SHA256(fake_verifier) != stored_challenge</code> $\to$ Returned <code>400 Invalid Grant</code>.
+        </p>
+      </div>
+    </div>
+
+    <!-- RIGHT: Decoded JWT Inspector -->
+    <div class="panel">
+      <div class="panel-title">📜 JSON Web Token (JWT) Inspector</div>
+
+      <div class="crypto-label">Encoded Compact JWT String (Header.Payload.Signature):</div>
+      <div class="jwt-display" id="jwt-compact">
+        <span class="jwt-header">eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjIwMjYtazEifQ</span>.<span class="jwt-payload">eyJzdWIiOiJ1c3JfOTgyMzQiLCJuYW1lIjoiQWRhcnNoIFZlcm1hIiwicm9sZXMiOlsic3lzdGVtc19hcmNoaXRlY3QiLCJwbGF0Zm9ybV9hZG1pbiJdLCJzY29wZSI6Im9yZGVycy53cml0ZSBjbG91ZC5hZG1pbiIsImlzcyI6Imh0dHBzOi8vYXV0aC5lbnRlcnByaXNlLmNvbSIsImF1ZCI6Imh0dHBzOi8vYXBpLmVudGVycHJpc2UuY29tIiwiZXhwIjoxNzk5ODAwMDAwfQ</span>.<span class="jwt-sig">dBjftJeZ4CVP-mB92Kx6y7z8a1b2c3d4e5f6g7h8i9j0</span>
+      </div>
+
+      <div class="crypto-label">Decoded JSON Claims & Header:</div>
+      <div class="jwt-decoded-box">
+        <div style="color: var(--accent-rose); font-weight: 700; margin-bottom: 0.3rem;">// HEADER (Algorithm & Key ID)</div>
+        <div>{</div>
+        <div style="padding-left: 1rem;"><span class="json-key">"alg"</span>: <span class="json-str">"RS256"</span>,</div>
+        <div style="padding-left: 1rem;"><span class="json-key">"typ"</span>: <span class="json-str">"JWT"</span>,</div>
+        <div style="padding-left: 1rem;"><span class="json-key">"kid"</span>: <span class="json-str">"2026-enterprise-k1"</span></div>
+        <div>}</div>
+
+        <div style="color: var(--accent-blue); font-weight: 700; margin-top: 0.8rem; margin-bottom: 0.3rem;">// PAYLOAD (Claims & Identity)</div>
+        <div>{</div>
+        <div style="padding-left: 1rem;"><span class="json-key">"sub"</span>: <span class="json-str">"usr_98234"</span>,</div>
+        <div style="padding-left: 1rem;"><span class="json-key">"name"</span>: <span class="json-str">"Jane Doe"</span>,</div>
+        <div style="padding-left: 1rem;"><span class="json-key">"roles"</span>: [<span class="json-str">"systems_architect"</span>, <span class="json-str">"platform_admin"</span>],</div>
+        <div style="padding-left: 1rem;"><span class="json-key">"scope"</span>: <span class="json-str">"orders.write cloud.admin"</span>,</div>
+        <div style="padding-left: 1rem;"><span class="json-key">"iss"</span>: <span class="json-str">"https://auth.enterprise.com"</span>,</div>
+        <div style="padding-left: 1rem;"><span class="json-key">"aud"</span>: <span class="json-str">"https://api.enterprise.com"</span>,</div>
+        <div style="padding-left: 1rem;"><span class="json-key">"exp"</span>: <span class="json-num">1799800000</span></div>
+        <div>}</div>
+
+        <div style="color: var(--accent-green); font-weight: 700; margin-top: 0.8rem; margin-bottom: 0.3rem;">// SIGNATURE (RS256 Verified via JWKS)</div>
+        <div style="color: var(--text-muted);">RSASHA256(Base64(Header) + "." + Base64(Payload), AuthServer_PrivateKey) == VALID ✅</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    class PkceSimulator {
+      constructor() {
+        this.generateNewKeys();
+      }
+
+      generateNewKeys() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+        let verifier = '';
+        for (let i = 0; i < 48; i++) {
+          verifier += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        this.verifier = verifier;
+        this.challenge = this.computeDummyHash(verifier);
+
+        document.getElementById('disp-verifier').textContent = this.verifier;
+        document.getElementById('disp-challenge').textContent = this.challenge;
+        this.resetSteps();
+      }
+
+      computeDummyHash(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+          hash = ((hash << 5) - hash) + str.charCodeAt(i);
+          hash |= 0;
+        }
+        return 'S256_' + Math.abs(hash).toString(36) + 'X9qK_' + str.substring(0, 10);
+      }
+
+      resetSteps() {
+        for (let i = 1; i <= 4; i++) {
+          const step = document.getElementById(`step-${i}`);
+          step.className = 'flow-step';
+        }
+        document.getElementById('attack-alert-box').className = 'attack-alert';
+      }
+
+      async runAuthFlow() {
+        this.resetSteps();
+        
+        for (let i = 1; i <= 4; i++) {
+          const step = document.getElementById(`step-${i}`);
+          step.className = 'flow-step active';
+          await this.delay(500);
+          step.className = 'flow-step success';
+        }
+      }
+
+      async simulateAttack() {
+        this.resetSteps();
+        
+        // Steps 1 & 2 succeed
+        for (let i = 1; i <= 2; i++) {
+          const step = document.getElementById(`step-${i}`);
+          step.className = 'flow-step success';
+          await this.delay(400);
+        }
+
+        // Step 3 Hacker intercept
+        const step3 = document.getElementById('step-3');
+        step3.className = 'flow-step active';
+        await this.delay(600);
+
+        // Step 4 Rejection
+        const step4 = document.getElementById('step-4');
+        step4.className = 'flow-step attack-failed';
+        document.getElementById('attack-alert-box').className = 'attack-alert active';
+      }
+
+      delay(ms) { return new Promise(res => setTimeout(res, ms)); }
+    }
+
+    const sim = new PkceSimulator();
+  </script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+[
+  {
+    "id": "csharp",
+    "term": "C# 12/13 & .NET Runtime",
+    "domain": "Backend & .NET Core",
+    "twoLiner": "Modern, object-oriented language developed by Microsoft for cloud-native APIs with zero-allocation memory primitives (Span<T>).",
+    "detailed": "C# combines high developer productivity with C++ level performance through RyuJIT, Generational Garbage Collection, and ref struct memory management. Ideal for high-throughput microservices.",
+    "guidePath": "guides/01_dotnet_backend/01_csharp_internals.md"
+  },
+  {
+    "id": "aspnet-webapi",
+    "term": "ASP.NET Core Web API",
+    "domain": "Backend & .NET Core",
+    "twoLiner": "Framework for building high-throughput RESTful services with built-in dependency injection, middleware pipelines, and OpenAPI support.",
+    "detailed": "Acts as the backbone for modern distributed microservices. Features Kestrel web server, async request processing, and flexible middleware pipelines for authentication and logging.",
+    "guidePath": "guides/01_dotnet_backend/02_aspnetcore_webapi.md"
+  },
+  {
+    "id": "efcore",
+    "term": "Entity Framework Core",
+    "domain": "Backend & .NET Core",
+    "twoLiner": "Microsoft's ORM that allows developers to interact with databases using strongly typed C# LINQ queries instead of raw SQL.",
+    "detailed": "Provides automated schema migrations, change tracking, and support for SQL Server and PostgreSQL. Can be tuned with AsNoTracking and Split Queries for high-throughput reads.",
+    "guidePath": "guides/01_dotnet_backend/03_efcore_optimization.md"
+  },
+  {
+    "id": "grpc",
+    "term": "gRPC & Protocol Buffers",
+    "domain": "Backend & .NET Core",
+    "twoLiner": "High-performance, contract-first RPC framework developed by Google running over HTTP/2 using binary Protocol Buffers.",
+    "detailed": "Replaces JSON over HTTP/1.1 for low-latency synchronous microservice-to-microservice communication, offering 7-10x faster serialization and multiplexed streaming.",
+    "guidePath": "guides/01_dotnet_backend/05_grpc_signalr.md"
+  },
+  {
+    "id": "signalr",
+    "term": "SignalR & WebSockets",
+    "domain": "Backend & .NET Core",
+    "twoLiner": "Real-time communication framework enabling servers to push live updates directly to connected web and mobile clients.",
+    "detailed": "Eliminates polling overhead by establishing bidirectional WebSockets with fallbacks (SSE, Long Polling). Ideal for live telemetry, dashboards, and notifications.",
+    "guidePath": "guides/01_dotnet_backend/05_grpc_signalr.md"
+  },
+  {
+    "id": "microservices",
+    "term": "Microservices Architecture",
+    "domain": "Distributed Systems",
+    "twoLiner": "Architectural style decomposing applications into small, autonomous, independently deployable services around business domains.",
+    "detailed": "Enables independent scaling, fault isolation, and agile deployments. Requires eventual consistency, distributed tracing (OpenTelemetry), and resilient API gateways.",
+    "guidePath": "guides/02_distributed_systems/01_microservices_decomposition.md"
+  },
+  {
+    "id": "ddd",
+    "term": "Domain-Driven Design (DDD)",
+    "domain": "Distributed Systems",
+    "twoLiner": "Software design approach structuring systems around business domains using Ubiquitous Language, Aggregates, and Bounded Contexts.",
+    "detailed": "Protects business rules from database or UI infrastructure concerns. Aggregate roots enforce consistency boundaries and emit domain events to other bounded contexts.",
+    "guidePath": "guides/02_distributed_systems/02_ddd_cqrs_event_sourcing.md"
+  },
+  {
+    "id": "cqrs",
+    "term": "CQRS (Command Query Responsibility Segregation)",
+    "domain": "Distributed Systems",
+    "twoLiner": "Pattern separating data modification operations (Commands) from data retrieval operations (Queries) into distinct models.",
+    "detailed": "Allows independent optimization of read and write pipelines. Write side focuses on business invariants while read side uses optimized views, caches, and read replicas.",
+    "guidePath": "guides/02_distributed_systems/02_ddd_cqrs_event_sourcing.md"
+  },
+  {
+    "id": "saga",
+    "term": "Saga Pattern & Compensations",
+    "domain": "Distributed Systems",
+    "twoLiner": "Distributed transaction pattern coordinating local transactions across microservices using compensating rollbacks.",
+    "detailed": "Replaces blocking 2-Phase Commit (2PC). Can be implemented via Orchestration (central coordinator) or Choreography (event-driven) to guarantee eventual consistency across microservice databases.",
+    "guidePath": "guides/02_distributed_systems/03_saga_outbox_resiliency.md"
+  },
+  {
+    "id": "outbox",
+    "term": "Transactional Outbox Pattern",
+    "domain": "Distributed Systems",
+    "twoLiner": "Pattern preventing dual-write failures by saving business changes and outbound events in the same local database transaction.",
+    "detailed": "A background publisher polls or listens via CDC (Change Data Capture) to dispatch events to message brokers (SQS/Kafka) reliably with at-least-once delivery guarantees.",
+    "guidePath": "guides/02_distributed_systems/03_saga_outbox_resiliency.md"
+  },
+  {
+    "id": "docker-k8s",
+    "term": "Docker & Kubernetes Orchestration",
+    "domain": "Cloud Platforms & DevOps",
+    "twoLiner": "Docker packages apps into immutable containers; Kubernetes automates scheduling, scaling, and zero-downtime rolling updates.",
+    "detailed": "Guarantees environment parity from development to cloud. Kubernetes handles load balancing, self-healing, Horizontal Pod Autoscaling (HPA), and configuration management.",
+    "guidePath": "guides/03_cloud_devops/03_docker_kubernetes.md"
+  },
+  {
+    "id": "terraform",
+    "term": "Terraform (Infrastructure as Code)",
+    "domain": "Cloud Platforms & DevOps",
+    "twoLiner": "Declarative IaC tool used to provision, version, and manage cloud infrastructure across AWS and Azure using code.",
+    "detailed": "Maintains remote state locking (S3/DynamoDB) to prevent configuration drift. Integrates into CI/CD pipelines for automated multi-environment infrastructure deployments.",
+    "guidePath": "guides/03_cloud_devops/04_terraform_cicd_pipelines.md"
+  },
+  {
+    "id": "oauth2-oidc",
+    "term": "OAuth 2.0 & OpenID Connect (OIDC)",
+    "domain": "Security & Data",
+    "twoLiner": "OAuth 2.0 provides delegated API authorization; OIDC adds user authentication and Single Sign-On (SSO) via signed ID tokens.",
+    "detailed": "Industry-standard identity framework using Authorization Code Flow with PKCE, JWT tokens, and JWKS public key verification to protect enterprise APIs without exposing user credentials.",
+    "guidePath": "guides/04_security_database/01_oauth2_oidc_jwt.md"
+  },
+  {
+    "id": "sql-tuning",
+    "term": "SQL Server Execution Plans & Index Tuning",
+    "domain": "Security & Data",
+    "twoLiner": "Execution plans analyze physical query operations; index tuning converts expensive table scans into efficient direct index seeks.",
+    "detailed": "Utilizes Clustered, Non-Clustered, and Covering (INCLUDE) indexes to eliminate Key Lookups and optimize high-concurrency enterprise queries under heavy load.",
+    "guidePath": "guides/04_security_database/03_sql_query_tuning.md"
+  },
+  {
+    "id": "angular-signals",
+    "term": "Angular Signals & NgRx",
+    "domain": "Frontend Engineering",
+    "twoLiner": "Signals provide fine-grained reactive state tracking; NgRx manages global immutable application state using Redux patterns.",
+    "detailed": "Signals trigger surgical DOM updates without requiring Zone.js dirty checking across the component tree. NgRx provides predictable state machines for complex multi-tab enterprise portals.",
+    "guidePath": "guides/05_frontend_engineering/06_rxjs_ngrx_signals.md"
+  },
+  {
+    "id": "react-fiber",
+    "term": "React Fiber & Reconciliation Engine",
+    "domain": "Frontend Engineering",
+    "twoLiner": "React's asynchronous reconciliation engine that models the UI hierarchy as an interruptible singly linked-list tree of Fiber nodes.",
+    "detailed": "Separates render diffing from synchronous DOM commit phases. Enables React 18 Concurrent Mode, prioritizing user interactions and preventing UI thread frame drops.",
+    "guidePath": "guides/05_frontend_engineering/07_react_fiber_reconciliation.md"
+  },
+  {
+    "id": "rag",
+    "term": "RAG (Retrieval-Augmented Generation)",
+    "domain": "AI Enablement",
+    "twoLiner": "AI architecture that grounds LLMs in enterprise knowledge by retrieving relevant embeddings from a vector database at query time.",
+    "detailed": "Eliminates LLM hallucinations and provides verifiable, source-attributed responses from private company documentation without requiring costly model fine-tuning.",
+    "guidePath": "guides/06_ai_engineering/01_rag_vector_search.md"
+  },
+  {
+    "id": "semantic-kernel",
+    "term": "Microsoft Semantic Kernel in .NET",
+    "domain": "AI Enablement",
+    "twoLiner": "Open-source SDK enabling .NET developers to orchestrate LLM prompts, memory connectors, and native C# plugins.",
+    "detailed": "Bridges enterprise backend applications with Azure OpenAI. Allows C# functions to be exposed as native tools that LLM agents can autonomously invoke.",
+    "guidePath": "guides/06_ai_engineering/02_azure_openai_semantic_kernel.md"
+  }
+]

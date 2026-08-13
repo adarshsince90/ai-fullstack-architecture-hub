@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Angular Signals vs React Virtual DOM Reactivity Simulator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0b0f19;
+      --card-bg: #111827;
+      --card-border: #1f2937;
+      --accent-blue: #38bdf8;
+      --accent-purple: #a855f7;
+      --accent-green: #22c55e;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+    body { background: var(--bg-dark); color: var(--text-main); padding: 1.5rem; }
+
+    .sim-header {
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 1rem;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 9999px;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-blue);
+      border: 1px solid var(--accent-blue);
+      margin-bottom: 0.5rem;
+    }
+    h1 { font-size: 1.6rem; font-weight: 800; color: #fff; margin-bottom: 0.25rem; }
+    p.desc { color: var(--text-muted); font-size: 0.9rem; }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    @media (max-width: 1000px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .panel-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    /* Component Tree Visualization */
+    .tree-box {
+      background: #070a12;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 1rem;
+      min-height: 260px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .node {
+      background: #1a2234;
+      border: 1px solid #2d3748;
+      border-radius: 6px;
+      padding: 0.6rem 0.9rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s ease;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.82rem;
+    }
+    .node.child { margin-left: 1.5rem; }
+    .node.leaf { margin-left: 3rem; }
+
+    .node.rendering {
+      background: rgba(245, 158, 11, 0.2);
+      border-color: var(--accent-amber);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+      transform: scale(1.02);
+    }
+    .node.signal-update {
+      background: rgba(34, 197, 94, 0.25);
+      border-color: var(--accent-green);
+      box-shadow: 0 0 15px rgba(34, 197, 94, 0.5);
+      transform: scale(1.03);
+    }
+    .node.skipped {
+      opacity: 0.4;
+      border-style: dashed;
+    }
+
+    .node-tag {
+      font-size: 0.7rem;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      background: #2d3748;
+      color: #94a3b8;
+    }
+
+    /* Controls */
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: auto;
+      padding-top: 1rem;
+      border-top: 1px solid var(--card-border);
+    }
+    .btn {
+      padding: 0.5rem 0.9rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+    .btn-react { background: rgba(56, 189, 248, 0.2); border-color: var(--accent-blue); color: var(--accent-blue); }
+    .btn-react:hover { background: rgba(56, 189, 248, 0.4); }
+    .btn-angular { background: rgba(244, 63, 94, 0.2); border-color: var(--accent-rose); color: var(--accent-rose); }
+    .btn-angular:hover { background: rgba(244, 63, 94, 0.4); }
+    .btn-outline { background: transparent; border-color: var(--card-border); color: #fff; }
+    .btn-outline:hover { background: #1e293b; }
+
+    /* Stats Box */
+    .stats-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+      margin-bottom: 1rem;
+    }
+    .stat-card {
+      background: #0b0f19;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 0.6rem;
+      text-align: center;
+    }
+    .stat-val { font-size: 1.2rem; font-weight: 800; color: #fff; font-family: 'Fira Code', monospace; }
+    .stat-lbl { font-size: 0.72rem; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+  <div class="sim-header">
+    <span class="badge">FRONTEND ARCHITECTURE PLAYGROUND</span>
+    <h1>Angular Signals vs React Virtual DOM Reactivity Simulator</h1>
+    <p class="desc">Visually verify how state updates propagate: React executes top-down Virtual DOM Fiber reconciliation over sub-trees, whereas Angular Signals update DOM bindings with fine-grained precision.</p>
+  </div>
+
+  <div class="grid-2">
+    
+    <!-- LEFT: React Virtual DOM Reconciliation -->
+    <div class="panel">
+      <div class="panel-title">⚛️ React Virtual DOM (Top-Down Fiber Re-render)</div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-val" id="react-render-count" style="color: var(--accent-blue);">0</div>
+          <div class="stat-lbl">Component Functions Executed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="react-dom-count" style="color: var(--accent-green);">0</div>
+          <div class="stat-lbl">Real DOM Mutations</div>
+        </div>
+      </div>
+
+      <div class="tree-box">
+        <div class="node" id="r-parent">
+          <span>&lt;DashboardContainer /&gt;</span>
+          <span class="node-tag" id="r-parent-val">Count: 0</span>
+        </div>
+        <div class="node child" id="r-child1">
+          <span>&lt;UserStatsCard /&gt;</span>
+          <span class="node-tag">Re-evaluated</span>
+        </div>
+        <div class="node child" id="r-child2">
+          <span>&lt;NotificationBanner /&gt;</span>
+          <span class="node-tag">Re-evaluated</span>
+        </div>
+        <div class="node leaf" id="r-leaf">
+          <span>&lt;MetricCounterBadge /&gt;</span>
+          <span class="node-tag" id="r-leaf-val">DOM: 0</span>
+        </div>
+      </div>
+
+      <div class="controls-row">
+        <button class="btn btn-react" onclick="sim.triggerReactUpdate()">▶ Mutate React State (setCount++)</button>
+        <button class="btn btn-outline" id="memo-toggle-btn" onclick="sim.toggleReactMemo()">🛡️ Enable React.memo</button>
+      </div>
+    </div>
+
+    <!-- RIGHT: Angular Fine-Grained Signals -->
+    <div class="panel">
+      <div class="panel-title">🅰️ Angular Signals (Fine-Grained Push/Pull Reactivity)</div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-val" id="angular-render-count" style="color: var(--accent-rose);">0</div>
+          <div class="stat-lbl">Component Functions Executed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="angular-dom-count" style="color: var(--accent-green);">0</div>
+          <div class="stat-lbl">Real DOM Mutations</div>
+        </div>
+      </div>
+
+      <div class="tree-box">
+        <div class="node" id="a-parent">
+          <span>&lt;app-dashboard&gt;</span>
+          <span class="node-tag" style="color: var(--accent-purple);">Signal Store</span>
+        </div>
+        <div class="node child" id="a-child1">
+          <span>&lt;app-user-stats&gt;</span>
+          <span class="node-tag">Untouched (0 checks)</span>
+        </div>
+        <div class="node child" id="a-child2">
+          <span>&lt;app-notification-banner&gt;</span>
+          <span class="node-tag">Untouched (0 checks)</span>
+        </div>
+        <div class="node leaf" id="a-leaf">
+          <span>&lt;span&gt;{{ count() }}&lt;/span&gt;</span>
+          <span class="node-tag" id="a-leaf-val" style="color: var(--accent-green);">DOM: 0</span>
+        </div>
+      </div>
+
+      <div class="controls-row">
+        <button class="btn btn-angular" onclick="sim.triggerAngularSignal()">▶ Mutate Angular Signal (count.set++)</button>
+        <button class="btn btn-outline" onclick="sim.resetAll()">↺ Reset Counters</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    class ReactivitySimulator {
+      constructor() {
+        this.reactCount = 0;
+        this.reactRenders = 0;
+        this.reactDomUpdates = 0;
+        this.useMemo = false;
+
+        this.angularCount = 0;
+        this.angularRenders = 0;
+        this.angularDomUpdates = 0;
+      }
+
+      toggleReactMemo() {
+        this.useMemo = !this.useMemo;
+        document.getElementById('memo-toggle-btn').textContent = this.useMemo ? '✅ React.memo Active' : '🛡️ Enable React.memo';
+        document.getElementById('memo-toggle-btn').style.borderColor = this.useMemo ? 'var(--accent-green)' : 'var(--card-border)';
+      }
+
+      async triggerReactUpdate() {
+        this.reactCount++;
+        this.reactDomUpdates++;
+        document.getElementById('r-parent-val').textContent = `Count: ${this.reactCount}`;
+        document.getElementById('r-leaf-val').textContent = `DOM: ${this.reactCount}`;
+
+        // Top-Down Walk
+        const p = document.getElementById('r-parent');
+        const c1 = document.getElementById('r-child1');
+        const c2 = document.getElementById('r-child2');
+        const leaf = document.getElementById('r-leaf');
+
+        // Parent Renders
+        p.className = 'node rendering';
+        this.reactRenders++;
+        this.updateStats();
+        await this.delay(200);
+
+        if (this.useMemo) {
+          c1.className = 'node child skipped';
+          c2.className = 'node child skipped';
+          await this.delay(200);
+        } else {
+          c1.className = 'node child rendering';
+          c2.className = 'node child rendering';
+          this.reactRenders += 2;
+          this.updateStats();
+          await this.delay(200);
+        }
+
+        // Leaf renders and commits DOM mutation
+        leaf.className = 'node leaf rendering';
+        this.reactRenders++;
+        this.updateStats();
+        await this.delay(300);
+
+        p.className = 'node';
+        c1.className = 'node child';
+        c2.className = 'node child';
+        leaf.className = 'node leaf';
+      }
+
+      async triggerAngularSignal() {
+        this.angularCount++;
+        this.angularDomUpdates++;
+        document.getElementById('a-leaf-val').textContent = `DOM: ${this.angularCount}`;
+
+        // Direct Signal Pin-Point Mutation
+        const leaf = document.getElementById('a-leaf');
+        leaf.className = 'node leaf signal-update';
+        this.updateStats();
+        await this.delay(400);
+        leaf.className = 'node leaf';
+      }
+
+      updateStats() {
+        document.getElementById('react-render-count').textContent = this.reactRenders;
+        document.getElementById('react-dom-count').textContent = this.reactDomUpdates;
+        document.getElementById('angular-render-count').textContent = this.angularRenders;
+        document.getElementById('angular-dom-count').textContent = this.angularDomUpdates;
+      }
+
+      resetAll() {
+        this.reactCount = 0;
+        this.reactRenders = 0;
+        this.reactDomUpdates = 0;
+        this.angularCount = 0;
+        this.angularRenders = 0;
+        this.angularDomUpdates = 0;
+        this.updateStats();
+        document.getElementById('r-parent-val').textContent = 'Count: 0';
+        document.getElementById('r-leaf-val').textContent = 'DOM: 0';
+        document.getElementById('a-leaf-val').textContent = 'DOM: 0';
+      }
+
+      delay(ms) { return new Promise(res => setTimeout(res, ms)); }
+    }
+
+    const sim = new ReactivitySimulator();
+  </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Agent & IDE Configurations
+.agents/
+.gemini/
+.idea/
+.vscode/
+
+# Personal & Confidential Candidate Profile Data
+docs/profile/
+docs/strategy/
+AGENTS.md
+
+# OS & System Files
+.DS_Store
+Thumbs.db
+*.log
+*.tmp

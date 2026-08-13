@@ -1,0 +1,602 @@
+[
+  {
+    "path": "guides/00_acronym_glossary.md",
+    "title": "Master Frontend & React Acronym Glossary",
+    "domainDir": "00_acronym_glossary.md",
+    "headers": [
+      "🗺️ Master End-to-End Pipeline: Source JSX to Pixels on Screen",
+      "🎯 The 2x2 Separation Matrix: Build-Time vs Browser & React vs Native",
+      "1. Core Transpilation & Compiler Terms",
+      "**AST** — Abstract Syntax Tree",
+      "**JSX** — JavaScript XML / JavaScript Syntax Extension",
+      "2. Browser & Rendering Engine Terms",
+      "**DOM** — Document Object Model",
+      "**VDOM** — Virtual Document Object Model",
+      "**CSSOM** — CSS Object Model",
+      "3. Rendering Strategies",
+      "**CSR** — Client-Side Rendering",
+      "**SSR** — Server-Side Rendering",
+      "**SSG** — Static Site Generation",
+      "**ISR** — Incremental Static Regeneration",
+      "**RSC** — React Server Components",
+      "4. React & State Architecture",
+      "**HOC** — Higher-Order Component",
+      "**RTK** — Redux Toolkit",
+      "**FP** — Functional Programming",
+      "5. Network & Web Protocols",
+      "**CORS** — Cross-Origin Resource Sharing",
+      "**SPA** — Single Page Application",
+      "**PWA** — Progressive Web App"
+    ]
+  },
+  {
+    "path": "guides/00_browser_architecture_event_loop.md",
+    "title": "00. Browser Architecture, Main Thread & The Event Loop",
+    "domainDir": "00_browser_architecture_event_loop.md",
+    "headers": [
+      "1. High-Level Browser Mental Model",
+      "2. Multi-Process Architecture & Security Sandboxing",
+      "3. Inside the Renderer Process: Main Thread & Execution Queues",
+      "The 5 Core Data Structures of the Main Thread:",
+      "4. The Event Loop Algorithm",
+      "Microtask Starvation (Senior Edge Case)",
+      "5. End-to-End Realtime Execution Trace Example",
+      "Complete System Lifecycle Trace:",
+      "6. Critical Rendering Path & Performance Bottlenecks",
+      "Reflow vs. Repaint vs. Compositing Only",
+      "Layout Thrashing (Forced Synchronous Layout)",
+      "7. Senior Interview Checkpoints"
+    ]
+  },
+  {
+    "path": "guides/01_dotnet_backend/01_csharp_internals.md",
+    "title": "C# Internals, CLR & Memory Management (.NET 8/10)",
+    "domainDir": "01_dotnet_backend",
+    "headers": [
+      "1. The CLR Execution Pipeline & Memory Architecture",
+      "Stack vs Managed Heap",
+      "2. Garbage Collection (GC) Generations & Internals",
+      "Senior GC Tuning & Best Practices",
+      "3. High-Performance C# Types: `Span<T>`, `Memory<T>`, and `ref struct`",
+      "4. Key Senior Interview Questions & Answers",
+      "Q1: What is the difference between `ValueTask<T>` and `Task<T>`?",
+      "Q2: What is a \"Captive Dependency\" in ASP.NET Core Dependency Injection?"
+    ]
+  },
+  {
+    "path": "guides/01_dotnet_backend/02_aspnetcore_webapi.md",
+    "title": "ASP.NET Core Web API, Middleware Pipeline & DI Architecture",
+    "domainDir": "01_dotnet_backend",
+    "headers": [
+      "1. The Kestrel HTTP Pipeline & Middleware Chain",
+      "Middleware Delegation Mechanics (`Use`, `Run`, `Map`)",
+      "2. Middleware vs Action Filters vs Endpoint Filters",
+      "3. Dependency Injection (DI) Lifetimes & Captive Dependencies",
+      "The Captive Dependency Trap (Critical Lead Interview Topic)",
+      "How to Fix Captive Dependencies:",
+      "4. Minimal APIs vs Controller-Based APIs",
+      "Architectural Comparison",
+      "5. Built-In Rate Limiting (.NET 8/10)",
+      "6. Senior & Lead Interview Scenarios",
+      "Q1: How do you handle unhandled exceptions across distributed microservices in ASP.NET Core?",
+      "Q2: Why is `DbContext` registered as `Scoped` instead of `Transient` or `Singleton`?"
+    ]
+  },
+  {
+    "path": "guides/01_dotnet_backend/03_efcore_optimization.md",
+    "title": "Entity Framework Core: Query Optimization & Performance Internals",
+    "domainDir": "01_dotnet_backend",
+    "headers": [
+      "1. The EF Core Query Pipeline: From LINQ to SQL",
+      "Key Performance Bottlenecks:",
+      "2. Change Tracking Optimization: `AsNoTracking()`",
+      "3. The Cartesian Explosion Problem & `AsSplitQuery()`",
+      "The Solution: Split Queries (`AsSplitQuery()`)",
+      "4. High-Throughput Techniques",
+      "1. DbContext Pooling (`AddDbContextPool`)",
+      "2. Pre-Compiled Queries (`EF.CompileAsyncQuery`)",
+      "3. Bulk Batch Operations (`ExecuteUpdateAsync` & `ExecuteDeleteAsync`)",
+      "5. EF Core Interceptors for Distributed Telemetry & Auditing",
+      "6. Senior & Lead Interview Scenarios",
+      "Q1: When would you choose Dapper over EF Core in a high-scale architecture?",
+      "Q2: How do you identify and mitigate the N+1 query problem?",
+      "7. 🔗 Recommended Next Guide & Architectural Continuity"
+    ]
+  },
+  {
+    "path": "guides/01_dotnet_backend/04_async_threading.md",
+    "title": "Async/Await, Threading & Background Services in .NET",
+    "domainDir": "01_dotnet_backend",
+    "headers": [
+      "1. The Async/Await State Machine Internals",
+      "What Roslyn Generates Under the Hood:",
+      "2. The CLR ThreadPool & Work-Stealing Algorithm",
+      "3. The ThreadPool Starvation Disaster (Sync-over-Async)",
+      "Why ThreadPool Starvation Crashes Systems:",
+      "4. Asynchronous Pipelines with `System.Threading.Channels`",
+      "5. Streaming Data with `IAsyncEnumerable<T>`",
+      "6. Senior & Lead Interview Scenarios",
+      "Q1: Does ASP.NET Core have a `SynchronizationContext`? Why does this matter?",
+      "Q2: What is the difference between `IHostedService` and `BackgroundService`?"
+    ]
+  },
+  {
+    "path": "guides/01_dotnet_backend/05_grpc_signalr.md",
+    "title": "Real-Time & High-Performance RPC: gRPC & SignalR",
+    "domainDir": "01_dotnet_backend",
+    "headers": [
+      "1. gRPC Architecture & HTTP/2 Foundations",
+      "Why gRPC Outperforms REST/JSON:",
+      "2. The 4 gRPC Streaming Modes",
+      "C# Bidirectional Streaming Implementation:",
+      "3. SignalR Real-Time Communications",
+      "SignalR Hub Definition:",
+      "4. Scaling SignalR in Multi-Instance Cloud Environments",
+      "Scaling Options:",
+      "5. Architectural Comparison: gRPC vs SignalR vs REST",
+      "6. Senior & Lead Interview Scenarios",
+      "Q1: How do you secure gRPC and SignalR endpoints in an enterprise zero-trust environment?",
+      "Q2: How do you handle client reconnections and missed events in SignalR?"
+    ]
+  },
+  {
+    "path": "guides/01_js_es6_jsx.md",
+    "title": "01. JavaScript (ES6+), V8 Engine Internals & JSX Transpilation",
+    "domainDir": "01_js_es6_jsx.md",
+    "headers": [
+      "⚙️ 1. V8 Engine Architecture & JIT Compiler (Ignition & TurboFan)",
+      "A. Ignition (Interpreter)",
+      "B. TurboFan (Optimizing JIT Compiler)",
+      "C. Hidden Classes (Shapes) & Inline Caches (IC)",
+      "🧠 2. V8 Memory Management & Garbage Collection",
+      "A. Young Generation & Scavenger GC (Minor GC)",
+      "B. Old Generation & Mark-Sweep-Compact (Major GC)",
+      "C. Common Frontend Memory Leaks & Diagnosis",
+      "🔍 3. Scope Chains, Execution Context & `this` Mechanics",
+      "A. Execution Context Creation Phase",
+      "B. `this` Binding Matrix",
+      "⚙️ 4. JSX (JavaScript Syntax Extension) AST Compilation & Transpilation Mechanics",
+      "A. Original JSX Source Code",
+      "B. Classic Runtime (`React.createElement`) — Pre-React 17",
+      "C. Modern Automatic Runtime (`react/jsx-runtime`) — React 17+",
+      "🔒 5. Closures, Lexical Scope & Private State",
+      "A. First-Principles Definition",
+      "B. Common Senior Interview Gotcha: Loop Scoping & `var` vs `let`",
+      "⚡ 6. Promises, Promise Chaining & Async/Await Under the Hood",
+      "A. Promise Lifecycle & Internal States",
+      "B. Promise Chaining & Microtask Scheduling",
+      "C. Syntactic Sugar: `async` / `await`",
+      "🔀 7. Concurrent Execution Combinators & Async Error Handling",
+      "A. Parallel vs Sequential Execution",
+      "B. Promise Combinators Matrix",
+      "C. Asynchronous Error Handling Patterns",
+      "🛠️ 8. Additional Missed Senior JS Topics: Rate-Limiting & Delegation",
+      "A. Event Delegation Pattern",
+      "B. Debouncing vs Throttling",
+      "💡 Senior Interview Checkpoints"
+    ]
+  },
+  {
+    "path": "guides/02_distributed_systems/01_microservices_decomposition.md",
+    "title": "Microservices Decomposition, API Gateways & BFF Architecture",
+    "domainDir": "02_distributed_systems",
+    "headers": [
+      "1. Monolith Decomposition Strategies",
+      "1. Decomposition by Business Capability",
+      "2. Decomposition by Subdomain (Domain-Driven Design)",
+      "3. The Strangler Fig Migration Pattern",
+      "2. API Gateway Pattern vs Backend-for-Frontend (BFF)",
+      "Architectural Comparison",
+      "3. Database-per-Service vs Shared Database Anti-Pattern",
+      "4. Distributed Tracing & Observability (OpenTelemetry & W3C Trace Context)",
+      "5. Senior & Lead Interview Scenarios",
+      "Q1: How do you handle distributed queries across services with independent databases without joining tables?",
+      "Q2: What is the \"Distributed Monolith\" anti-pattern and how do you diagnose it?"
+    ]
+  },
+  {
+    "path": "guides/02_distributed_systems/02_ddd_cqrs_event_sourcing.md",
+    "title": "Domain-Driven Design (DDD), CQRS & Event Sourcing",
+    "domainDir": "02_distributed_systems",
+    "headers": [
+      "1. Domain-Driven Design (DDD) Tactical Building Blocks",
+      "Core Concepts:",
+      "2. Command Query Responsibility Segregation (CQRS)",
+      "3. CQRS Implementation in .NET with MediatR Pipeline Behaviors",
+      "4. Event Sourcing Mechanics",
+      "Rehydrating Aggregate State:",
+      "Snapshotting for Performance:",
+      "5. Senior & Lead Interview Scenarios",
+      "Q1: What are the biggest trade-offs and risks of adopting Event Sourcing?",
+      "Q2: How do you handle optimistic concurrency in an Event-Sourced aggregate?"
+    ]
+  },
+  {
+    "path": "guides/02_distributed_systems/03_saga_outbox_resiliency.md",
+    "title": "Saga Pattern, Outbox Pattern & Distributed Resiliency",
+    "domainDir": "02_distributed_systems",
+    "headers": [
+      "1. The Dual-Write Problem & Transactional Outbox Pattern",
+      "The Transactional Outbox Solution",
+      "2. Distributed Transactions: The Saga Pattern",
+      "Orchestration vs Choreography",
+      "3. Message Broker Landscape: Apache Kafka vs RabbitMQ vs AWS SQS/SNS",
+      "4. Resiliency Patterns (Polly in .NET)"
+    ]
+  },
+  {
+    "path": "guides/02_distributed_systems/04_hld_lld_framework.md",
+    "title": "High-Level (HLD) & Low-Level (LLD) System Design Framework",
+    "domainDir": "02_distributed_systems",
+    "headers": [
+      "1. The 45-Minute System Design Interview Blueprint",
+      "2. Enterprise Caching Strategies",
+      "Cache Stampede (Thundering Herd) Prevention:",
+      "3. Database Sharding & Consistent Hashing",
+      "4. Distributed Rate Limiting Algorithms",
+      "Redis Sliding Window Log using Lua Script:",
+      "5. CAP Theorem vs PACELC Theorem",
+      "The PACELC Theorem (Senior/Lead Distinction):",
+      "6. Senior & Lead Interview Scenarios",
+      "Q1: How would you design a distributed ID generation service (like Twitter Snowflake)?"
+    ]
+  },
+  {
+    "path": "guides/02_html5_css3_postcss.md",
+    "title": "02. HTML5, CSS3, PostCSS, Gulp & Esbuild",
+    "domainDir": "02_html5_css3_postcss.md",
+    "headers": [
+      "🧱 HTML5 & Accessibility (a11y)",
+      "1. Semantic HTML Structure",
+      "2. ARIA Best Practices",
+      "🎨 Modern CSS3 (Flexbox, Grid & Custom Properties)",
+      "Flexbox vs. CSS Grid",
+      "CSS Custom Properties (Variables)",
+      "⚙️ CSS Post-Processors: PostCSS",
+      "What is PostCSS?",
+      "Key Plugins",
+      "🛠️ Task Runners (Gulp) vs Next-Gen Bundlers (Esbuild)",
+      "Gulp (Task Automation)",
+      "Esbuild (Ultra-fast Bundler written in Go)"
+    ]
+  },
+  {
+    "path": "guides/03_cloud_devops/01_aws_cloud_native.md",
+    "title": "AWS Cloud-Native Architecture & Serverless Ecosystem",
+    "domainDir": "03_cloud_devops",
+    "headers": [
+      "1. AWS Compute Spectrum: Lambda vs ECS Fargate vs EKS",
+      "AWS Lambda Internals & Cold Starts:",
+      "Cold Start Mitigation for .NET / Web Applications:",
+      "2. Event-Driven Cloud Messaging: SQS vs SNS vs EventBridge",
+      "Key Architectural Distinctions:",
+      "3. High Availability & Multi-Region Active-Active Architecture",
+      "High-Scale Data Storage Patterns:",
+      "4. Senior & Lead Interview Scenarios",
+      "Q1: How do you choose between Amazon SQS and Apache Kafka (Amazon MSK) in an enterprise design?",
+      "Q2: What is the \"Fan-out\" pattern in AWS and why is it preferred over chaining direct HTTP calls?"
+    ]
+  },
+  {
+    "path": "guides/03_cloud_devops/02_azure_enterprise.md",
+    "title": "Azure Enterprise Architecture & Cloud Services",
+    "domainDir": "03_cloud_devops",
+    "headers": [
+      "1. Azure Compute: App Services vs Azure Functions",
+      "2. Azure Cosmos DB: The 5 Consistency Models",
+      "Partition Key Heuristics & Request Units (RUs):",
+      "3. Azure Enterprise Security: Key Vault & Managed Identities",
+      "Managed Identity Types:",
+      "4. Azure Messaging Landscape: Service Bus vs Event Hubs vs Event Grid",
+      "5. Senior & Lead Interview Scenarios",
+      "Q1: Why is \"Session\" consistency the recommended default in Azure Cosmos DB?",
+      "Q2: How do you implement zero-downtime deployments in Azure App Service?"
+    ]
+  },
+  {
+    "path": "guides/03_cloud_devops/03_docker_kubernetes.md",
+    "title": "Docker, Kubernetes & Container Orchestration",
+    "domainDir": "03_cloud_devops",
+    "headers": [
+      "1. Docker & Linux Container Internals",
+      "Multi-Stage Build & Security Hardening:",
+      "2. Kubernetes Architecture & Control Plane Mechanics",
+      "3. Production Deployments, Probes & Auto-Scaling",
+      "1. RollingUpdate Deployment Strategy",
+      "2. The 3 Kubernetes Probes",
+      "3. Resource Requests vs Limits (OOMKilled & CPU Throttling)",
+      "4. Helm Charts & Enterprise Package Management",
+      "5. Senior & Lead Interview Scenarios",
+      "Q1: Why should you avoid setting CPU limits in certain high-throughput microservices?",
+      "Q2: What happens when a Kubernetes Pod transitions from Terminating to Deleted?"
+    ]
+  },
+  {
+    "path": "guides/03_cloud_devops/04_terraform_cicd_pipelines.md",
+    "title": "Terraform (IaC), CI/CD Security & Release Engineering",
+    "domainDir": "03_cloud_devops",
+    "headers": [
+      "1. Terraform Architecture & State Management",
+      "Production Remote State Backend with S3 & DynamoDB:",
+      "State Drift & Remediation:",
+      "2. Enterprise CI/CD Pipeline Architecture & Quality Gates",
+      "3. Keyless Cloud Authentication with OIDC (OpenID Connect)",
+      "4. Senior & Lead Interview Scenarios",
+      "Q1: How do you prevent sensitive secrets (passwords, private keys) from being stored in plain text in `terraform.tfstate`?",
+      "Q2: What is the difference between Blue/Green Deployments and Canary Releases?"
+    ]
+  },
+  {
+    "path": "guides/03_react_fundamentals.md",
+    "title": "03. React Fundamentals & Angular-to-React Concept Mapping",
+    "domainDir": "03_react_fundamentals.md",
+    "headers": [
+      "🌉 Angular to React: Mental Model Bridge",
+      "🎣 React Hooks Core Reference",
+      "1. `useState` & `useReducer`",
+      "2. `useEffect` Synchronization",
+      "3. Performance Optimization: `useMemo`, `useCallback`, and `React.memo`",
+      "⚡ React Fiber & Reconciliation Algorithm"
+    ]
+  },
+  {
+    "path": "guides/04_security_database/01_oauth2_oidc_jwt.md",
+    "title": "OAuth 2.0, OpenID Connect (OIDC) & JWT Token Lifecycle",
+    "domainDir": "04_security_database",
+    "headers": [
+      "1. OAuth 2.0 vs OpenID Connect (OIDC)",
+      "The 4 OAuth 2.0 Roles:",
+      "2. Authorization Code Flow with PKCE (Proof Key for Code Exchange)",
+      "Why PKCE Prevents Code Interception:",
+      "3. JSON Web Token (JWT) Anatomy & Cryptographic Signing",
+      "Asymmetric (RS256) vs Symmetric (HS256) Signing:",
+      "4. Token Revocation & Refresh Token Rotation (RTR)",
+      "5. Senior & Lead Interview Scenarios",
+      "Q1: Where should JWT access tokens be stored in a Single-Page Application (React/Angular)?",
+      "Q2: How do Resource Servers validate JWT tokens without creating a network bottleneck to the Authorization Server?"
+    ]
+  },
+  {
+    "path": "guides/04_security_database/02_owasp_secure_coding.md",
+    "title": "OWASP Top 10 Enterprise Secure Coding & Zero-Trust Architecture",
+    "domainDir": "04_security_database",
+    "headers": [
+      "1. OWASP Top 10 Enterprise Breakdown & Mitigations",
+      "1. Broken Object Level Authorization (BOLA / IDOR) — #1 API Vulnerability",
+      "2. SQL & Command Injection",
+      "3. Server-Side Request Forgery (SSRF)",
+      "4. Cross-Site Scripting (XSS) & Cross-Site Request Forgery (CSRF)",
+      "2. Zero-Trust Architecture Principles",
+      "3. Senior & Lead Interview Scenarios",
+      "Q1: How do you safeguard an enterprise API against Distributed Denial of Service (DDoS) and credential stuffing attacks?",
+      "Q2: What is the difference between Role-Based Access Control (RBAC) and Attribute-Based Access Control (ABAC)?"
+    ]
+  },
+  {
+    "path": "guides/04_security_database/03_sql_query_tuning.md",
+    "title": "Relational Database Engine Tuning & Architecture (SQL Server & PostgreSQL)",
+    "domainDir": "04_security_database",
+    "headers": [
+      "1. SQL Server Storage Engine: Pages, Extents & B-Trees",
+      "2. Key Execution Plan Operators & Performance Killers",
+      "3. Index Optimization: Covering Indexes & Column Order",
+      "The Key Lookup Problem:",
+      "The Solution: Covering Index (`INCLUDE` Columns)",
+      "4. Diagnostic Dynamic Management Views (DMVs)",
+      "1. Identifying Top 10 Most Expensive Queries by CPU:",
+      "5. Transaction Isolation Levels & Locking",
+      "6. PostgreSQL Core Architecture & Capabilities",
+      "Key Architectural Capabilities:",
+      ".NET 8 / EF Core Integration (`Npgsql`)",
+      "7. SQL Server vs. PostgreSQL: Senior Decision Matrix",
+      "8. Senior & Lead Interview Scenarios",
+      "Q1: What causes Deadlocks and how do you resolve them in an enterprise SQL database?",
+      "Q2: What is Parameter Sniffing and how do you fix it?",
+      "9. 🔗 Recommended Next Guide & Architectural Continuity"
+    ]
+  },
+  {
+    "path": "guides/04_security_database/04_dynamodb_data_modeling.md",
+    "title": "DynamoDB Data Modeling & Single-Table NoSQL Design",
+    "domainDir": "04_security_database",
+    "headers": [
+      "1. DynamoDB Architecture & Partition Key Mechanics",
+      "2. The Single-Table Design Philosophy",
+      "Access Patterns Satisfied in a Single Query:",
+      "3. Global Secondary Indexes (GSI) & Sparse Indexes",
+      "Sparse Indexes for Filtering:",
+      "4. Capacity Planning: RCU, WCU & Hot Partitioning",
+      "Hot Partition Mitigation (Key Salting):",
+      "5. Senior & Lead Interview Scenarios",
+      "Q1: When should you NOT use DynamoDB Single-Table Design?",
+      "Q2: How do you achieve ACID transactions across multiple items in DynamoDB?"
+    ]
+  },
+  {
+    "path": "guides/04_state_management.md",
+    "title": "04. State Management: Redux Toolkit & GraphQL (Apollo Client)",
+    "domainDir": "04_state_management.md",
+    "headers": [
+      "🔀 Redux & Redux Toolkit (RTK)",
+      "1. Core Principles",
+      "2. Creating a Slice (`createSlice`)",
+      "3. Async Actions with `createAsyncThunk`",
+      "📡 GraphQL & Apollo Client Integration",
+      "1. GraphQL vs REST API",
+      "2. Apollo Client Queries & Mutations"
+    ]
+  },
+  {
+    "path": "guides/05_aws_cicd_git.md",
+    "title": "05. AWS Cloud Infrastructure (CDK - Cloud Development Kit, S3 - Simple Storage Service, CloudFront), CircleCI & Git Workflows",
+    "domainDir": "05_aws_cicd_git.md",
+    "headers": [
+      "☁️ AWS Static Site Architecture (S3 + CloudFront)",
+      "Key Components:",
+      "🏗️ AWS CDK v2 Infrastructure Code Snippet",
+      "🔄 CI/CD Pipeline Automation: CircleCI",
+      "🐙 Git Master Workflows & Security Maintenance",
+      "Rebase vs Merge in Senior FE Workflows",
+      "Triaging Dependabot Security Alerts"
+    ]
+  },
+  {
+    "path": "guides/05_frontend_engineering/01_fe_foundations.md",
+    "title": "Frontend Foundations: HTML5 Semantics, Modern CSS3 & Core Web Vitals",
+    "domainDir": "05_frontend_engineering",
+    "headers": [
+      "1. HTML5 Semantics & Accessibility (A11y)",
+      "Accessibility (ARIA & WCAG 2.1 AA Compliance):",
+      "2. Modern CSS3: Flexbox vs CSS Grid",
+      "Flexbox Key Mechanics:",
+      "Modern CSS Grid Power Patterns:",
+      "3. Core Web Vitals (CWV) Optimization from First Principles",
+      "4. Senior & Lead Interview Scenarios",
+      "Q1: How do you eliminate render-blocking JavaScript and CSS to improve LCP?",
+      "Q2: What causes high INP (Interaction to Next Paint) in React/Angular applications and how do you fix it?"
+    ]
+  },
+  {
+    "path": "guides/05_frontend_engineering/02_browser_rendering.md",
+    "title": "Browser Rendering Pipeline, Reflows & GPU Compositing",
+    "domainDir": "05_frontend_engineering",
+    "headers": [
+      "1. The 5 Stages of the Browser Rendering Pipeline",
+      "The Cost of DOM Mutations:",
+      "2. Forced Synchronous Layout & Layout Thrashing",
+      "Vulnerable vs Optimized Code:",
+      "3. GPU Hardware Acceleration & Composite Layers",
+      "4. Senior & Lead Interview Scenarios",
+      "Q1: What is the difference between `requestAnimationFrame()` and `setTimeout(fn, 16)` for animations?",
+      "Q2: Why does modifying `transform: translateX(100px)` perform better than modifying `left: 100px`?"
+    ]
+  },
+  {
+    "path": "guides/05_frontend_engineering/03_js_core_event_loop.md",
+    "title": "JavaScript V8 Engine Internals, Closures & Event Loop Mechanics",
+    "domainDir": "05_frontend_engineering",
+    "headers": [
+      "1. Google V8 Engine Architecture: Ignition & TurboFan",
+      "Hidden Classes (Shapes) & Inline Caching:",
+      "2. Execution Context & Closures from First Principles",
+      "Memory Leak Pitfall: Trapped DOM Nodes in Closures",
+      "3. The Event Loop & Microtask Priority Mechanics",
+      "4. Senior & Lead Interview Scenarios",
+      "Q1: What is the exact console output of this code snippet and why?"
+    ]
+  },
+  {
+    "path": "guides/05_frontend_engineering/04_typescript_advanced.md",
+    "title": "Advanced TypeScript Type System, Generics & Metaprogramming",
+    "domainDir": "05_frontend_engineering",
+    "headers": [
+      "1. Conditional Types & the `infer` Keyword",
+      "2. Discriminated Unions & Exhaustiveness Checking",
+      "3. Mapped Types & Key Remapping via `as`",
+      "4. Template Literal Types for Type-Safe Routing & Events",
+      "5. Senior & Lead Interview Scenarios",
+      "Q1: What is the difference between `unknown` and `any` in TypeScript?",
+      "Q2: How do you implement a strictly type-safe `Pick` and `Omit` from scratch?"
+    ]
+  },
+  {
+    "path": "guides/05_frontend_engineering/05_angular_architecture.md",
+    "title": "Angular Enterprise Architecture: Standalone Components, DI & Change Detection",
+    "domainDir": "05_frontend_engineering",
+    "headers": [
+      "1. Standalone Components vs Legacy NgModules",
+      "2. Hierarchical Dependency Injection (Injector Tree)",
+      "DI Resolution Modifiers:",
+      "3. Change Detection: Zone.js vs `OnPush` Strategy",
+      "4. Modern Control Flow & Deferrable Views (Angular 17+)",
+      "5. Senior & Lead Interview Scenarios",
+      "Q1: What is the difference between `ChangeDetectorRef.markForCheck()` and `ChangeDetectorRef.detectChanges()`?",
+      "Q2: How do you migrate an enterprise legacy Angular application with 50+ NgModules to Standalone Components?"
+    ]
+  },
+  {
+    "path": "guides/05_frontend_engineering/06_rxjs_ngrx_signals.md",
+    "title": "RxJS Streams, NgRx Store & Angular Fine-Grained Signals",
+    "domainDir": "05_frontend_engineering",
+    "headers": [
+      "1. RxJS Reactive Streams & The 4 Higher-Order Operators",
+      "Search Typeahead Implementation:",
+      "2. NgRx Store: Unidirectional Event-Sourced Architecture",
+      "3. Angular Signals: Fine-Grained Push-Pull Reactivity",
+      "Why Signals Outperform Zone.js & RxJS for Template Reactivity:",
+      "4. Senior & Lead Interview Scenarios",
+      "Q1: When should you choose Angular Signals over RxJS Observables?",
+      "Q2: How does NgRx `createSelector` prevent redundant re-renders?"
+    ]
+  },
+  {
+    "path": "guides/05_frontend_engineering/07_react_fiber_reconciliation.md",
+    "title": "React Fiber Architecture, Reconciliation & Virtual DOM Internals",
+    "domainDir": "05_frontend_engineering",
+    "headers": [
+      "1. Why the Virtual DOM & React Fiber Exist",
+      "2. The Fiber Node Data Structure",
+      "3. The Two-Phase Lifecycle: Render Phase vs Commit Phase",
+      "4. Reconciliation Diffing Heuristics"
+    ]
+  },
+  {
+    "path": "guides/05_frontend_engineering/08_react_hooks_redux_toolkit.md",
+    "title": "React Custom Hooks, State Architecture & Redux Toolkit (RTK)",
+    "domainDir": "05_frontend_engineering",
+    "headers": [
+      "1. React Hooks Execution Model & Stale Closures",
+      "The Stale Closure Bug:",
+      "2. When to Use `useMemo` & `useCallback` (Senior Trade-Offs)",
+      "3. The State Management Spectrum: Context API vs Redux Toolkit",
+      "4. Redux Toolkit (RTK) & Immer Proxy Mutations",
+      "5. Server State vs Client State (RTK Query / Apollo Client)",
+      "6. Senior & Lead Interview Scenarios",
+      "Q1: Why do React Hooks forbid conditional calls (e.g. inside `if` statements or loops)?",
+      "Q2: How do you resolve massive re-render cascades caused by React Context API?"
+    ]
+  },
+  {
+    "path": "guides/06_ai_engineering/01_rag_vector_search.md",
+    "title": "Retrieval-Augmented Generation (RAG) Architecture & Vector Search",
+    "domainDir": "06_ai_engineering",
+    "headers": [
+      "1. The End-to-End RAG Architecture",
+      "2. Document Chunking Strategies",
+      "3. High-Dimensional Vector Embeddings & Similarity Metrics",
+      "Mathematical Distance Metrics:",
+      "4. Hybrid Search & Reciprocal Rank Fusion (RRF)",
+      "5. Senior & Lead Interview Scenarios",
+      "Q1: How do you prevent multi-tenant data leakage in an enterprise RAG system?",
+      "Q2: What is the \"Lost in the Middle\" phenomenon in RAG context windows and how do you mitigate it?"
+    ]
+  },
+  {
+    "path": "guides/06_ai_engineering/02_azure_openai_semantic_kernel.md",
+    "title": "Azure OpenAI Enterprise Integration & Microsoft Semantic Kernel in .NET",
+    "domainDir": "06_ai_engineering",
+    "headers": [
+      "1. Azure OpenAI Enterprise Security Foundations",
+      "2. Microsoft Semantic Kernel Architecture",
+      "3. Native Plugin Implementation & Tool Calling",
+      "1. Creating a Native C# Plugin:",
+      "2. Registering and Running Automatic Tool Calling:",
+      "4. Senior & Lead Interview Scenarios",
+      "Q1: How do you prevent an autonomous AI Agent from executing unauthorized destructive actions in Semantic Kernel?",
+      "Q2: What is the difference between Semantic Kernel and LangChain?"
+    ]
+  },
+  {
+    "path": "guides/06_ai_engineering/03_ai_assisted_sdlc.md",
+    "title": "AI-Assisted SDLC, Prompt Engineering & LLM Security Guardrails",
+    "domainDir": "06_ai_engineering",
+    "headers": [
+      "1. Core Prompt Engineering Paradigms for Senior Engineers",
+      "2. AI-Assisted Unit Test Generation & Quality Gates",
+      "3. LLM Security & Guardrails (OWASP Top 10 for LLMs)",
+      "4. Senior & Lead Interview Scenarios",
+      "Q1: How do you establish enterprise engineering policies for AI coding tools (Copilot, Cursor) to protect IP and prevent security regressions?",
+      "Q2: What is the difference between RAG and Model Fine-Tuning, and when do you use each?"
+    ]
+  }
+]

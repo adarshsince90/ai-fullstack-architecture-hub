@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Browser Event Loop & Architecture Simulator</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;600;700&family=Outfit:wght@600;700&display=swap');
+    
+    * { box-sizing: border-box; }
+
+    body {
+      background: #0d111d;
+      color: #e2e8f0;
+      font-family: 'Inter', sans-serif;
+      padding: 24px;
+      margin: 0;
+    }
+    
+    h2 { font-family: 'Outfit', sans-serif; color: #38bdf8; margin: 0 0 6px 0; }
+    p { color: #94a3b8; font-size: 0.9rem; margin: 0 0 20px 0; }
+    
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 24px;
+      background: #161c2d;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    button {
+      background: #1e293b;
+      border: 1px solid rgba(255,255,255,0.15);
+      color: white;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    button:hover { transform: translateY(-2px); border-color: #38bdf8; }
+
+    button.btn-primary { background: linear-gradient(135deg, #6366f1, #a855f7); border: none; }
+    button.btn-success { background: linear-gradient(135deg, #059669, #10b981); border: none; }
+    button.btn-warning { background: linear-gradient(135deg, #d97706, #f59e0b); border: none; }
+    button.btn-danger { background: linear-gradient(135deg, #dc2626, #ef4444); border: none; }
+    
+    .architecture-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    
+    .panel {
+      background: #161c2d;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      min-height: 200px;
+    }
+    
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    
+    .badge {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    .badge-stack { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
+    .badge-micro { background: rgba(236, 72, 153, 0.2); color: #ec4899; }
+    .badge-macro { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+    .badge-raf { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
+    .badge-render { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+
+    .queue-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .queue-item {
+      background: #1e293b;
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .queue-item.active {
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.15);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+    }
+
+    .render-screen {
+      background: #090d16;
+      border: 2px dashed rgba(255,255,255,0.15);
+      border-radius: 8px;
+      height: 90px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.85rem;
+      color: #34d399;
+      text-align: center;
+      transition: all 0.3s;
+    }
+
+    .render-screen.flashing {
+      border-color: #10b981;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    .console-log {
+      background: #090d16;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 14px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.82rem;
+      height: 160px;
+      overflow-y: auto;
+      color: #a7f3d0;
+    }
+
+    .log-line { margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+
+  <h2>⚡ Browser Event Loop & Concurrency Simulator</h2>
+  <p>Simulate how the Call Stack, Microtask Queue, Macrotask Queue, rAF Queue, and Render Pipeline interact step-by-step.</p>
+
+  <div class="toolbar">
+    <button class="btn-primary" onclick="addSyncTask()">+ Sync Code</button>
+    <button class="btn-warning" onclick="addMacrotask()">+ setTimeout (Macrotask)</button>
+    <button class="btn-primary" style="background: linear-gradient(135deg, #ec4899, #8b5cf6);" onclick="addMicrotask()">+ Promise.then (Microtask)</button>
+    <button class="btn-primary" style="background: linear-gradient(135deg, #a855f7, #6366f1);" onclick="addRAFTask()">+ rAF (Animation)</button>
+    <button class="btn-success" onclick="stepEventLoop()">▶ Step Event Loop</button>
+    <button class="btn-danger" onclick="runRealtimeSimulation()">🚀 Run Realtime Fetch Demo</button>
+    <button onclick="clearAll()">🔄 Reset</button>
+  </div>
+
+  <div class="architecture-grid">
+    <!-- Call Stack -->
+    <div class="panel">
+      <div class="panel-header">
+        <span>Call Stack (V8)</span>
+        <span class="badge badge-stack" id="stack-count">0</span>
+      </div>
+      <div class="queue-list" id="call-stack">
+        <div style="color: #64748b; font-size: 0.8rem; text-align: center; margin-top: 20px;">[ Stack Empty ]</div>
+      </div>
+    </div>
+
+    <!-- Microtask Queue -->
+    <div class="panel">
+      <div class="panel-header">
+        <span>Microtask Queue</span>
+        <span class="badge badge-micro" id="micro-count">0</span>
+      </div>
+      <div class="queue-list" id="microtask-queue"></div>
+    </div>
+
+    <!-- Macrotask Queue -->
+    <div class="panel">
+      <div class="panel-header">
+        <span>Macrotask Queue</span>
+        <span class="badge badge-macro" id="macro-count">0</span>
+      </div>
+      <div class="queue-list" id="macrotask-queue"></div>
+    </div>
+
+    <!-- rAF Queue & Render -->
+    <div class="panel">
+      <div class="panel-header">
+        <span>rAF Queue & Screen</span>
+        <span class="badge badge-raf" id="raf-count">0</span>
+      </div>
+      <div class="queue-list" id="raf-queue" style="margin-bottom: 12px; min-height: 50px;"></div>
+      <div class="render-screen" id="render-screen">
+        <div>Display Output:</div>
+        <div id="screen-text" style="font-weight: bold; margin-top: 4px; color: #fff;">Idle</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="console-log" id="log-console">
+    <div class="log-line" style="color: #64748b;">[System] Event Loop ready. Add tasks or click Step / Run Demo.</div>
+  </div>
+
+  <script>
+    const state = {
+      stack: [],
+      microtasks: [],
+      macrotasks: [],
+      rafTasks: [],
+      stepCount: 0
+    };
+
+    function log(msg) {
+      const consoleEl = document.getElementById('log-console');
+      const item = document.createElement('div');
+      item.className = 'log-line';
+      item.innerText = `[Step ${state.stepCount}] ${msg}`;
+      consoleEl.appendChild(item);
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+    }
+
+    function updateUI() {
+      // Stack
+      const stackEl = document.getElementById('call-stack');
+      document.getElementById('stack-count').innerText = state.stack.length;
+      if (state.stack.length === 0) {
+        stackEl.innerHTML = '<div style="color: #64748b; font-size: 0.8rem; text-align: center; margin-top: 20px;">[ Stack Empty ]</div>';
+      } else {
+        stackEl.innerHTML = state.stack.map((item, idx) => `
+          <div class="queue-item ${idx === state.stack.length - 1 ? 'active' : ''}">
+            <span>${item.name}</span>
+            <span style="color: #38bdf8;">SYNC</span>
+          </div>
+        `).join('');
+      }
+
+      // Microtasks
+      const microEl = document.getElementById('microtask-queue');
+      document.getElementById('micro-count').innerText = state.microtasks.length;
+      microEl.innerHTML = state.microtasks.map((item) => `
+        <div class="queue-item">
+          <span>${item.name}</span>
+          <span style="color: #ec4899;">Micro</span>
+        </div>
+      `).join('');
+
+      // Macrotasks
+      const macroEl = document.getElementById('macrotask-queue');
+      document.getElementById('macro-count').innerText = state.macrotasks.length;
+      macroEl.innerHTML = state.macrotasks.map((item) => `
+        <div class="queue-item">
+          <span>${item.name}</span>
+          <span style="color: #f59e0b;">Macro</span>
+        </div>
+      `).join('');
+
+      // rAF
+      const rafEl = document.getElementById('raf-queue');
+      document.getElementById('raf-count').innerText = state.rafTasks.length;
+      rafEl.innerHTML = state.rafTasks.map((item) => `
+        <div class="queue-item">
+          <span>${item.name}</span>
+          <span style="color: #c084fc;">rAF</span>
+        </div>
+      `).join('');
+    }
+
+    function addSyncTask() {
+      state.stack.push({ name: `console.log("Sync Code ${Date.now().toString().slice(-4)}")` });
+      log(`Pushed synchronous task onto Call Stack.`);
+      updateUI();
+    }
+
+    function addMicrotask() {
+      state.microtasks.push({ name: `Promise.then(#${state.microtasks.length + 1})` });
+      log(`Queued Microtask into Job Queue.`);
+      updateUI();
+    }
+
+    function addMacrotask() {
+      state.macrotasks.push({ name: `setTimeout(#${state.macrotasks.length + 1})` });
+      log(`Queued Macrotask into Task Queue.`);
+      updateUI();
+    }
+
+    function addRAFTask() {
+      state.rafTasks.push({ name: `requestAnimationFrame(#${state.rafTasks.length + 1})` });
+      log(`Queued Animation callback into rAF Queue.`);
+      updateUI();
+    }
+
+    function stepEventLoop() {
+      state.stepCount++;
+      
+      // 1. Drain Call Stack if present
+      if (state.stack.length > 0) {
+        const task = state.stack.pop();
+        log(`⚡ Call Stack Executed: ${task.name}`);
+        updateUI();
+        return;
+      }
+
+      // 2. Drain Microtasks fully
+      if (state.microtasks.length > 0) {
+        const micro = state.microtasks.shift();
+        log(`🔥 Draining Microtask Queue: Executed ${micro.name}`);
+        updateUI();
+        return;
+      }
+
+      // 3. Render Opportunity (rAF & Layout)
+      if (state.rafTasks.length > 0) {
+        const raf = state.rafTasks.shift();
+        log(`🎨 Render Phase (rAF): Executing ${raf.name} -> Style -> Layout -> Paint`);
+        
+        const screen = document.getElementById('render-screen');
+        const text = document.getElementById('screen-text');
+        screen.classList.add('flashing');
+        text.innerText = `Updated by ${raf.name}`;
+        setTimeout(() => screen.classList.remove('flashing'), 400);
+        
+        updateUI();
+        return;
+      }
+
+      // 4. Run 1 Macrotask
+      if (state.macrotasks.length > 0) {
+        const macro = state.macrotasks.shift();
+        log(`📦 Picked 1 Macrotask from Queue: Executed ${macro.name}`);
+        updateUI();
+        return;
+      }
+
+      log(`💤 Event Loop Idle (All queues empty).`);
+    }
+
+    function runRealtimeSimulation() {
+      clearAll();
+      log(`🚀 Starting Realtime Fetch & UI Flow Simulation...`);
+      
+      // Step 1: User Click -> Synchronous execution
+      state.stack.push({ name: `button.onClick()` });
+      state.stack.push({ name: `statusLabel = "Loading Report..."` });
+      updateUI();
+      
+      setTimeout(() => {
+        log(`  ↳ Registering 5000ms timer with Web API Timer Thread`);
+        state.macrotasks.push({ name: `TimeoutCallback (5000ms Fallback)` });
+        updateUI();
+      }, 600);
+
+      setTimeout(() => {
+        log(`  ↳ Initiating fetch('/api/sales') via Network Process`);
+        state.stack.pop(); // statusLabel
+        state.stack.pop(); // onClick
+        updateUI();
+      }, 1200);
+
+      setTimeout(() => {
+        log(`  ↳ Network Process received 200 OK JSON! Resolving Promise...`);
+        state.microtasks.push({ name: `.then(data => clearTimeout & rAF)` });
+        updateUI();
+      }, 1800);
+
+      setTimeout(() => {
+        log(`  ↳ Microtask executing: Cancelled Timer & Queued rAF UI Render`);
+        state.microtasks.shift(); // remove microtask
+        state.macrotasks.pop();   // clearTimeout cancels timer!
+        state.rafTasks.push({ name: `rAF: render(data)` });
+        updateUI();
+      }, 2400);
+
+      setTimeout(() => {
+        log(`  ↳ VSYNC tick arrived! Executing rAF Render Pipeline`);
+        const raf = state.rafTasks.shift();
+        const screen = document.getElementById('render-screen');
+        const text = document.getElementById('screen-text');
+        screen.classList.add('flashing');
+        text.innerText = `Total: $50,000 (Report Loaded!)`;
+        updateUI();
+      }, 3000);
+    }
+
+    function clearAll() {
+      state.stack = [];
+      state.microtasks = [];
+      state.macrotasks = [];
+      state.rafTasks = [];
+      state.stepCount = 0;
+      document.getElementById('screen-text').innerText = 'Idle';
+      document.getElementById('log-console').innerHTML = '<div class="log-line" style="color: #64748b;">[System] Event Loop reset. Ready for events.</div>';
+      updateUI();
+    }
+  </script>
+</body>
+</html>

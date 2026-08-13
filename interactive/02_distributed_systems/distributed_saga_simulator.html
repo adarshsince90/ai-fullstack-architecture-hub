@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Distributed Saga & Resiliency Visualizer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --border: #30363d;
+      --text: #c9d1d9;
+      --text-bright: #f0f6fc;
+      --primary: #58a6ff;
+      --success: #3fb950;
+      --danger: #f85149;
+      --warning: #d29922;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 1.5rem;
+    }
+    .header {
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    h1 { font-size: 1.25rem; color: var(--text-bright); }
+    .controls { display: flex; gap: 0.75rem; }
+    button {
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 0.8rem;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      background: var(--card-bg);
+      color: var(--text-bright);
+      transition: all 0.2s;
+    }
+    button:hover { border-color: var(--primary); }
+    button.btn-primary { background: #238636; border-color: #2ea043; color: white; }
+    button.btn-danger { background: #da3633; border-color: #f85149; color: white; }
+    
+    .saga-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .service-node {
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+      transition: all 0.3s;
+      position: relative;
+    }
+    .service-node.active { border-color: var(--primary); box-shadow: 0 0 12px rgba(88, 166, 255, 0.3); }
+    .service-node.success { border-color: var(--success); background: rgba(63, 185, 80, 0.08); }
+    .service-node.failed { border-color: var(--danger); background: rgba(248, 81, 73, 0.08); }
+    .service-node.compensating { border-color: var(--warning); background: rgba(210, 153, 34, 0.08); }
+    
+    .node-title { font-weight: 700; font-size: 0.95rem; color: var(--text-bright); margin-bottom: 0.4rem; }
+    .node-status { font-family: 'Fira Code', monospace; font-size: 0.75rem; color: #8b949e; }
+    
+    .log-terminal {
+      background: #090d13;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      height: 220px;
+      overflow-y: auto;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.78rem;
+    }
+    .log-line { margin-bottom: 0.3rem; }
+    .log-time { color: #8b949e; margin-right: 0.5rem; }
+    .log-info { color: var(--primary); }
+    .log-success { color: var(--success); }
+    .log-error { color: var(--danger); }
+    .log-warn { color: var(--warning); }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <h1>⚡ Distributed Saga Orchestrator & Compensating Actions</h1>
+      <p style="font-size: 0.8rem; color: #8b949e; margin-top: 0.2rem;">Simulate distributed multi-service transactional execution and rollbacks.</p>
+    </div>
+    <div class="controls">
+      <button class="btn-primary" onclick="runSaga(false)">▶ Run Successful Order Saga</button>
+      <button class="btn-danger" onclick="runSaga(true)">⚠️ Trigger Inventory Failure & Compensate</button>
+      <button onclick="resetSaga()">↺ Reset</button>
+    </div>
+  </div>
+
+  <div class="saga-grid">
+    <div class="service-node" id="node-orchestrator">
+      <div class="node-title">Saga Orchestrator</div>
+      <div class="node-status" id="status-orchestrator">IDLE</div>
+    </div>
+    <div class="service-node" id="node-payment">
+      <div class="node-title">1. Payment Service</div>
+      <div class="node-status" id="status-payment">PENDING</div>
+    </div>
+    <div class="service-node" id="node-inventory">
+      <div class="node-title">2. Inventory Service</div>
+      <div class="node-status" id="status-inventory">PENDING</div>
+    </div>
+    <div class="service-node" id="node-shipping">
+      <div class="node-title">3. Shipping Service</div>
+      <div class="node-status" id="status-shipping">PENDING</div>
+    </div>
+  </div>
+
+  <div class="log-terminal" id="terminal">
+    <div class="log-line"><span class="log-time">[00:00:00]</span> <span class="log-info">System initialized. Ready to execute Saga workflows.</span></div>
+  </div>
+
+  <script>
+    const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+    
+    function log(msg, type = 'info') {
+      const term = document.getElementById('terminal');
+      const time = new Date().toTimeString().split(' ')[0];
+      const div = document.createElement('div');
+      div.className = 'log-line';
+      div.innerHTML = `<span class="log-time">[${time}]</span> <span class="log-${type}">${msg}</span>`;
+      term.appendChild(div);
+      term.scrollTop = term.scrollHeight;
+    }
+
+    function setNode(id, status, stateClass) {
+      const node = document.getElementById(`node-${id}`);
+      const statusEl = document.getElementById(`status-${id}`);
+      node.className = `service-node ${stateClass}`;
+      statusEl.textContent = status;
+    }
+
+    function resetSaga() {
+      ['orchestrator', 'payment', 'inventory', 'shipping'].forEach(id => {
+        setNode(id, id === 'orchestrator' ? 'IDLE' : 'PENDING', '');
+      });
+      log('Saga state reset.', 'info');
+    }
+
+    async function runSaga(shouldFailInventory) {
+      resetSaga();
+      log('--- Starting Order Checkout Saga [ID: saga_89231] ---', 'info');
+      setNode('orchestrator', 'COORDINATING', 'active');
+
+      // Step 1: Process Payment
+      await sleep(600);
+      setNode('payment', 'CHARGING $120.00', 'active');
+      log('Saga Orchestrator dispatched: ProcessPaymentCommand ($120.00)', 'info');
+      await sleep(1000);
+      setNode('payment', 'CHARGED SUCCESS', 'success');
+      log('PaymentService: Payment authorized & charged successfully.', 'success');
+
+      // Step 2: Reserve Inventory
+      await sleep(600);
+      setNode('inventory', 'RESERVING ITEMS', 'active');
+      log('Saga Orchestrator dispatched: ReserveInventoryCommand (SKU-992)', 'info');
+      await sleep(1000);
+
+      if (shouldFailInventory) {
+        // Failure scenario
+        setNode('inventory', 'OUT OF STOCK (FAILED)', 'failed');
+        log('InventoryService: ❌ Insufficient stock for SKU-992. InventoryReservationFailedEvent published.', 'error');
+
+        await sleep(800);
+        log('Saga Orchestrator: Initiating Compensating Transactions (Rollback)...', 'warn');
+        setNode('orchestrator', 'ROLLING BACK', 'compensating');
+
+        // Compensating Payment
+        await sleep(600);
+        setNode('payment', 'REFUNDING MONEY', 'compensating');
+        log('Saga Orchestrator dispatched: RefundPaymentCommand ($120.00)', 'warn');
+        await sleep(1200);
+        setNode('payment', 'REFUNDED ($120.00)', 'compensating');
+        log('PaymentService: Money refunded to customer wallet.', 'success');
+
+        setNode('orchestrator', 'SAGA ABORTED (COMPENSATED)', 'failed');
+        log('--- Saga Completed with Compensating Rollback ---', 'error');
+        return;
+      }
+
+      // Success inventory
+      setNode('inventory', 'RESERVED SUCCESS', 'success');
+      log('InventoryService: Stock allocated and locked.', 'success');
+
+      // Step 3: Create Shipping Label
+      await sleep(600);
+      setNode('shipping', 'DISPATCHING CARRIER', 'active');
+      log('Saga Orchestrator dispatched: CreateShippingLabelCommand', 'info');
+      await sleep(1000);
+      setNode('shipping', 'LABEL CREATED (TRACK #9912)', 'success');
+      log('ShippingService: Carrier notified. Tracking label generated.', 'success');
+
+      setNode('orchestrator', 'SAGA COMPLETED', 'success');
+      log('--- Order Checkout Saga Finished Successfully ---', 'success');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Master Full-Stack & Systems Engineering Interview Hub</title>
+  <meta name="description" content="Master Engineering Mind Map, Curated Learning Paths, Interactive Simulators and Guides for Senior Full Stack & Lead Engineers.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <!-- Markdown Renderer for dynamic guide viewing -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Global Header -->
+    <header class="global-header">
+      <div class="brand-section">
+        <div class="logo-icon">🚀</div>
+        <div>
+          <h1 class="app-title">Master Systems & Full-Stack Prep</h1>
+          <div class="app-subtitle">Senior / Lead Software Engineer & Architecture Prep Hub</div>
+        </div>
+      </div>
+      
+      <!-- Top Global Search Box -->
+      <div class="search-box">
+        <input type="text" id="topic-search" placeholder="🔍 Search any topic, pattern, or keyword..." oninput="app.filterTopics(this.value)">
+      </div>
+
+      <div class="header-actions">
+        <button class="btn btn-primary" id="recap-btn" onclick="app.showRecapView()">
+          ⚡ Quick Recap (Interactive)
+        </button>
+        <button class="btn btn-outline" id="mindmap-toggle-btn" onclick="app.showMindmapView()">
+          🗺️ Mind Map
+        </button>
+        <button class="btn btn-outline" id="simulators-btn" onclick="app.showSimulatorsView()">
+          ⚡ Simulators
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Dynamic Container -->
+    <main class="main-content" id="main-content">
+      
+      <!-- Global Search Deep Guide Matches Banner -->
+      <div class="search-results-overlay" id="global-search-results" style="display: none;">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+      
+      <!-- 1. MIND MAP & LEARNING PATHS VIEW -->
+      <section id="mindmap-view" class="view-section" style="display: none;">
+        
+        <!-- Hero Learning Paths Selector -->
+        <div class="paths-banner">
+          <div class="section-badge">🧭 RECOMMENDED LEARNING PATHS</div>
+          <h2 class="banner-title">Choose Your Career Progression Track</h2>
+          <div class="paths-grid" id="learning-paths-container">
+            <!-- Rendered dynamically by app.js -->
+          </div>
+        </div>
+
+        <!-- Master Domain Pillars Tree -->
+        <div class="mindmap-section">
+          <div class="mindmap-header">
+            <div>
+              <div class="section-badge">🌳 INTERACTIVE MIND MAP</div>
+              <h2 class="section-title">6 Core Engineering Domains</h2>
+              <p class="section-desc">Click any node to explore in-depth architectural guides, runnable code templates, and interactive simulators.</p>
+            </div>
+          </div>
+
+          <div class="domains-tree-grid" id="domains-tree-container">
+            <!-- Rendered dynamically by app.js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. IN-DEPTH GUIDE VIEWER -->
+      <section id="guide-viewer-section" class="view-section" style="display: none;">
+        <div class="guide-toolbar">
+          <button class="btn btn-sm btn-outline" id="guide-back-btn" onclick="app.goBackFromGuide()">← Back</button>
+          <div class="guide-meta-title" id="guide-title-display">Reading Guide</div>
+          <button class="btn btn-sm btn-accent" id="guide-sim-btn" style="display: none;">⚡ Launch Simulator</button>
+          <a class="btn btn-sm btn-outline" id="raw-guide-link" target="_blank">Open Raw Markdown</a>
+        </div>
+        <div class="guide-markdown-body" id="guide-content-display">
+          <!-- Rendered markdown content -->
+        </div>
+      </section>
+
+      <!-- 3. QUICK RECAP SINGLE SCROLLABLE VIEW (WITH INTERACTIVE CHECKBOXES) -->
+      <section id="recap-view" class="view-section active">
+        <div class="recap-header-banner">
+          <div class="recap-header-left">
+            <div class="section-badge">⚡ UNIFIED MASTER KNOWLEDGE BASE</div>
+            <h2 class="section-title">Senior Technical Definitions & Readiness Checklist</h2>
+            <p class="section-desc">Unified master repository combining 4-5 lines of architectural depth with structured 4-part interview explanations across all 19 engineering domains. Check off topics as you master them to track interview readiness.</p>
+          </div>
+        </div>
+
+        <!-- Quick Navigation Table of Contents (TOC) & Sticky Progress Bar -->
+        <div class="recap-toc-bar" id="recap-toc-bar">
+          <!-- Row 1: All domain chips covering initial row(s) -->
+          <div class="recap-toc-chips-row" id="recap-toc-chips">
+            <!-- Rendered dynamically by app.js -->
+          </div>
+          
+          <!-- Last Row: Progress bar on left, Expand/Collapse on right -->
+          <div class="recap-toc-bottom-row">
+            <div class="recap-stats-box-inline">
+              <span class="recap-progress-text-inline">
+                <span id="recap-completed-count">0</span>/<span id="recap-total-count">0</span> (<span id="recap-percentage">0%</span>)
+              </span>
+              <div class="recap-progress-bar-inline">
+                <div class="recap-progress-fill" id="recap-progress-fill" style="width: 0%;"></div>
+              </div>
+              <button class="btn btn-sm btn-outline btn-reset-inline" onclick="app.resetRecapProgress()" title="Reset Progress Checklist">↺ Reset</button>
+            </div>
+            <div class="recap-toc-actions">
+              <button class="btn btn-sm btn-outline" onclick="app.toggleAllRecapSections(true)">▾ Expand All</button>
+              <button class="btn btn-sm btn-outline" onclick="app.toggleAllRecapSections(false)">▸ Collapse All</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2-Column Split: Sticky Tree Sidebar + Document Pane -->
+        <div class="recap-split-layout">
+          <!-- Left Sticky Sidebar Tree View -->
+          <aside class="recap-tree-sidebar">
+            <div class="recap-tree-header">
+              <div class="recap-tree-title-row">
+                <div class="recap-tree-title">🗂️ Master Architecture Tree</div>
+                <div class="recap-tree-quick-toggles">
+                  <button class="tree-mini-btn" title="Expand All Domains" onclick="app.toggleAllTreeDomains(true)">▾ Expand</button>
+                  <button class="tree-mini-btn" title="Collapse All to Headlines" onclick="app.toggleAllTreeDomains(false)">▸ Headlines</button>
+                </div>
+              </div>
+              <input type="text" id="recap-tree-search" class="recap-tree-search" placeholder="🔍 Filter keywords..." oninput="app.filterRecapTree(this.value)">
+            </div>
+            <div class="recap-tree-nav" id="recap-tree-nav">
+              <!-- Rendered dynamically by app.js -->
+            </div>
+          </aside>
+
+          <!-- Main Document Pane -->
+          <main class="recap-document-pane">
+            <div class="recap-document-container" id="recap-document-container">
+              <!-- Rendered dynamically by app.js from docs/profile/Definitions.md -->
+            </div>
+          </main>
+        </div>
+      </section>
+
+      <!-- 6. INTERACTIVE SIMULATORS PLAYGROUND -->
+      <section id="simulators-view" class="view-section" style="display: none;">
+        <div class="simulators-header">
+          <div class="section-badge">⚡ VISUAL PLAYGROUNDS</div>
+          <h2 class="section-title">Interactive Engineering Simulators</h2>
+          <p class="section-desc">Verify deep execution mechanics visually—from Distributed Saga Transactions to JS Event Loops and React Fiber Diffing.</p>
+        </div>
+
+        <div class="simulators-grid">
+          <div class="sim-card" onclick="app.launchSimulator('interactive/01_dotnet_backend/aspnet_middleware_di_simulator.html', 'ASP.NET Core Middleware & DI Captive Dependency Simulator')">
+            <div class="sim-icon">🧠</div>
+            <div class="sim-title">ASP.NET Core Middleware & DI Scope Simulator</div>
+            <div class="sim-desc">Simulate bidirectional HTTP middleware execution, short-circuiting, and the Singleton-to-Scoped Captive Dependency trap.</div>
+            <span class="sim-tag">Backend & .NET</span>
+          </div>
+
+          <div class="sim-card" onclick="app.launchSimulator('interactive/02_distributed_systems/distributed_saga_simulator.html', 'Distributed Saga & Compensating Actions')">
+            <div class="sim-icon">⚡</div>
+            <div class="sim-title">Distributed Saga Orchestrator</div>
+            <div class="sim-desc">Simulate distributed multi-service checkout workflows, inventory failures, and compensating rollbacks.</div>
+            <span class="sim-tag">Distributed Systems</span>
+          </div>
+
+          <div class="sim-card" onclick="app.launchSimulator('interactive/04_security_database/oauth2_pkce_token_flow_simulator.html', 'OAuth 2.0 PKCE & JWT Simulator')">
+            <div class="sim-icon">🔐</div>
+            <div class="sim-title">OAuth 2.0 PKCE & JWT Flow Simulator</div>
+            <div class="sim-desc">Simulate SHA-256 S256 code challenge generation, token exchange, and intercepted code attack mitigation.</div>
+            <span class="sim-tag">Security & Identity</span>
+          </div>
+
+          <div class="sim-card" onclick="app.launchSimulator('interactive/05_frontend_engineering/browser_event_loop_simulator.html', 'JS Event Loop & Microtasks')">
+            <div class="sim-icon">🔄</div>
+            <div class="sim-title">Browser Event Loop & Microtasks</div>
+            <div class="sim-desc">Step-by-step visual execution of Call Stack, Web APIs, Microtask Queue (Promises), and Macrotasks.</div>
+            <span class="sim-tag">Frontend Core</span>
+          </div>
+
+          <div class="sim-card" onclick="app.launchSimulator('interactive/05_frontend_engineering/react_rendering_visualizer.html', 'React Fiber Re-render Visualizer')">
+            <div class="sim-icon">⚛️</div>
+            <div class="sim-title">React Fiber & Reconciliation Tree</div>
+            <div class="sim-desc">Visualize state bubbling, prop drilling, and how React.memo / memoization skips sub-tree reconciliations.</div>
+            <span class="sim-tag">React Deep-Dive</span>
+          </div>
+
+          <div class="sim-card" onclick="app.launchSimulator('interactive/05_frontend_engineering/angular_signals_reactivity_simulator.html', 'Angular Signals vs React Virtual DOM')">
+            <div class="sim-icon">🅰️</div>
+            <div class="sim-title">Signals vs React Virtual DOM Simulator</div>
+            <div class="sim-desc">Compare Angular Signals fine-grained reactivity vs React top-down Virtual DOM Fiber re-render cascades.</div>
+            <span class="sim-tag">Multi-Framework</span>
+          </div>
+
+          <div class="sim-card" onclick="app.launchSimulator('interactive/05_frontend_engineering/redux_flow_simulator.html', 'Redux Event-Sourcing State Machine')">
+            <div class="sim-icon">📦</div>
+            <div class="sim-title">Redux Toolkit State Flow & Immer</div>
+            <div class="sim-desc">Inspect action dispatching, middleware interception, and immutable draft mutations using Immer.</div>
+            <span class="sim-tag">State Management</span>
+          </div>
+
+          <div class="sim-card" onclick="app.launchSimulator('interactive/05_frontend_engineering/transpile_pipeline_visualizer.html', 'Compiler & Transpiler Pipeline')">
+            <div class="sim-icon">⚙️</div>
+            <div class="sim-title">esbuild / PostCSS Transpile Pipeline</div>
+            <div class="sim-desc">Step through AST parsing, JSX compilation, CSS post-processing, and bundle minification.</div>
+            <span class="sim-tag">Tooling & Build</span>
+          </div>
+
+          <div class="sim-card" onclick="app.launchSimulator('interactive/06_ai_engineering/rag_pipeline_simulator.html', 'RAG & Vector Search Simulator')">
+            <div class="sim-icon">🤖</div>
+            <div class="sim-title">RAG & Vector Search Simulator</div>
+            <div class="sim-desc">Simulate document chunking, Cosine distance vector search, prompt augmentation, and grounded citations.</div>
+            <span class="sim-tag">AI & LLM Architecture</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Global Simulator Modal / Frame Container -->
+      <div class="simulator-frame-modal" id="sim-modal" style="display: none;">
+        <div class="sim-modal-header">
+          <h3 id="sim-modal-title">Simulator</h3>
+          <button class="btn btn-sm btn-outline" onclick="app.closeSimulator()">✕ Close Simulator</button>
+        </div>
+        <iframe id="sim-iframe" class="sim-iframe" src=""></iframe>
+      </div>
+
+    </main>
+
+    <!-- Floating Bottom-Right AI Assistant Widget Panel (Non-blocking) -->
+    <div class="ai-widget-panel" id="ai-widget-panel" style="display: none;">
+      <div class="ai-drawer-header">
+        <div class="ai-drawer-title">
+          <span>🤖</span>
+          <div>
+            <h3>AI Prep Tutor (BYOK)</h3>
+            <div class="ai-drawer-subtitle">
+              <span class="ai-status-dot missing" id="ai-key-status-dot"></span>
+              <span id="ai-key-status-label">Configure API Key</span>
+            </div>
+          </div>
+        </div>
+        <div class="ai-header-actions">
+          <button class="btn btn-sm btn-outline" id="ai-expand-btn" onclick="app.toggleAiWidth()" title="Toggle Wide Immersive / Compact Mode">↔️ Expand</button>
+          <button class="btn btn-sm btn-outline" onclick="app.toggleAiSettings()" title="API Key & Provider Settings">⚙️ Settings</button>
+          <button class="btn btn-sm btn-outline" onclick="app.clearAiChatHistory()" title="Clear Chat Conversation History">🗑️ Clear</button>
+          <button class="btn btn-sm btn-outline" onclick="app.toggleAiAssistant()" title="Minimize Chat">✕</button>
+        </div>
+      </div>
+
+      <div class="ai-key-config" id="ai-key-config" style="display: none;">
+        <div class="key-config-row">
+          <select id="ai-provider-select" onchange="app.onAiProviderChange()">
+            <option value="groq">Groq (Llama 3.3 70B - Fast & Free)</option>
+            <option value="gemini">Google Gemini (1.5 / 2.5 Flash)</option>
+            <option value="openai">OpenAI (GPT-4o / 4o-mini)</option>
+            <option value="openrouter">OpenRouter (Claude / DeepSeek)</option>
+          </select>
+          <input type="password" id="ai-api-key" placeholder="Paste Groq API Key (gsk_...)..." oninput="app.saveAiKey(this.value)">
+        </div>
+        <div class="key-hint">💡 Keys are stored in browser memory (`sessionStorage`) only. Sent directly to provider endpoints without backend servers.</div>
+      </div>
+
+      <div class="ai-chat-body" id="ai-chat-body">
+        <div class="ai-msg bot-msg">
+          <div class="msg-sender">🤖 Interview Coach</div>
+          <div class="msg-content">Hello! I am your AI Software Engineering Interview Coach. Ask me any question, request system design mock interviews, or ask for clarifications on any of the 292 terms in this repository!</div>
+        </div>
+      </div>
+
+      <!-- Active Context Bar -->
+      <div class="ai-context-bar" id="ai-context-bar" style="display: none;">
+        <span id="ai-context-label">📍 Active Context: General Engineering</span>
+        <button class="btn-context-chip" id="ai-context-btn" onclick="app.askAboutActiveContext()">⚡ Ask AI about this topic</button>
+      </div>
+
+      <div class="ai-chat-input-row">
+        <textarea id="ai-chat-input" placeholder="Ask a question or request a mock interview (e.g. 'Explain Saga vs Outbox pattern')..." rows="2" onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); app.sendAiMessage(); }"></textarea>
+        <button class="btn btn-primary" onclick="app.sendAiMessage()">Send 🚀</button>
+      </div>
+    </div>
+
+    <!-- Global Footer -->
+    <footer class="global-footer">
+      <div class="footer-content">
+        <span>Master Systems & Full-Stack Engineering Hub • Open Source MIT License</span>
+        <span class="footer-links">
+          <a href="README.md" target="_blank">Showcase README</a>
+          <a href="PROGRESS.md" target="_blank">Content Roadmap</a>
+          <a href="LICENSE" target="_blank">MIT License</a>
+        </span>
+      </div>
+    </footer>
+
+    <!-- Floating Controls at Bottom Right (Top button sits to the left of AI Tutor button) -->
+    <div class="floating-right-controls">
+      <button class="back-to-top-btn" id="back-to-top-btn" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })" title="Scroll to Top">
+        ⬆️ Top
+      </button>
+      <button class="ai-fab-btn" id="ai-fab-btn" onclick="app.toggleAiAssistant()" title="Toggle AI Study Tutor">
+        🤖 <span>AI Tutor</span>
+      </button>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

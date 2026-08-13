@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASP.NET Core Middleware & DI Captive Dependency Simulator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0b0f19;
+      --card-bg: #111827;
+      --card-border: #1f2937;
+      --accent-blue: #38bdf8;
+      --accent-purple: #a855f7;
+      --accent-green: #22c55e;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+    body { background: var(--bg-dark); color: var(--text-main); padding: 1.5rem; }
+
+    .sim-header {
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 1rem;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 9999px;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-blue);
+      border: 1px solid var(--accent-blue);
+      margin-bottom: 0.5rem;
+    }
+    h1 { font-size: 1.6rem; font-weight: 800; color: #fff; margin-bottom: 0.25rem; }
+    p.desc { color: var(--text-muted); font-size: 0.9rem; }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    @media (max-width: 900px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .panel-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    /* Middleware Pipeline Steps */
+    .pipeline-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      position: relative;
+    }
+    .mw-node {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      background: #1a2234;
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+    .mw-node.active-forward {
+      border-color: var(--accent-blue);
+      background: rgba(56, 189, 248, 0.12);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+      transform: translateX(6px);
+    }
+    .mw-node.active-backward {
+      border-color: var(--accent-green);
+      background: rgba(34, 197, 94, 0.12);
+      box-shadow: 0 0 15px rgba(34, 197, 94, 0.3);
+      transform: translateX(-6px);
+    }
+    .mw-node.short-circuited {
+      border-color: var(--accent-rose);
+      background: rgba(244, 63, 94, 0.15);
+      box-shadow: 0 0 15px rgba(244, 63, 94, 0.3);
+    }
+    .mw-info { display: flex; align-items: center; gap: 0.6rem; }
+    .mw-idx { font-family: 'Fira Code', monospace; font-size: 0.8rem; color: var(--accent-purple); }
+    .mw-name { font-weight: 600; font-size: 0.9rem; }
+    .mw-status { font-size: 0.75rem; color: var(--text-muted); font-family: 'Fira Code', monospace; }
+
+    /* Controls */
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--card-border);
+    }
+    .btn {
+      padding: 0.5rem 0.9rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: var(--accent-blue); color: #000; }
+    .btn-primary:hover { background: #7dd3fc; }
+    .btn-outline { background: transparent; border-color: var(--card-border); color: #fff; }
+    .btn-outline:hover { background: #1e293b; }
+    .btn-danger { background: rgba(244, 63, 94, 0.2); border-color: var(--accent-rose); color: var(--accent-rose); }
+    .btn-danger:hover { background: rgba(244, 63, 94, 0.4); }
+
+    /* Console / Logs */
+    .console-box {
+      background: #070a12;
+      border: 1px solid #1f2937;
+      border-radius: 8px;
+      padding: 0.75rem;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.78rem;
+      color: #38bdf8;
+      height: 160px;
+      overflow-y: auto;
+      margin-top: 1rem;
+    }
+    .log-line { margin-bottom: 0.3rem; }
+    .log-fwd { color: #38bdf8; }
+    .log-bwd { color: #22c55e; }
+    .log-err { color: #f43f5e; font-weight: 600; }
+
+    /* DI Lifetime Visualizer */
+    .di-cards-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+    .di-card {
+      background: #1a2234;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 0.9rem;
+    }
+    .di-title { font-weight: 700; font-size: 0.95rem; color: #fff; margin-bottom: 0.25rem; display: flex; justify-content: space-between; }
+    .di-lifetime-tag { font-size: 0.7rem; padding: 0.15rem 0.5rem; border-radius: 4px; font-family: 'Fira Code', monospace; }
+    .tag-singleton { background: rgba(168, 85, 247, 0.2); color: var(--accent-purple); border: 1px solid var(--accent-purple); }
+    .tag-scoped { background: rgba(56, 189, 248, 0.2); color: var(--accent-blue); border: 1px solid var(--accent-blue); }
+    .tag-transient { background: rgba(34, 197, 94, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); }
+    .di-desc { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+    .di-state-box { background: #0b0f19; border-radius: 6px; padding: 0.5rem; font-family: 'Fira Code', monospace; font-size: 0.75rem; }
+
+    .captive-alert {
+      margin-top: 1rem;
+      background: rgba(244, 63, 94, 0.15);
+      border: 1px solid var(--accent-rose);
+      border-radius: 8px;
+      padding: 0.9rem;
+      font-size: 0.85rem;
+      display: none;
+    }
+    .captive-alert.active { display: block; animation: pulse 1.5s infinite; }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(244, 63, 94, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sim-header">
+    <span class="badge">ASP.NET CORE RUNTIME INTERNALS</span>
+    <h1>Middleware Pipeline & DI Captive Dependency Simulator</h1>
+    <p class="desc">Step through bidirectional HTTP RequestDelegate execution and simulate the notorious Singleton-to-Scoped Captive Dependency memory leak.</p>
+  </div>
+
+  <div class="grid-2">
+    
+    <!-- LEFT: Middleware Pipeline -->
+    <div class="panel">
+      <div class="panel-title">⚡ HTTP Request Middleware Delegate Chain</div>
+      
+      <div class="pipeline-container" id="pipeline-nodes">
+        <div class="mw-node" id="node-0">
+          <div class="mw-info"><span class="mw-idx">1</span><span class="mw-name">ExceptionHandlerMiddleware</span></div>
+          <span class="mw-status" id="st-0">Idle</span>
+        </div>
+        <div class="mw-node" id="node-1">
+          <div class="mw-info"><span class="mw-idx">2</span><span class="mw-name">HttpsRedirectionMiddleware</span></div>
+          <span class="mw-status" id="st-1">Idle</span>
+        </div>
+        <div class="mw-node" id="node-2">
+          <div class="mw-info"><span class="mw-idx">3</span><span class="mw-name">RateLimiterMiddleware (100 QPS)</span></div>
+          <span class="mw-status" id="st-2">Idle</span>
+        </div>
+        <div class="mw-node" id="node-3">
+          <div class="mw-info"><span class="mw-idx">4</span><span class="mw-name">AuthenticationMiddleware (JWT)</span></div>
+          <span class="mw-status" id="st-3">Idle</span>
+        </div>
+        <div class="mw-node" id="node-4">
+          <div class="mw-info"><span class="mw-idx">5</span><span class="mw-name">Endpoint / Controller Action</span></div>
+          <span class="mw-status" id="st-4">Idle</span>
+        </div>
+      </div>
+
+      <div class="controls-row">
+        <button class="btn btn-primary" onclick="sim.runRequest('normal')">▶ Dispatch Normal Request (200 OK)</button>
+        <button class="btn btn-danger" onclick="sim.runRequest('ratelimit')">⚠️ Trigger Rate Limit (429)</button>
+        <button class="btn btn-danger" onclick="sim.runRequest('error')">💥 Unhandled Exception (500)</button>
+        <button class="btn btn-outline" onclick="sim.resetPipeline()">↺ Reset</button>
+      </div>
+
+      <div class="console-box" id="mw-console">
+        <div class="log-line">Console initialized. Ready to process HTTP requests.</div>
+      </div>
+    </div>
+
+    <!-- RIGHT: DI Container & Captive Dependency Visualizer -->
+    <div class="panel">
+      <div class="panel-title">🧠 Dependency Injection Lifetimes & Captive Trap</div>
+
+      <div class="di-cards-grid">
+        <div class="di-card" id="card-singleton">
+          <div class="di-title">
+            <span>GlobalMetricsService</span>
+            <span class="di-lifetime-tag tag-singleton">Singleton (1 Instance)</span>
+          </div>
+          <div class="di-desc">Lives for the entire lifecycle of the process. Injected once at startup.</div>
+          <div class="di-state-box" id="singleton-state">Instance Hash: #A891F | References: Root</div>
+        </div>
+
+        <div class="di-card" id="card-scoped">
+          <div class="di-title">
+            <span>AppDbContext</span>
+            <span class="di-lifetime-tag tag-scoped">Scoped (Per-Request)</span>
+          </div>
+          <div class="di-desc">Created when HTTP Request begins, disposed when request completes.</div>
+          <div class="di-state-box" id="scoped-state">Request #101: Active | ChangeTracker: 0 Entities</div>
+        </div>
+
+        <div class="di-card" id="card-transient">
+          <div class="di-title">
+            <span>PriceCalculator</span>
+            <span class="di-lifetime-tag tag-transient">Transient (Per-Call)</span>
+          </div>
+          <div class="di-desc">New instance instantiated every time resolved from IServiceProvider.</div>
+          <div class="di-state-box" id="transient-state">Instantiated on demand (Stateless)</div>
+        </div>
+      </div>
+
+      <div class="controls-row">
+        <button class="btn btn-danger" onclick="sim.triggerCaptiveDependency()">⚠️ Inject Scoped into Singleton (Trap!)</button>
+        <button class="btn btn-primary" onclick="sim.fixWithScopeFactory()">✅ Fix with IServiceScopeFactory</button>
+      </div>
+
+      <div class="captive-alert" id="captive-alert-box">
+        <strong>🚨 CAPTIVE DEPENDENCY DETECTED!</strong>
+        <p style="margin-top: 0.3rem;">
+          <code>AppDbContext</code> (Scoped) has been captured by <code>GlobalMetricsService</code> (Singleton)!
+          <br>• <strong>Memory Leak</strong>: ChangeTracker never gets disposed; memory grows monotonically.
+          <br>• <strong>Concurrency Crash</strong>: Simultaneous HTTP requests accessing DbContext will throw <code>InvalidOperationException</code>!
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    class MiddlewareSimulator {
+      constructor() {
+        this.nodes = [
+          { name: 'ExceptionHandlerMiddleware', desc: 'Catches upstream unhandled exceptions' },
+          { name: 'HttpsRedirectionMiddleware', desc: 'Enforces HTTPS TLS encryption' },
+          { name: 'RateLimiterMiddleware', desc: 'Applies sliding window rate checks' },
+          { name: 'AuthenticationMiddleware', desc: 'Validates JWT Bearer signature' },
+          { name: 'Endpoint / Action', desc: 'Executes business logic & generates IResult' }
+        ];
+        this.isRunning = false;
+        this.reqCount = 100;
+      }
+
+      log(msg, type = 'fwd') {
+        const c = document.getElementById('mw-console');
+        const d = document.createElement('div');
+        d.className = `log-line log-${type}`;
+        d.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+        c.appendChild(d);
+        c.scrollTop = c.scrollHeight;
+      }
+
+      resetPipeline() {
+        for (let i = 0; i < 5; i++) {
+          const node = document.getElementById(`node-${i}`);
+          node.className = 'mw-node';
+          document.getElementById(`st-${i}`).textContent = 'Idle';
+        }
+      }
+
+      async runRequest(mode) {
+        if (this.isRunning) return;
+        this.isRunning = true;
+        this.resetPipeline();
+        this.reqCount++;
+        const reqId = `REQ-${this.reqCount}`;
+
+        this.log(`Incoming HTTP GET /api/v1/orders (Id: ${reqId})`, 'fwd');
+
+        // Step Forward
+        for (let i = 0; i < 5; i++) {
+          const node = document.getElementById(`node-${i}`);
+          const status = document.getElementById(`st-${i}`);
+          
+          node.className = 'mw-node active-forward';
+          status.textContent = 'await next() ──►';
+          this.log(`--> Entering ${this.nodes[i].name}`, 'fwd');
+          await this.delay(400);
+
+          // Simulate Rate Limit Rejection at Step 2
+          if (mode === 'ratelimit' && i === 2) {
+            node.className = 'mw-node short-circuited';
+            status.textContent = '⛔ 429 Too Many Requests (Short-Circuit)';
+            this.log(`[SHORT-CIRCUIT] RateLimiter exceeded quota. Returning 429 immediately!`, 'err');
+            await this.delay(500);
+            await this.stepBackward(1, reqId);
+            this.isRunning = false;
+            return;
+          }
+
+          // Simulate Unhandled Exception at Endpoint (Step 4)
+          if (mode === 'error' && i === 4) {
+            node.className = 'mw-node short-circuited';
+            status.textContent = '💥 NullReferenceException';
+            this.log(`[EXCEPTION] Unhandled error thrown in Controller action!`, 'err');
+            await this.delay(500);
+            await this.stepBackward(3, reqId, true);
+            this.isRunning = false;
+            return;
+          }
+        }
+
+        // Action Completed, Step Backward
+        await this.stepBackward(4, reqId, false);
+        this.isRunning = false;
+      }
+
+      async stepBackward(startIdx, reqId, hasError = false) {
+        for (let i = startIdx; i >= 0; i--) {
+          const node = document.getElementById(`node-${i}`);
+          const status = document.getElementById(`st-${i}`);
+
+          if (i === 0 && hasError) {
+            node.className = 'mw-node short-circuited';
+            status.textContent = '🛡️ Caught! Returning ProblemDetails 500';
+            this.log(`<-- ExceptionHandler intercepted error and converted to RFC 7807 ProblemDetails.`, 'err');
+          } else {
+            node.className = 'mw-node active-backward';
+            status.textContent = '◄── Returning Response';
+            this.log(`<-- Exiting ${this.nodes[i].name}`, 'bwd');
+          }
+          await this.delay(350);
+        }
+        this.log(`HTTP Response finalized and sent to client.`, 'bwd');
+      }
+
+      triggerCaptiveDependency() {
+        const alertBox = document.getElementById('captive-alert-box');
+        alertBox.className = 'captive-alert active';
+        document.getElementById('singleton-state').innerHTML = '<span style="color:#f43f5e">⚠️ TRAPPED REFERENCE to Scoped AppDbContext #DB-892 (LEAKING!)</span>';
+        document.getElementById('scoped-state').innerHTML = '<span style="color:#f43f5e">Captured by Singleton! Disposed=FALSE | Entities: 14,280</span>';
+      }
+
+      fixWithScopeFactory() {
+        const alertBox = document.getElementById('captive-alert-box');
+        alertBox.className = 'captive-alert';
+        alertBox.style.display = 'none';
+        document.getElementById('singleton-state').innerHTML = '<span style="color:#22c55e">✅ Holds IServiceScopeFactory (Clean & Safe)</span>';
+        document.getElementById('scoped-state').innerHTML = '<span style="color:#38bdf8">Created per-call via scope.ServiceProvider. Disposed=TRUE</span>';
+      }
+
+      delay(ms) { return new Promise(res => setTimeout(res, ms)); }
+    }
+
+    const sim = new MiddlewareSimulator();
+  </script>
+</body>
+</html>

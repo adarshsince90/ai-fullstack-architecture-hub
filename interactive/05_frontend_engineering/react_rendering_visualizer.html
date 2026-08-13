@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>React Rendering & Reconciliation Simulator</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;600;700&family=Outfit:wght@600;700&display=swap');
+    
+    body {
+      background: #0d111d;
+      color: #e2e8f0;
+      font-family: 'Inter', sans-serif;
+      padding: 24px;
+      margin: 0;
+    }
+    
+    h2 { font-family: 'Outfit', sans-serif; color: #38bdf8; margin-bottom: 8px; }
+    p { color: #94a3b8; font-size: 0.9rem; margin-bottom: 20px; }
+    
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      background: #161c2d;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    button {
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      border: none;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    button:hover { opacity: 0.9; transform: translateY(-2px); }
+
+    .toggle-memo {
+      background: #1e293b;
+      border: 1px solid #6366f1;
+    }
+    
+    .tree-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      background: rgba(18, 22, 36, 0.7);
+      padding: 30px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      position: relative;
+    }
+    
+    .node-row {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      width: 100%;
+    }
+    
+    .comp-node {
+      background: #1e293b;
+      border: 2px solid #475569;
+      border-radius: 12px;
+      padding: 16px 20px;
+      min-width: 180px;
+      text-align: center;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+    
+    .comp-node.rendering {
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.2);
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.5);
+      transform: scale(1.05);
+    }
+    
+    .comp-node.skipped {
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.15);
+      opacity: 0.7;
+    }
+    
+    .node-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #fff;
+    }
+
+    .node-state {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem;
+      margin-top: 6px;
+      color: #ec4899;
+    }
+    
+    .render-log {
+      margin-top: 24px;
+      background: #090d16;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 16px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.85rem;
+      max-height: 180px;
+      overflow-y: auto;
+      color: #a7f3d0;
+    }
+
+    .log-item { margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+
+  <h2>⚛️ React Fiber Tree & Re-render Visualizer</h2>
+  <p>Trigger state updates at the root or leaf components to see how render passes traverse down the component tree, and observe the impact of <code>React.memo</code>.</p>
+
+  <div class="controls">
+    <button onclick="triggerRootUpdate()">Update App State (Root)</button>
+    <button onclick="triggerLeafUpdate()">Update Child B State</button>
+    <button class="toggle-memo" id="memo-btn" onclick="toggleMemo()">Toggle React.memo on Child A: OFF</button>
+  </div>
+
+  <div class="tree-container">
+    <!-- Root -->
+    <div class="node-row">
+      <div class="comp-node" id="node-root">
+        <div class="node-title">&lt;App /&gt; (Root)</div>
+        <div class="node-state">count: <span id="val-root">0</span></div>
+      </div>
+    </div>
+
+    <!-- Level 1 -->
+    <div class="node-row">
+      <div class="comp-node" id="node-childA">
+        <div class="node-title">&lt;ChildA /&gt;</div>
+        <div class="node-state">props: { parentCount }</div>
+        <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 4px;" id="memo-badge">React.memo: NO</div>
+      </div>
+      <div class="comp-node" id="node-childB">
+        <div class="node-title">&lt;ChildB /&gt;</div>
+        <div class="node-state">localState: <span id="val-childB">0</span></div>
+      </div>
+    </div>
+
+    <!-- Level 2 -->
+    <div class="node-row">
+      <div class="comp-node" id="node-subChildA">
+        <div class="node-title">&lt;SubChildA /&gt;</div>
+        <div class="node-state">props: {}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="render-log" id="log-console">
+    <div class="log-item">[System] Initialized Fiber Tree. Ready for events.</div>
+  </div>
+
+  <script>
+    let rootCount = 0;
+    let childBCount = 0;
+    let isMemoEnabled = false;
+
+    function log(msg) {
+      const consoleEl = document.getElementById('log-console');
+      const item = document.createElement('div');
+      item.className = 'log-item';
+      item.innerText = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      consoleEl.appendChild(item);
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+    }
+
+    function toggleMemo() {
+      isMemoEnabled = !isMemoEnabled;
+      document.getElementById('memo-btn').innerText = `Toggle React.memo on Child A: ${isMemoEnabled ? 'ON' : 'OFF'}`;
+      document.getElementById('memo-badge').innerText = `React.memo: ${isMemoEnabled ? 'YES' : 'NO'}`;
+      log(`React.memo on <ChildA /> set to: ${isMemoEnabled}`);
+    }
+
+    function resetNodes() {
+      document.querySelectorAll('.comp-node').forEach(n => {
+        n.classList.remove('rendering', 'skipped');
+      });
+    }
+
+    function triggerRootUpdate() {
+      resetNodes();
+      rootCount++;
+      document.getElementById('val-root').innerText = rootCount;
+      log(`⚡ State change in <App /> (count = ${rootCount})`);
+
+      // Render Root
+      const rootNode = document.getElementById('node-root');
+      rootNode.classList.add('rendering');
+
+      setTimeout(() => {
+        // Child A check
+        const childA = document.getElementById('node-childA');
+        const subChildA = document.getElementById('node-subChildA');
+        
+        if (isMemoEnabled) {
+          childA.classList.add('skipped');
+          subChildA.classList.add('skipped');
+          log(`  ↳ <ChildA /> props unchanged -> Skipped render via React.memo!`);
+        } else {
+          childA.classList.add('rendering');
+          log(`  ↳ <ChildA /> re-rendered because parent re-rendered.`);
+          
+          setTimeout(() => {
+            subChildA.classList.add('rendering');
+            log(`    ↳ <SubChildA /> re-rendered.`);
+          }, 300);
+        }
+
+        // Child B render
+        const childB = document.getElementById('node-childB');
+        childB.classList.add('rendering');
+        log(`  ↳ <ChildB /> re-rendered.`);
+
+      }, 300);
+    }
+
+    function triggerLeafUpdate() {
+      resetNodes();
+      childBCount++;
+      document.getElementById('val-childB').innerText = childBCount;
+      log(`⚡ State change inside <ChildB /> (localState = ${childBCount})`);
+
+      const childB = document.getElementById('node-childB');
+      childB.classList.add('rendering');
+      log(`  ↳ Only <ChildB /> re-rendered. Siblings and parents untouched.`);
+    }
+  </script>
+</body>
+</html>

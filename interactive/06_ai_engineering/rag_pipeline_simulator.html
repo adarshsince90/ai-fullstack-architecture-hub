@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retrieval-Augmented Generation (RAG) & Vector Search Simulator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0b0f19;
+      --card-bg: #111827;
+      --card-border: #1f2937;
+      --accent-blue: #38bdf8;
+      --accent-purple: #a855f7;
+      --accent-green: #22c55e;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+    body { background: var(--bg-dark); color: var(--text-main); padding: 1.5rem; }
+
+    .sim-header {
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 1rem;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 9999px;
+      background: rgba(168, 85, 247, 0.15);
+      color: var(--accent-purple);
+      border: 1px solid var(--accent-purple);
+      margin-bottom: 0.5rem;
+    }
+    h1 { font-size: 1.6rem; font-weight: 800; color: #fff; margin-bottom: 0.25rem; }
+    p.desc { color: var(--text-muted); font-size: 0.9rem; }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 1.5rem;
+    }
+    @media (max-width: 1000px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .panel-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    /* Step Pipeline */
+    .pipeline-step {
+      background: #1a2234;
+      border: 1px solid #2d3748;
+      border-radius: 8px;
+      padding: 0.9rem;
+      margin-bottom: 0.8rem;
+      transition: all 0.25s ease;
+    }
+    .pipeline-step.active {
+      border-color: var(--accent-blue);
+      background: rgba(56, 189, 248, 0.12);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.25);
+    }
+    .pipeline-step.matched {
+      border-color: var(--accent-green);
+      background: rgba(34, 197, 94, 0.15);
+    }
+    .step-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
+    .step-title { font-weight: 700; font-size: 0.88rem; color: #fff; }
+    .step-score { font-family: 'Fira Code', monospace; font-size: 0.78rem; color: var(--accent-green); font-weight: 700; }
+    .step-text { font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; }
+
+    /* Controls */
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--card-border);
+    }
+    .btn {
+      padding: 0.5rem 0.9rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: var(--accent-purple); color: #fff; }
+    .btn-primary:hover { background: #c084fc; }
+    .btn-outline { background: transparent; border-color: var(--card-border); color: #fff; }
+    .btn-outline:hover { background: #1e293b; }
+
+    .query-select {
+      background: #0b0f19;
+      border: 1px solid var(--card-border);
+      color: #fff;
+      padding: 0.5rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      width: 100%;
+      margin-bottom: 0.8rem;
+    }
+
+    /* Output Console */
+    .prompt-box {
+      background: #070a12;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 0.9rem;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.78rem;
+      margin-bottom: 1rem;
+      max-height: 200px;
+      overflow-y: auto;
+      line-height: 1.4;
+    }
+    .prompt-sys { color: var(--accent-rose); }
+    .prompt-ctx { color: var(--accent-blue); }
+    .prompt-usr { color: var(--accent-amber); }
+
+    .response-card {
+      background: #131c2e;
+      border: 1px solid var(--accent-green);
+      border-radius: 8px;
+      padding: 1rem;
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+    .citation-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      background: rgba(56, 189, 248, 0.2);
+      color: var(--accent-blue);
+      border: 1px solid var(--accent-blue);
+      margin-left: 0.3rem;
+      font-family: 'Fira Code', monospace;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sim-header">
+    <span class="badge">AI ENABLEMENT & LLM ARCHITECTURE</span>
+    <h1>Retrieval-Augmented Generation (RAG) & Vector Search Simulator</h1>
+    <p class="desc">Visually verify chunking, multi-dimensional vector space similarity scoring (Cosine Distance), prompt context augmentation, and citation-grounded LLM inference.</p>
+  </div>
+
+  <div class="grid-2">
+    
+    <!-- LEFT: Ingestion & Vector Retrieval -->
+    <div class="panel">
+      <div class="panel-title">📚 Document Ingestion & Cosine Vector Retrieval</div>
+
+      <label style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.3rem; display: block;">Select User Query to Simulate:</label>
+      <select id="query-select" class="query-select" onchange="sim.onQueryChange()">
+        <option value="sla">"What is our enterprise SLA uptime commitment and support response time?"</option>
+        <option value="backup">"How frequently are database backups taken for disaster recovery?"</option>
+        <option value="security">"What encryption standards are enforced for data at rest and in transit?"</option>
+      </select>
+
+      <div id="chunks-container">
+        <!-- Chunks rendered dynamically -->
+      </div>
+
+      <div class="controls-row">
+        <button class="btn btn-primary" onclick="sim.runRagPipeline()">▶ Execute Vector Search & RAG Flow</button>
+        <button class="btn btn-outline" onclick="sim.reset()">↺ Reset</button>
+      </div>
+    </div>
+
+    <!-- RIGHT: Augmented Prompt & Grounded Response -->
+    <div class="panel">
+      <div class="panel-title">🤖 Context-Augmented Prompt & Grounded LLM Response</div>
+
+      <div style="font-size: 0.75rem; color: var(--text-muted); font-family: 'Fira Code', monospace; margin-bottom: 0.3rem;">Injected LLM Context Window:</div>
+      <div class="prompt-box" id="prompt-display">
+        <span class="prompt-sys">[SYSTEM]: You are a factual assistant. Answer using ONLY provided context.</span><br><br>
+        <span class="prompt-ctx">=== CONTEXT CHUNKS ===<br>(Awaiting vector retrieval...)</span><br><br>
+        <span class="prompt-usr">=== USER QUESTION ===<br>"What is our enterprise SLA uptime commitment?"</span>
+      </div>
+
+      <div style="font-size: 0.75rem; color: var(--text-muted); font-family: 'Fira Code', monospace; margin-bottom: 0.3rem;">Grounded LLM Output:</div>
+      <div class="response-card" id="response-display">
+        Click <strong>"Execute Vector Search & RAG Flow"</strong> to retrieve relevant context and generate a citation-grounded response.
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const KNOWLEDGE_BASE = [
+      {
+        id: 'CHUNK-101',
+        doc: 'Enterprise_SLA_2026.pdf',
+        text: 'Enterprise Platinum tier customers are guaranteed 99.99% monthly service uptime SLA. Critical Severity 1 tickets have a mandatory response time of under 15 minutes by dedicated platform engineers.',
+        vector: [0.88, 0.12, 0.45],
+        category: 'sla'
+      },
+      {
+        id: 'CHUNK-102',
+        doc: 'Cloud_Security_Policy.pdf',
+        text: 'All persistent data at rest must be encrypted using AES-256 via Customer-Managed Keys (KMS/Key Vault). All network communication in transit mandates TLS 1.3 with Mutual TLS (mTLS) for microservices.',
+        vector: [0.15, 0.92, 0.31],
+        category: 'security'
+      },
+      {
+        id: 'CHUNK-103',
+        doc: 'Disaster_Recovery_Standard.pdf',
+        text: 'Automated differential database snapshots are executed every 15 minutes, with full database backups performed every 24 hours. Backups are geo-replicated across AWS us-east-1 and us-west-2 with RPO of 15m and RTO of 1 hour.',
+        vector: [0.22, 0.38, 0.94],
+        category: 'backup'
+      }
+    ];
+
+    class RagSimulator {
+      constructor() {
+        this.renderChunks();
+      }
+
+      renderChunks(matches = {}) {
+        const container = document.getElementById('chunks-container');
+        container.innerHTML = KNOWLEDGE_BASE.map(chunk => {
+          const score = matches[chunk.id] !== undefined ? matches[chunk.id].toFixed(3) : null;
+          const isMatched = score && parseFloat(score) > 0.85;
+
+          return `
+            <div class="pipeline-step ${isMatched ? 'matched' : ''}" id="card-${chunk.id}">
+              <div class="step-head">
+                <span class="step-title">📄 [${chunk.id}] ${chunk.doc}</span>
+                ${score ? `<span class="step-score">Cosine Similarity: ${score} ${isMatched ? '✅ (Top-1)' : ''}</span>` : ''}
+              </div>
+              <div class="step-text">${chunk.text}</div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      onQueryChange() {
+        this.reset();
+      }
+
+      reset() {
+        this.renderChunks();
+        document.getElementById('prompt-display').innerHTML = `
+          <span class="prompt-sys">[SYSTEM]: You are a factual assistant. Answer using ONLY provided context.</span><br><br>
+          <span class="prompt-ctx">=== CONTEXT CHUNKS ===<br>(Awaiting vector retrieval...)</span><br><br>
+          <span class="prompt-usr">=== USER QUESTION ===<br>${document.getElementById('query-select').selectedOptions[0].text}</span>
+        `;
+        document.getElementById('response-display').textContent = 'Click "Execute Vector Search & RAG Flow" to retrieve relevant context and generate a citation-grounded response.';
+      }
+
+      async runRagPipeline() {
+        const selectedQueryType = document.getElementById('query-select').value;
+        const queryText = document.getElementById('query-select').selectedOptions[0].text;
+
+        // Calculate scores
+        const scores = {};
+        KNOWLEDGE_BASE.forEach(chunk => {
+          if (chunk.category === selectedQueryType) {
+            scores[chunk.id] = 0.948; // High similarity match
+          } else {
+            scores[chunk.id] = 0.214; // Low similarity match
+          }
+        });
+
+        this.renderChunks(scores);
+
+        const matchedChunk = KNOWLEDGE_BASE.find(c => c.category === selectedQueryType);
+
+        // Update Prompt Box
+        document.getElementById('prompt-display').innerHTML = `
+          <span class="prompt-sys">[SYSTEM]: You are an enterprise assistant. Answer using ONLY provided context.</span><br><br>
+          <span class="prompt-ctx">=== RETRIEVED CONTEXT (Top-1 Cosine: ${scores[matchedChunk.id].toFixed(3)}) ===<br>[Source: ${matchedChunk.doc}] ${matchedChunk.text}</span><br><br>
+          <span class="prompt-usr">=== USER QUESTION ===<br>${queryText}</span>
+        `;
+
+        await this.delay(400);
+
+        // Generate Grounded Output
+        let responseHtml = '';
+        if (selectedQueryType === 'sla') {
+          responseHtml = `Our enterprise SLA guarantees <strong>99.99% monthly service uptime</strong> for Platinum tier customers. Critical Severity 1 tickets have a mandatory response time of <strong>under 15 minutes</strong>. <span class="citation-badge">Source: Enterprise_SLA_2026.pdf (Chunk-101)</span>`;
+        } else if (selectedQueryType === 'backup') {
+          responseHtml = `Database differential snapshots occur <strong>every 15 minutes</strong>, with full backups every 24 hours geo-replicated across AWS us-east-1 and us-west-2 (RPO: 15 mins, RTO: 1 hour). <span class="citation-badge">Source: Disaster_Recovery_Standard.pdf (Chunk-103)</span>`;
+        } else {
+          responseHtml = `Data at rest is encrypted using <strong>AES-256 via Customer-Managed Keys (CMK)</strong>, while data in transit enforces <strong>TLS 1.3 with Mutual TLS (mTLS)</strong> for microservices. <span class="citation-badge">Source: Cloud_Security_Policy.pdf (Chunk-102)</span>`;
+        }
+
+        document.getElementById('response-display').innerHTML = responseHtml;
+      }
+
+      delay(ms) { return new Promise(res => setTimeout(res, ms)); }
+    }
+
+    const sim = new RagSimulator();
+  </script>
+</body>
+</html>

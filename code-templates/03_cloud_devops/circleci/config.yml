@@ -1,0 +1,64 @@
+version: 2.1
+
+executors:
+  node-executor:
+    docker:
+      - image: cimg/node:20.10.0
+    working_directory: ~/app
+
+jobs:
+  test-and-build:
+    executor: node-executor
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "yarn.lock" }}
+      - run:
+          name: Yarn Install
+          command: yarn install --frozen-lockfile
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "yarn.lock" }}
+      - run:
+          name: Run Linter
+          command: yarn lint
+      - run:
+          name: Run Unit Tests
+          command: yarn test --watchAll=false
+      - run:
+          name: Build Production Assets
+          command: yarn build
+      - persist_to_workspace:
+          root: .
+          paths:
+            - dist
+
+  deploy-aws:
+    executor: node-executor
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Install AWS CLI
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+      - run:
+          name: Sync to S3 & Invalidate CloudFront
+          command: |
+            aws s3 sync dist/ s3://$S3_BUCKET_NAME --delete
+            aws cloudfront create-invalidation --distribution-id $CF_DISTRIBUTION_ID --paths "/*"
+
+workflows:
+  pipeline:
+    jobs:
+      - test-and-build
+      - deploy-aws:
+          requires:
+            - test-and-build
+          filters:
+            branches:
+              only: main

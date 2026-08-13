@@ -1,0 +1,103 @@
+name: Enterprise CI/CD Pipeline & Quality Gates
+
+on:
+  push:
+    branches: [ main, release/* ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  id-token: write # Required for OIDC federation with AWS IAM
+  contents: read
+  security-events: write
+
+jobs:
+  # =========================================================================
+  # Stage 1: Build, Test & SonarQube SAST Quality Gate
+  # =========================================================================
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore Dependencies
+        run: dotnet restore
+
+      - name: Run Unit & Architecture Tests
+        run: dotnet test --no-restore --collect:"XPlat Code Coverage" --logger trx
+
+      - name: SonarQube Static Analysis & Quality Gate
+        uses: SonarSource/sonarqube-scan-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+  # =========================================================================
+  # Stage 2: Container Security Vulnerability Scan (Trivy)
+  # =========================================================================
+  security-container-scan:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Build Local Container Image
+        run: docker build -t enterprise-api:${{ github.sha }} .
+
+      - name: Run Trivy Vulnerability Scanner (Block on CRITICAL)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: enterprise-api:${{ github.sha }}
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1' # Fails the pipeline if Critical vulnerabilities exist!
+
+  # =========================================================================
+  # Stage 3: Keyless OIDC AWS Authentication & ECS Rolling Deploy
+  # =========================================================================
+  deploy-production:
+    if: github.ref == 'refs/heads/main'
+    needs: security-container-scan
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials via OIDC (No Static Secrets!)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::123456789012:role/GitHubActionsDeploymentRole
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, Tag, and Push Image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: master-platform/enterprise-api
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker tag enterprise-api:${{ github.sha }} $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker tag enterprise-api:${{ github.sha }} $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+      - name: Deploy to Amazon ECS Fargate Service
+        run: |
+          aws ecs update-service \
+            --cluster enterprise-ecs-cluster-prod \
+            --service api-service-prod \
+            --force-new-deployment

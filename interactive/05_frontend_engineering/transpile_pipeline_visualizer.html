@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Transpilation & PostCSS Pipeline Simulator</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;600;700&family=Outfit:wght@600;700&display=swap');
+    
+    body {
+      background: #0d111d;
+      color: #e2e8f0;
+      font-family: 'Inter', sans-serif;
+      padding: 24px;
+      margin: 0;
+    }
+    
+    h2 { font-family: 'Outfit', sans-serif; color: #10b981; margin-bottom: 8px; }
+    p { color: #94a3b8; font-size: 0.9rem; margin-bottom: 24px; }
+    
+    .pipeline-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+    }
+    
+    .pipe-step {
+      background: #161c2d;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 16px;
+      min-width: 180px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .pipe-step.active {
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.15);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+    }
+    
+    .pipe-arrow { font-size: 1.2rem; color: #64748b; }
+    
+    .code-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .code-box {
+      background: #090d16;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 20px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.85rem;
+    }
+
+    .box-header {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      color: #38bdf8;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    button {
+      background: linear-gradient(135deg, #10b981, #0284c7);
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 20px;
+      transition: all 0.2s;
+    }
+
+    button:hover { opacity: 0.9; transform: translateY(-2px); }
+  </style>
+</head>
+<body>
+
+  <h2>⚙️ Build Tooling: Gulp, PostCSS & Esbuild Pipeline</h2>
+  <p>Run the interactive compiler pipeline to watch raw JSX and nesting CSS transform step-by-step into browser-ready JavaScript and autoprefixed CSS.</p>
+
+  <button onclick="runPipeline()">Run Pipeline (Gulp + Esbuild + PostCSS)</button>
+
+  <div class="pipeline-wrapper">
+    <div class="pipe-step" id="step-src">
+      <div style="font-weight: bold; color: #fff;">1. Raw Source</div>
+      <div style="font-size: 0.75rem; color: #94a3b8;">JSX & CSS Nesting</div>
+    </div>
+    <div class="pipe-arrow">➔</div>
+    <div class="pipe-step" id="step-esbuild">
+      <div style="font-weight: bold; color: #38bdf8;">2. Esbuild</div>
+      <div style="font-size: 0.75rem; color: #94a3b8;">JSX to React.createElement</div>
+    </div>
+    <div class="pipe-arrow">➔</div>
+    <div class="pipe-step" id="step-postcss">
+      <div style="font-weight: bold; color: #a855f7;">3. PostCSS</div>
+      <div style="font-size: 0.75rem; color: #94a3b8;">Autoprefixer & Un-nest</div>
+    </div>
+    <div class="pipe-arrow">➔</div>
+    <div class="pipe-step" id="step-dist">
+      <div style="font-weight: bold; color: #10b981;">4. Minified Dist</div>
+      <div style="font-size: 0.75rem; color: #94a3b8;">Production bundle</div>
+    </div>
+  </div>
+
+  <div class="code-grid">
+    <div class="code-box">
+      <div class="box-header">
+        <span>Input Code (`src/App.jsx` & `src/styles.css`)</span>
+      </div>
+      <pre style="color: #cbd5e1;">
+// Input JSX:
+const Card = ({ title }) => (
+  &lt;div className="card"&gt;
+    &lt;h1&gt;{title}&lt;/h1&gt;
+  &lt;/div&gt;
+);
+
+/* Input Modern CSS: */
+.card {
+  display: flex;
+  user-select: none;
+  &amp; h1 { color: var(--brand); }
+}</pre>
+    </div>
+
+    <div class="code-box">
+      <div class="box-header">
+        <span>Output Transformation Result</span>
+        <span id="step-status" style="font-size: 0.8rem; color: #f59e0b;">Ready</span>
+      </div>
+      <pre id="output-code" style="color: #a7f3d0;">// Click "Run Pipeline" to watch transformation...</pre>
+    </div>
+  </div>
+
+  <script>
+    function resetSteps() {
+      document.querySelectorAll('.pipe-step').forEach(s => s.classList.remove('active'));
+    }
+
+    function runPipeline() {
+      resetSteps();
+      
+      // Step 1
+      document.getElementById('step-src').classList.add('active');
+      document.getElementById('step-status').innerText = 'Reading Source Files...';
+      document.getElementById('output-code').innerText = '// Parsing AST tokens from JSX and CSS...';
+
+      setTimeout(() => {
+        // Step 2: Esbuild JSX
+        resetSteps();
+        document.getElementById('step-esbuild').classList.add('active');
+        document.getElementById('step-status').innerText = 'Esbuild JS Transpilation...';
+        document.getElementById('output-code').innerText = 
+`// [Esbuild Output JS]
+import { jsx as _jsx } from "react/jsx-runtime";
+const Card = ({ title }) => _jsx("div", { 
+  className: "card", 
+  children: _jsx("h1", { children: title }) 
+});`;
+
+        setTimeout(() => {
+          // Step 3: PostCSS
+          resetSteps();
+          document.getElementById('step-postcss').classList.add('active');
+          document.getElementById('step-status').innerText = 'PostCSS Plugins Running...';
+          document.getElementById('output-code').innerText = 
+`/* [PostCSS Output - Autoprefixed & Flattened] */
+.card {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.card h1 {
+  color: var(--brand);
+}`;
+
+          setTimeout(() => {
+            // Step 4: Dist Bundle
+            resetSteps();
+            document.getElementById('step-dist').classList.add('active');
+            document.getElementById('step-status').innerText = 'Complete Bundle Generated! 🎉';
+            document.getElementById('output-code').innerText = 
+`/* Production Dist Bundle (dist/app.min.js & dist/app.min.css) */
+import{jsx as e}from"react/jsx-runtime";const Card=({title:t})=>e("div",{className:"card",children:e("h1",{children:t})});
+.card{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.card h1{color:var(--brand)}`;
+
+          }, 800);
+
+        }, 800);
+
+      }, 800);
+    }
+  </script>
+</body>
+</html>

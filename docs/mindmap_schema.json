@@ -1,0 +1,134 @@
+{
+  "title": "Senior & Lead Full-Stack Engineering Mind Map",
+  "version": "2.0.0",
+  "learningPaths": [
+    {
+      "id": "lead-fullstack",
+      "name": "Lead Full-Stack Engineer Path",
+      "description": "Comprehensive journey covering Backend (.NET), Architecture, Frontend (Angular & React), and Cloud.",
+      "sequence": ["dotnet-backend", "distributed-systems", "frontend-engineering", "cloud-devops", "security-data", "ai-engineering"]
+    },
+    {
+      "id": "systems-architect",
+      "name": "Senior Systems & Cloud Architect Path",
+      "description": "Deep dive into Distributed Systems, Microservices, DDD, AWS/Azure, Resiliency, and System Design HLD/LLD.",
+      "sequence": ["distributed-systems", "dotnet-backend", "cloud-devops", "security-data", "ai-engineering"]
+    },
+    {
+      "id": "frontend-mastery",
+      "name": "Frontend Engineering & Multi-Framework Path",
+      "description": "Foundations (HTML5/CSS3) -> Core JS/TS -> Angular (RxJS/Signals) -> React (Fiber/Hooks/RTK).",
+      "sequence": ["frontend-foundations", "frontend-jsts", "frontend-angular", "frontend-react"]
+    }
+  ],
+  "domains": [
+    {
+      "id": "dotnet-backend",
+      "name": "Backend & .NET Core",
+      "icon": "🧠",
+      "badge": "Core Stack",
+      "description": "C#, .NET 8/10, ASP.NET Core Web API, EF Core, Async/Await, Dependency Injection, gRPC & SignalR.",
+      "guidePath": "guides/01_dotnet_backend/README.md",
+      "subtopics": [
+        { "id": "csharp-fundamentals", "name": "C# 12/13 & .NET 8/10 Runtime", "level": "Foundation", "status": "Ready", "guide": "guides/01_dotnet_backend/01_csharp_internals.md" },
+        { "id": "aspnet-webapi", "name": "ASP.NET Core Web API & Middleware", "level": "Core", "status": "Ready", "guide": "guides/01_dotnet_backend/02_aspnetcore_webapi.md" },
+        { "id": "efcore-tuning", "name": "Entity Framework Core & Query Optimization", "level": "Advanced", "status": "Ready", "guide": "guides/01_dotnet_backend/03_efcore_optimization.md" },
+        { "id": "async-concurrency", "name": "Async/Await, Threading & Background Services", "level": "Advanced", "status": "Ready", "guide": "guides/01_dotnet_backend/04_async_threading.md" },
+        { "id": "grpc-signalr", "name": "Real-time & RPC: gRPC & SignalR", "level": "Advanced", "status": "Ready", "guide": "guides/01_dotnet_backend/05_grpc_signalr.md" }
+      ]
+    },
+    {
+      "id": "distributed-systems",
+      "name": "Distributed Systems & System Design",
+      "icon": "🏗️",
+      "badge": "Architecture",
+      "description": "Microservices, DDD, CQRS, Saga & Outbox Patterns, Resiliency, High Level & Low Level Design.",
+      "guidePath": "guides/02_distributed_systems/README.md",
+      "subtopics": [
+        { "id": "microservices-patterns", "name": "Microservices Decompositions & API Gateways", "level": "Architecture", "status": "Ready", "guide": "guides/02_distributed_systems/01_microservices_decomposition.md" },
+        { "id": "ddd-cqrs", "name": "Domain-Driven Design (DDD) & CQRS", "level": "Architecture", "status": "Ready", "guide": "guides/02_distributed_systems/02_ddd_cqrs_event_sourcing.md" },
+        { "id": "saga-outbox", "name": "Saga Pattern, Outbox & Eventual Consistency", "level": "Advanced", "status": "Ready", "guide": "guides/02_distributed_systems/03_saga_outbox_resiliency.md" },
+        { "id": "hld-lld", "name": "System Design: Scalability, Caching, Rate Limiting", "level": "Lead", "status": "Ready", "guide": "guides/02_distributed_systems/04_hld_lld_framework.md" }
+      ]
+    },
+    {
+      "id": "cloud-devops",
+      "name": "Cloud Platforms & DevOps",
+      "icon": "☁️",
+      "badge": "Infrastructure",
+      "description": "AWS (Lambda, ECS, EKS, S3, DynamoDB) & Azure (App Services, Functions, Cosmos DB), Docker, K8s, Terraform, CI/CD.",
+      "guidePath": "guides/03_cloud_devops/README.md",
+      "subtopics": [
+        { "id": "aws-architecture", "name": "AWS Cloud-Native Services & Serverless", "level": "Cloud", "status": "Ready", "guide": "guides/03_cloud_devops/01_aws_cloud_native.md" },
+        { "id": "azure-architecture", "name": "Azure Enterprise Services & Key Vault", "level": "Cloud", "status": "Ready", "guide": "guides/03_cloud_devops/02_azure_enterprise.md" },
+        { "id": "containers-k8s", "name": "Docker, Kubernetes & Helm", "level": "Platform", "status": "Ready", "guide": "guides/03_cloud_devops/03_docker_kubernetes.md" },
+        { "id": "iac-cicd", "name": "Terraform, GitHub Actions & CI/CD Security", "level": "DevOps", "status": "Ready", "guide": "guides/03_cloud_devops/04_terraform_cicd_pipelines.md" }
+      ]
+    },
+    {
+      "id": "security-data",
+      "name": "Security & Data Engineering",
+      "icon": "🔐",
+      "badge": "Enterprise",
+      "description": "OAuth2 / OIDC, JWT, SAML, RBAC, OWASP Top 10, SQL Server Tuning, Execution Plans, and DynamoDB.",
+      "guidePath": "guides/04_security_database/README.md",
+      "subtopics": [
+        { "id": "auth-security", "name": "OAuth2, OpenID Connect & JWT Token Lifecycle", "level": "Security", "status": "Ready", "guide": "guides/04_security_database/01_oauth2_oidc_jwt.md" },
+        { "id": "owasp-top10", "name": "OWASP Top 10 & Enterprise Secure Coding", "level": "Security", "status": "Ready", "guide": "guides/04_security_database/02_owasp_secure_coding.md" },
+        { "id": "sqlserver-tuning", "name": "Relational DB Engine Tuning: SQL Server & PostgreSQL (JSONB, pgvector)", "level": "Data", "status": "Ready", "guide": "guides/04_security_database/03_sql_query_tuning.md" },
+        { "id": "dynamodb-nosql", "name": "DynamoDB Data Modeling & Single-Table Design", "level": "Data", "status": "Ready", "guide": "guides/04_security_database/04_dynamodb_data_modeling.md" }
+      ]
+    },
+    {
+      "id": "frontend-engineering",
+      "name": "Frontend Engineering (Foundations → Angular → React)",
+      "icon": "🎨",
+      "badge": "Full Stack",
+      "description": "Unified Frontend Path: HTML5/CSS3 Foundations → Core JS/TS → Angular (RxJS/Signals) → React (Fiber/Hooks/RTK).",
+      "guidePath": "guides/05_frontend_engineering/README.md",
+      "levels": [
+        {
+          "level": "Level 1: Foundations",
+          "topics": [
+            { "id": "fe-foundations", "name": "HTML5 Semantics, CSS3 Flexbox/Grid, Core Web Vitals", "guide": "guides/05_frontend_engineering/01_fe_foundations.md" },
+            { "id": "browser-rendering", "name": "Browser Rendering Pipeline & DOM Paint Cycles", "guide": "guides/05_frontend_engineering/02_browser_rendering.md" }
+          ]
+        },
+        {
+          "level": "Level 2: Core JS & TypeScript",
+          "topics": [
+            { "id": "js-core", "name": "ES6+ Closures, Prototypes, Event Loop & Promises", "guide": "guides/05_frontend_engineering/03_js_core_event_loop.md" },
+            { "id": "ts-advanced", "name": "TypeScript Type System, Generics & Utility Types", "guide": "guides/05_frontend_engineering/04_typescript_advanced.md" }
+          ]
+        },
+        {
+          "level": "Level 3: Angular Ecosystem",
+          "topics": [
+            { "id": "angular-arch", "name": "Angular Architecture, DI, Components & Lifecycle", "guide": "guides/05_frontend_engineering/05_angular_architecture.md" },
+            { "id": "rxjs-signals", "name": "RxJS Streams, NgRx Store & Angular Signals", "guide": "guides/05_frontend_engineering/06_rxjs_ngrx_signals.md" }
+          ]
+        },
+        {
+          "level": "Level 4: React Ecosystem",
+          "topics": [
+            { "id": "react-fiber", "name": "React Fiber, Virtual DOM Reconciliation & JSX Internals", "guide": "guides/05_frontend_engineering/07_react_fiber_reconciliation.md" },
+            { "id": "react-hooks-rtk", "name": "Custom Hooks, Context vs Redux Toolkit (RTK) Event Sourcing", "guide": "guides/05_frontend_engineering/08_react_hooks_redux_toolkit.md" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ai-engineering",
+      "name": "AI Enablement & Modern SDLC",
+      "icon": "🤖",
+      "badge": "Modern Tech",
+      "description": "Azure OpenAI, RAG Architectures, Vector Databases, Semantic Kernel, and AI-Assisted Development.",
+      "guidePath": "guides/06_ai_engineering/README.md",
+      "subtopics": [
+        { "id": "rag-architecture", "name": "Retrieval-Augmented Generation (RAG) & Vector Search", "level": "AI", "status": "Ready", "guide": "guides/06_ai_engineering/01_rag_vector_search.md" },
+        { "id": "azure-openai", "name": "Azure OpenAI Services & Semantic Kernel in .NET", "level": "AI", "status": "Ready", "guide": "guides/06_ai_engineering/02_azure_openai_semantic_kernel.md" },
+        { "id": "ai-sdlc", "name": "AI-Powered SDLC, Copilot, Prompt Engineering & Code Gen", "level": "SDLC", "status": "Ready", "guide": "guides/06_ai_engineering/03_ai_assisted_sdlc.md" }
+      ]
+    }
+  ]
+}
