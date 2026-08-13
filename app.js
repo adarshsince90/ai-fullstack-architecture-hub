@@ -287,6 +287,8 @@ class MasterPrepApp {
           this.guideOrigin = 'recap';
         } else if (isVisible('simulators-view')) {
           this.guideOrigin = 'simulators';
+        } else if (isVisible('graph-dashboard-view')) {
+          this.guideOrigin = 'graph';
         } else {
           this.guideOrigin = 'mindmap';
         }
@@ -333,24 +335,57 @@ class MasterPrepApp {
 
       // Update Back button text based on origin
       const backBtn = document.getElementById('guide-back-btn');
-      const originLabels = { recap: 'Quick Recap', mindmap: 'Mind Map', simulators: 'Simulators' };
-      if (backBtn) backBtn.textContent = `← Back to ${originLabels[this.guideOrigin]}`;
+      const originLabels = { recap: 'Quick Recap', mindmap: 'Learning Paths', simulators: 'Simulators', graph: 'Graph Dashboard' };
+      if (backBtn) backBtn.textContent = `← Back to ${originLabels[this.guideOrigin] || 'Learning Paths'}`;
 
       // Update Breadcrumb with correct origin action restoring state
       this.updateBreadcrumb([
-        { text: originLabels[this.guideOrigin], action: 'app.goBackFromGuide()' },
+        { text: originLabels[this.guideOrigin] || 'Learning Paths', action: 'app.goBackFromGuide()' },
         { text: domainName, action: 'app.goBackFromGuide()' },
         { text: topicName, active: true }
       ]);
 
-      // Switch View — hide all, show guide
+      // Switch View — hide all main sections, show guide viewer
+      const graphView = document.getElementById('graph-dashboard-view');
+      if (graphView) graphView.style.display = 'none';
       document.getElementById('mindmap-view').style.display = 'none';
       document.getElementById('simulators-view').style.display = 'none';
       document.getElementById('recap-view').style.display = 'none';
       document.getElementById('guide-viewer-section').style.display = 'block';
 
+      const originBtnMap = { recap: 'recap-btn', mindmap: 'mindmap-toggle-btn', simulators: 'simulators-btn', graph: 'graph-dashboard-btn' };
+      this.updateHeaderActiveButton(originBtnMap[this.guideOrigin] || 'mindmap-toggle-btn');
+
       this.setActiveContext('guide', topicName, guidePath);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Scroll to specific topic heading within the rendered guide if matched
+      let targetHeading = null;
+      if (topicName && topicName !== 'Guide') {
+        const cleanTopic = topicName.toLowerCase().replace(/[^a-z0-9]+/g, '');
+        const headings = displayContainer.querySelectorAll('h1, h2, h3, h4');
+        for (const h of headings) {
+          const cleanH = h.textContent.toLowerCase().replace(/[^a-z0-9]+/g, '');
+          if (cleanH && (cleanH.includes(cleanTopic) || cleanTopic.includes(cleanH))) {
+            targetHeading = h;
+            break;
+          }
+        }
+      }
+
+      if (targetHeading) {
+        requestAnimationFrame(() => {
+          targetHeading.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          targetHeading.style.transition = 'background-color 0.3s ease, color 0.3s ease';
+          targetHeading.style.backgroundColor = 'rgba(6, 182, 212, 0.2)';
+          targetHeading.style.borderRadius = '6px';
+          targetHeading.style.padding = '0.2rem 0.5rem';
+          setTimeout(() => {
+            targetHeading.style.backgroundColor = '';
+          }, 2200);
+        });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     } catch (err) {
       console.error(err);
       alert(`Guide ${guidePath} is currently being prepared.`);
@@ -362,6 +397,7 @@ class MasterPrepApp {
     switch (this.guideOrigin) {
       case 'recap':      this.showRecapView(); break;
       case 'simulators': this.showSimulatorsView(); break;
+      case 'graph':      this.showGraphDashboardView(); break;
       default:           this.showMindmapView(); break;
     }
 
@@ -789,8 +825,27 @@ class MasterPrepApp {
     document.querySelectorAll('#recap-progress-fill').forEach(el => el.style.width = `${percentage}%`);
   }
 
+  // Update Header Actions Active Highlight State
+  updateHeaderActiveButton(activeId) {
+    const navButtons = ['recap-btn', 'graph-dashboard-btn', 'mindmap-toggle-btn', 'simulators-btn'];
+    navButtons.forEach(id => {
+      const btn = document.getElementById(id);
+      if (!btn) return;
+      if (id === activeId) {
+        btn.classList.remove('btn-outline');
+        btn.classList.add('btn-primary');
+      } else {
+        btn.classList.remove('btn-primary');
+        btn.classList.add('btn-outline');
+      }
+    });
+  }
+
   // Switch to Quick Recap View
   showRecapView() {
+    this.updateHeaderActiveButton('recap-btn');
+    const graphView = document.getElementById('graph-dashboard-view');
+    if (graphView) graphView.style.display = 'none';
     document.getElementById('guide-viewer-section').style.display = 'none';
     document.getElementById('simulators-view').style.display = 'none';
     document.getElementById('mindmap-view').style.display = 'none';
@@ -803,6 +858,9 @@ class MasterPrepApp {
 
   // Switch to Mindmap View
   showMindmapView() {
+    this.updateHeaderActiveButton('mindmap-toggle-btn');
+    const graphView = document.getElementById('graph-dashboard-view');
+    if (graphView) graphView.style.display = 'none';
     document.getElementById('guide-viewer-section').style.display = 'none';
     document.getElementById('simulators-view').style.display = 'none';
     document.getElementById('recap-view').style.display = 'none';
@@ -810,12 +868,15 @@ class MasterPrepApp {
     
     this.updateBreadcrumb([
       { text: 'Master Knowledge Base', action: 'app.showRecapView()' },
-      { text: 'Master Mind Map', active: true }
+      { text: 'Learning Paths', active: true }
     ]);
   }
 
   // Switch to Simulators View
   showSimulatorsView() {
+    this.updateHeaderActiveButton('simulators-btn');
+    const graphView = document.getElementById('graph-dashboard-view');
+    if (graphView) graphView.style.display = 'none';
     document.getElementById('guide-viewer-section').style.display = 'none';
     document.getElementById('mindmap-view').style.display = 'none';
     document.getElementById('recap-view').style.display = 'none';
@@ -825,6 +886,156 @@ class MasterPrepApp {
       { text: 'Master Knowledge Base', action: 'app.showRecapView()' },
       { text: 'Interactive Simulators', active: true }
     ]);
+  }
+
+  // Switch to Graph Dashboard View
+  async showGraphDashboardView() {
+    this.updateHeaderActiveButton('graph-dashboard-btn');
+    document.getElementById('guide-viewer-section').style.display = 'none';
+    document.getElementById('mindmap-view').style.display = 'none';
+    document.getElementById('recap-view').style.display = 'none';
+    document.getElementById('simulators-view').style.display = 'none';
+    document.getElementById('graph-dashboard-view').style.display = 'block';
+
+    this.updateBreadcrumb([
+      { text: 'Master Knowledge Base', action: 'app.showRecapView()' },
+      { text: 'Interactive Graph Dashboard', active: true }
+    ]);
+
+    if (!this.graphEngine) {
+      await this.initGraphEngine();
+    } else {
+      this.graphEngine.resizeCanvas();
+    }
+  }
+
+  // Initialize Canvas Graph Engine
+  async initGraphEngine() {
+    try {
+      const topologyRes = await fetch('docs/graph_topology.json');
+      if (!topologyRes.ok) throw new Error('Failed to load docs/graph_topology.json');
+      const topologyData = await topologyRes.json();
+
+      this.graphEngine = new MindMapGraphEngine('graph-canvas-container', {
+        initialViewAxis: 'techDomain',
+        onNodeClick: (node) => this.openGraphNodeModal(node)
+      });
+
+      this.graphEngine.loadData(topologyData);
+    } catch (err) {
+      console.error('Failed to initialize Graph Engine:', err);
+    }
+  }
+
+  setGraphViewAxis(axisKey) {
+    if (!this.graphEngine) return;
+    this.graphEngine.setViewAxis(axisKey);
+
+    document.querySelectorAll('.btn-axis').forEach(btn => btn.classList.remove('active'));
+    if (axisKey === 'sdlcPhase') document.getElementById('btn-axis-sdlc')?.classList.add('active');
+    else if (axisKey === 'techDomain') document.getElementById('btn-axis-tech')?.classList.add('active');
+    else if (axisKey === 'archLayer') document.getElementById('btn-axis-arch')?.classList.add('active');
+  }
+
+  filterGraphNodes(query) {
+    if (!this.graphEngine) return;
+    const q = (query || '').toLowerCase().trim();
+    this.graphEngine.nodes.forEach(n => {
+      if (q && n.name.toLowerCase().includes(q)) {
+        n.radius = Math.max(18, (n.val || 14) * 1.3);
+      } else {
+        n.radius = n.val ? Math.max(12, n.val * 0.9) : 14;
+      }
+    });
+  }
+
+  zoomGraphIn() {
+    if (this.graphEngine) this.graphEngine.zoomIn();
+  }
+
+  zoomGraphOut() {
+    if (this.graphEngine) this.graphEngine.zoomOut();
+  }
+
+  resetGraphCamera() {
+    if (this.graphEngine) this.graphEngine.resetCamera();
+  }
+
+  // Parse 4-Part Executive Definition from Definitions.md for a given topic
+  getDefinitionForNode(nodeName) {
+    if (!this.recapMarkdown) {
+      return null;
+    }
+
+    const cleanName = (nodeName || '').replace(/^(Code Snippet:|Interactive Tool:)/i, '').trim().toLowerCase();
+    const sections = this.recapMarkdown.split(/^###\s+/m);
+
+    for (const sec of sections) {
+      const firstLineEnd = sec.indexOf('\n');
+      if (firstLineEnd === -1) continue;
+      const heading = sec.substring(0, firstLineEnd).trim().toLowerCase();
+
+      if (heading.includes(cleanName) || cleanName.includes(heading)) {
+        const body = sec.substring(firstLineEnd);
+
+        const extractField = (prefix) => {
+          const regex = new RegExp(`-\\s*\\*\\*${prefix}\\*\\*:\\s*([^\n]+)`, 'i');
+          const m = body.match(regex);
+          return m ? m[1].trim() : null;
+        };
+
+        return {
+          what: extractField('What It Is') || extractField('What it is'),
+          why: extractField('Why It Is Used') || extractField('Why it is used'),
+          when: extractField('When Used') || extractField('When used'),
+          tradeoffs: extractField('Benefits & Trade-offs') || extractField('Benefits and Trade-offs')
+        };
+      }
+    }
+
+    return null;
+  }
+
+  openGraphNodeModal(node) {
+    this.activeGraphNode = node;
+    const modal = document.getElementById('graph-node-modal');
+    if (!modal) return;
+
+    document.getElementById('gmodal-level').textContent = node.level || 'Topic';
+    document.getElementById('gmodal-title').textContent = node.name;
+    document.getElementById('gmodal-domain').textContent = node.clusterId || 'System';
+    document.getElementById('gmodal-sdlc').textContent = node.taxonomies?.sdlcPhase || '-';
+    document.getElementById('gmodal-tech').textContent = node.taxonomies?.techDomain || '-';
+    document.getElementById('gmodal-arch').textContent = node.taxonomies?.archLayer || '-';
+
+    // Lookup 4-Part Recap Definition
+    const def = this.getDefinitionForNode(node.name);
+
+    document.getElementById('gmodal-what').textContent = def?.what || node.description || 'Core technical concept within the engineering architecture hub.';
+    document.getElementById('gmodal-why').textContent = def?.why || 'Solves critical scalability, reliability, and modularity challenges in enterprise architectures.';
+    document.getElementById('gmodal-when').textContent = def?.when || 'Architected and tuned during enterprise development, system design, and production deployment.';
+    document.getElementById('gmodal-tradeoffs').textContent = def?.tradeoffs || 'Provides high engineering velocity and operational clarity; requires disciplined architecture governance.';
+
+    modal.style.display = 'flex';
+  }
+
+  closeGraphModal() {
+    const modal = document.getElementById('graph-node-modal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  openGraphNodeGuide() {
+    if (!this.activeGraphNode) return;
+    this.closeGraphModal();
+    const node = this.activeGraphNode;
+
+    let targetGuide = node.guidePath || '';
+    if (!targetGuide || !targetGuide.endsWith('.md')) {
+      const domainObj = this.schema?.domains?.find(d => d.id === node.clusterId);
+      targetGuide = domainObj?.guidePath || 'guides/01_dotnet_backend/README.md';
+    }
+
+    this.openGuide(targetGuide, node.clusterId || 'Guide', node.name);
   }
 
   // Launch Simulator in Modal / Iframe

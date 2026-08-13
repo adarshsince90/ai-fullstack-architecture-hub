@@ -1,0 +1,3226 @@
+{
+  "title": "AI Full-Stack Architecture Hub - Multi-Connected Graph Topology",
+  "generatedAt": "2026-08-13T14:29:36.053Z",
+  "stats": {
+    "totalNodes": 146,
+    "totalLinks": 165,
+    "structuralLinks": 145,
+    "crossLinks": 20
+  },
+  "taxonomyCategories": {
+    "sdlcPhases": [
+      "Requirements & Domain",
+      "Design & Architecture",
+      "Development",
+      "Testing & Quality",
+      "Security & Compliance",
+      "Deployment & Ops",
+      "Maintenance & Ops"
+    ],
+    "techDomains": [
+      "Backend",
+      "System Design",
+      "Cloud/DevOps",
+      "Security/Data",
+      "Frontend",
+      "AI"
+    ],
+    "archLayers": [
+      "Presentation Layer",
+      "API & Gateway Layer",
+      "Application/Domain Layer",
+      "Persistence Layer",
+      "Infrastructure Layer"
+    ]
+  },
+  "nodes": [
+    {
+      "id": "root-web-app-dev",
+      "name": "Web Application Development",
+      "level": "Center Epicenter",
+      "badge": "Master Core",
+      "description": "Epicenter of modern full-stack web application engineering, cloud infrastructure, and AI integration.",
+      "guidePath": "README.md",
+      "clusterId": "root",
+      "taxonomies": {
+        "sdlcPhase": "Requirements & Domain",
+        "techDomain": "System Design",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 35
+    },
+    {
+      "id": "domain-dotnet-backend",
+      "name": "Backend & .NET Core",
+      "level": "Domain Pillar",
+      "badge": "Core Stack",
+      "icon": "🧠",
+      "description": "C#, .NET 8/10, ASP.NET Core Web API, EF Core, Async/Await, Dependency Injection, gRPC & SignalR.",
+      "guidePath": "guides/01_dotnet_backend/README.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 24
+    },
+    {
+      "id": "topic-csharp-fundamentals",
+      "name": "C# 12/13 & .NET 8/10 Runtime",
+      "level": "Foundation",
+      "badge": "Ready",
+      "description": "C# 12/13 & .NET 8/10 Runtime within Backend & .NET Core",
+      "guidePath": "guides/01_dotnet_backend/01_csharp_internals.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "leaf-csharp-fundamentals-1",
+      "name": "1. The CLR Execution Pipeline & Memory Architecture",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in C# 12/13 & .NET 8/10 Runtime",
+      "guidePath": "guides/01_dotnet_backend/01_csharp_internals.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-csharp-fundamentals-2",
+      "name": "2. Garbage Collection (GC) Generations & Internals",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in C# 12/13 & .NET 8/10 Runtime",
+      "guidePath": "guides/01_dotnet_backend/01_csharp_internals.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-csharp-fundamentals-3",
+      "name": "3. High-Performance C# Types: Span<T>, Memory<T>, and ref struct",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in C# 12/13 & .NET 8/10 Runtime",
+      "guidePath": "guides/01_dotnet_backend/01_csharp_internals.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-csharp-fundamentals-4",
+      "name": "4. Key Senior Interview Questions & Answers",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in C# 12/13 & .NET 8/10 Runtime",
+      "guidePath": "guides/01_dotnet_backend/01_csharp_internals.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "topic-aspnet-webapi",
+      "name": "ASP.NET Core Web API & Middleware",
+      "level": "Core",
+      "badge": "Ready",
+      "description": "ASP.NET Core Web API & Middleware within Backend & .NET Core",
+      "guidePath": "guides/01_dotnet_backend/02_aspnetcore_webapi.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "leaf-aspnet-webapi-1",
+      "name": "1. The Kestrel HTTP Pipeline & Middleware Chain",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in ASP.NET Core Web API & Middleware",
+      "guidePath": "guides/01_dotnet_backend/02_aspnetcore_webapi.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-aspnet-webapi-2",
+      "name": "2. Middleware vs Action Filters vs Endpoint Filters",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in ASP.NET Core Web API & Middleware",
+      "guidePath": "guides/01_dotnet_backend/02_aspnetcore_webapi.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-aspnet-webapi-3",
+      "name": "3. Dependency Injection (DI) Lifetimes & Captive Dependencies",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in ASP.NET Core Web API & Middleware",
+      "guidePath": "guides/01_dotnet_backend/02_aspnetcore_webapi.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-aspnet-webapi-4",
+      "name": "4. Minimal APIs vs Controller-Based APIs",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in ASP.NET Core Web API & Middleware",
+      "guidePath": "guides/01_dotnet_backend/02_aspnetcore_webapi.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-aspnet-webapi-5",
+      "name": "5. Built-In Rate Limiting (.NET 8/10)",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in ASP.NET Core Web API & Middleware",
+      "guidePath": "guides/01_dotnet_backend/02_aspnetcore_webapi.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "topic-efcore-tuning",
+      "name": "Entity Framework Core & Query Optimization",
+      "level": "Advanced",
+      "badge": "Ready",
+      "description": "Entity Framework Core & Query Optimization within Backend & .NET Core",
+      "guidePath": "guides/01_dotnet_backend/03_efcore_optimization.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "leaf-efcore-tuning-1",
+      "name": "1. The EF Core Query Pipeline: From LINQ to SQL",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Entity Framework Core & Query Optimization",
+      "guidePath": "guides/01_dotnet_backend/03_efcore_optimization.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-efcore-tuning-2",
+      "name": "2. Change Tracking Optimization: AsNoTracking()",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Entity Framework Core & Query Optimization",
+      "guidePath": "guides/01_dotnet_backend/03_efcore_optimization.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-efcore-tuning-3",
+      "name": "3. The Cartesian Explosion Problem & AsSplitQuery()",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Entity Framework Core & Query Optimization",
+      "guidePath": "guides/01_dotnet_backend/03_efcore_optimization.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-efcore-tuning-4",
+      "name": "4. High-Throughput Techniques",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Entity Framework Core & Query Optimization",
+      "guidePath": "guides/01_dotnet_backend/03_efcore_optimization.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-efcore-tuning-5",
+      "name": "5. EF Core Interceptors for Distributed Telemetry & Auditing",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Entity Framework Core & Query Optimization",
+      "guidePath": "guides/01_dotnet_backend/03_efcore_optimization.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-efcore-tuning-6",
+      "name": "7. 🔗 Recommended Next Guide & Architectural Continuity",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Entity Framework Core & Query Optimization",
+      "guidePath": "guides/01_dotnet_backend/03_efcore_optimization.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "topic-async-concurrency",
+      "name": "Async/Await, Threading & Background Services",
+      "level": "Advanced",
+      "badge": "Ready",
+      "description": "Async/Await, Threading & Background Services within Backend & .NET Core",
+      "guidePath": "guides/01_dotnet_backend/04_async_threading.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "leaf-async-concurrency-1",
+      "name": "1. The Async/Await State Machine Internals",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Async/Await, Threading & Background Services",
+      "guidePath": "guides/01_dotnet_backend/04_async_threading.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-async-concurrency-2",
+      "name": "2. The CLR ThreadPool & Work-Stealing Algorithm",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Async/Await, Threading & Background Services",
+      "guidePath": "guides/01_dotnet_backend/04_async_threading.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-async-concurrency-3",
+      "name": "3. The ThreadPool Starvation Disaster (Sync-over-Async)",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Async/Await, Threading & Background Services",
+      "guidePath": "guides/01_dotnet_backend/04_async_threading.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-async-concurrency-4",
+      "name": "4. Asynchronous Pipelines with System.Threading.Channels",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Async/Await, Threading & Background Services",
+      "guidePath": "guides/01_dotnet_backend/04_async_threading.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-async-concurrency-5",
+      "name": "5. Streaming Data with IAsyncEnumerable<T>",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Async/Await, Threading & Background Services",
+      "guidePath": "guides/01_dotnet_backend/04_async_threading.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "topic-grpc-signalr",
+      "name": "Real-time & RPC: gRPC & SignalR",
+      "level": "Advanced",
+      "badge": "Ready",
+      "description": "Real-time & RPC: gRPC & SignalR within Backend & .NET Core",
+      "guidePath": "guides/01_dotnet_backend/05_grpc_signalr.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "API & Gateway Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "leaf-grpc-signalr-1",
+      "name": "1. gRPC Architecture & HTTP/2 Foundations",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Real-time & RPC: gRPC & SignalR",
+      "guidePath": "guides/01_dotnet_backend/05_grpc_signalr.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "API & Gateway Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-grpc-signalr-2",
+      "name": "2. The 4 gRPC Streaming Modes",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Real-time & RPC: gRPC & SignalR",
+      "guidePath": "guides/01_dotnet_backend/05_grpc_signalr.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "API & Gateway Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-grpc-signalr-3",
+      "name": "3. SignalR Real-Time Communications",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Real-time & RPC: gRPC & SignalR",
+      "guidePath": "guides/01_dotnet_backend/05_grpc_signalr.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "API & Gateway Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-grpc-signalr-4",
+      "name": "4. Scaling SignalR in Multi-Instance Cloud Environments",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Real-time & RPC: gRPC & SignalR",
+      "guidePath": "guides/01_dotnet_backend/05_grpc_signalr.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "API & Gateway Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-grpc-signalr-5",
+      "name": "5. Architectural Comparison: gRPC vs SignalR vs REST",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Real-time & RPC: gRPC & SignalR",
+      "guidePath": "guides/01_dotnet_backend/05_grpc_signalr.md",
+      "clusterId": "dotnet-backend",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "API & Gateway Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "domain-distributed-systems",
+      "name": "Distributed Systems & System Design",
+      "level": "Domain Pillar",
+      "badge": "Architecture",
+      "icon": "🏗️",
+      "description": "Microservices, DDD, CQRS, Saga & Outbox Patterns, Resiliency, High Level & Low Level Design.",
+      "guidePath": "guides/02_distributed_systems/README.md",
+      "clusterId": "distributed-systems",
+      "taxonomies": {
+        "sdlcPhase": "Design & Architecture",
+        "techDomain": "System Design",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 24
+    },
+    {
+      "id": "topic-microservices-patterns",
+      "name": "Microservices Decompositions & API Gateways",
+      "level": "Architecture",
+      "badge": "Ready",
+      "description": "Microservices Decompositions & API Gateways within Distributed Systems & System Design",
+      "guidePath": "guides/02_distributed_systems/01_microservices_decomposition.md",
+      "clusterId": "distributed-systems",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "System Design",
+        "archLayer": "API & Gateway Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "leaf-microservices-patterns-1",
+      "name": "1. Monolith Decomposition Strategies",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Microservices Decompositions & API Gateways",
+      "guidePath": "guides/02_distributed_systems/01_microservices_decomposition.md",
+      "clusterId": "distributed-systems",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "System Design",
+        "archLayer": "API & Gateway Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-microservices-patterns-2",
+      "name": "2. API Gateway Pattern vs Backend-for-Frontend (BFF)",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Microservices Decompositions & API Gateways",
+      "guidePath": "guides/02_distributed_systems/01_microservices_decomposition.md",
+      "clusterId": "distributed-systems",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "System Design",
+        "archLayer": "API & Gateway Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-microservices-patterns-3",
+      "name": "3. Database-per-Service vs Shared Database Anti-Pattern",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Microservices Decompositions & API Gateways",
+      "guidePath": "guides/02_distributed_systems/01_microservices_decomposition.md",
+      "clusterId": "distributed-systems",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "System Design",
+        "archLayer": "API & Gateway Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-microservices-patterns-4",
+      "name": "4. Distributed Tracing & Observability (OpenTelemetry & W3C Trace Context)",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Microservices Decompositions & API Gateways",
+      "guidePath": "guides/02_distributed_systems/01_microservices_decomposition.md",
+      "clusterId": "distributed-systems",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "System Design",
+        "archLayer": "API & Gateway Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "topic-ddd-cqrs",
+      "name": "Domain-Driven Design (DDD) & CQRS",
+      "level": "Architecture",
+      "badge": "Ready",
+      "description": "Domain-Driven Design (DDD) & CQRS within Distributed Systems & System Design",
+      "guidePath": "guides/02_distributed_systems/02_ddd_cqrs_event_sourcing.md",
+      "clusterId": "distributed-systems",
+      "taxonomies": {
+        "sdlcPhase": "Requirements & Domain",
+        "techDomain": "System Design",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "leaf-ddd-cqrs-1",
+      "name": "1. Domain-Driven Design (DDD) Tactical Building Blocks",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Domain-Driven Design (DDD) & CQRS",
+      "guidePath": "guides/02_distributed_systems/02_ddd_cqrs_event_sourcing.md",
+      "clusterId": "distributed-systems",
+      "taxonomies": {
+        "sdlcPhase": "Requirements & Domain",
+        "techDomain": "System Design",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-ddd-cqrs-2",
+      "name": "2. Command Query Responsibility Segregation (CQRS)",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Domain-Driven Design (DDD) & CQRS",
+      "guidePath": "guides/02_distributed_systems/02_ddd_cqrs_event_sourcing.md",
+      "clusterId": "distributed-systems",
+      "taxonomies": {
+        "sdlcPhase": "Requirements & Domain",
+        "techDomain": "System Design",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-ddd-cqrs-3",
+      "name": "3. CQRS Implementation in .NET with MediatR Pipeline Behaviors",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Domain-Driven Design (DDD) & CQRS",
+      "guidePath": "guides/02_distributed_systems/02_ddd_cqrs_event_sourcing.md",
+      "clusterId": "distributed-systems",
+      "taxonomies": {
+        "sdlcPhase": "Requirements & Domain",
+        "techDomain": "System Design",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-ddd-cqrs-4",
+      "name": "4. Event Sourcing Mechanics",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Domain-Driven Design (DDD) & CQRS",
+      "guidePath": "guides/02_distributed_systems/02_ddd_cqrs_event_sourcing.md",
+      "clusterId": "distributed-systems",
+      "taxonomies": {
+        "sdlcPhase": "Requirements & Domain",
+        "techDomain": "System Design",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "topic-saga-outbox",
+      "name": "Saga Pattern, Outbox & Eventual Consistency",
+      "level": "Advanced",
+      "badge": "Ready",
+      "description": "Saga Pattern, Outbox & Eventual Consistency within Distributed Systems & System Design",
+      "guidePath": "guides/02_distributed_systems/03_saga_outbox_resiliency.md",
+      "clusterId": "distributed-systems",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "System Design",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "leaf-saga-outbox-1",
+      "name": "1. The Dual-Write Problem & Transactional Outbox Pattern",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Saga Pattern, Outbox & Eventual Consistency",
+      "guidePath": "guides/02_distributed_systems/03_saga_outbox_resiliency.md",
+      "clusterId": "distributed-systems",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "System Design",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-saga-outbox-2",
+      "name": "2. Distributed Transactions: The Saga Pattern",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Saga Pattern, Outbox & Eventual Consistency",
+      "guidePath": "guides/02_distributed_systems/03_saga_outbox_resiliency.md",
+      "clusterId": "distributed-systems",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "System Design",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-saga-outbox-3",
+      "name": "3. Message Broker Landscape: Apache Kafka vs RabbitMQ vs AWS SQS/SNS",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Saga Pattern, Outbox & Eventual Consistency",
+      "guidePath": "guides/02_distributed_systems/03_saga_outbox_resiliency.md",
+      "clusterId": "distributed-systems",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "System Design",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-saga-outbox-4",
+      "name": "4. Resiliency Patterns (Polly in .NET)",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Saga Pattern, Outbox & Eventual Consistency",
+      "guidePath": "guides/02_distributed_systems/03_saga_outbox_resiliency.md",
+      "clusterId": "distributed-systems",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "System Design",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "topic-hld-lld",
+      "name": "System Design: Scalability, Caching, Rate Limiting",
+      "level": "Lead",
+      "badge": "Ready",
+      "description": "System Design: Scalability, Caching, Rate Limiting within Distributed Systems & System Design",
+      "guidePath": "guides/02_distributed_systems/04_hld_lld_framework.md",
+      "clusterId": "distributed-systems",
+      "taxonomies": {
+        "sdlcPhase": "Design & Architecture",
+        "techDomain": "System Design",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "leaf-hld-lld-1",
+      "name": "1. The 45-Minute System Design Interview Blueprint",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in System Design: Scalability, Caching, Rate Limiting",
+      "guidePath": "guides/02_distributed_systems/04_hld_lld_framework.md",
+      "clusterId": "distributed-systems",
+      "taxonomies": {
+        "sdlcPhase": "Design & Architecture",
+        "techDomain": "System Design",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-hld-lld-2",
+      "name": "2. Enterprise Caching Strategies",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in System Design: Scalability, Caching, Rate Limiting",
+      "guidePath": "guides/02_distributed_systems/04_hld_lld_framework.md",
+      "clusterId": "distributed-systems",
+      "taxonomies": {
+        "sdlcPhase": "Design & Architecture",
+        "techDomain": "System Design",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-hld-lld-3",
+      "name": "3. Database Sharding & Consistent Hashing",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in System Design: Scalability, Caching, Rate Limiting",
+      "guidePath": "guides/02_distributed_systems/04_hld_lld_framework.md",
+      "clusterId": "distributed-systems",
+      "taxonomies": {
+        "sdlcPhase": "Design & Architecture",
+        "techDomain": "System Design",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-hld-lld-4",
+      "name": "4. Distributed Rate Limiting Algorithms",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in System Design: Scalability, Caching, Rate Limiting",
+      "guidePath": "guides/02_distributed_systems/04_hld_lld_framework.md",
+      "clusterId": "distributed-systems",
+      "taxonomies": {
+        "sdlcPhase": "Design & Architecture",
+        "techDomain": "System Design",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-hld-lld-5",
+      "name": "5. CAP Theorem vs PACELC Theorem",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in System Design: Scalability, Caching, Rate Limiting",
+      "guidePath": "guides/02_distributed_systems/04_hld_lld_framework.md",
+      "clusterId": "distributed-systems",
+      "taxonomies": {
+        "sdlcPhase": "Design & Architecture",
+        "techDomain": "System Design",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "domain-cloud-devops",
+      "name": "Cloud Platforms & DevOps",
+      "level": "Domain Pillar",
+      "badge": "Infrastructure",
+      "icon": "☁️",
+      "description": "AWS (Lambda, ECS, EKS, S3, DynamoDB) & Azure (App Services, Functions, Cosmos DB), Docker, K8s, Terraform, CI/CD.",
+      "guidePath": "guides/03_cloud_devops/README.md",
+      "clusterId": "cloud-devops",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Cloud/DevOps",
+        "archLayer": "Infrastructure Layer"
+      },
+      "val": 24
+    },
+    {
+      "id": "topic-aws-architecture",
+      "name": "AWS Cloud-Native Services & Serverless",
+      "level": "Cloud",
+      "badge": "Ready",
+      "description": "AWS Cloud-Native Services & Serverless within Cloud Platforms & DevOps",
+      "guidePath": "guides/03_cloud_devops/01_aws_cloud_native.md",
+      "clusterId": "cloud-devops",
+      "taxonomies": {
+        "sdlcPhase": "Deployment & Ops",
+        "techDomain": "Cloud/DevOps",
+        "archLayer": "Infrastructure Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "leaf-aws-architecture-1",
+      "name": "1. AWS Compute Spectrum: Lambda vs ECS Fargate vs EKS",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in AWS Cloud-Native Services & Serverless",
+      "guidePath": "guides/03_cloud_devops/01_aws_cloud_native.md",
+      "clusterId": "cloud-devops",
+      "taxonomies": {
+        "sdlcPhase": "Deployment & Ops",
+        "techDomain": "Cloud/DevOps",
+        "archLayer": "Infrastructure Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-aws-architecture-2",
+      "name": "2. Event-Driven Cloud Messaging: SQS vs SNS vs EventBridge",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in AWS Cloud-Native Services & Serverless",
+      "guidePath": "guides/03_cloud_devops/01_aws_cloud_native.md",
+      "clusterId": "cloud-devops",
+      "taxonomies": {
+        "sdlcPhase": "Deployment & Ops",
+        "techDomain": "Cloud/DevOps",
+        "archLayer": "Infrastructure Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-aws-architecture-3",
+      "name": "3. High Availability & Multi-Region Active-Active Architecture",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in AWS Cloud-Native Services & Serverless",
+      "guidePath": "guides/03_cloud_devops/01_aws_cloud_native.md",
+      "clusterId": "cloud-devops",
+      "taxonomies": {
+        "sdlcPhase": "Deployment & Ops",
+        "techDomain": "Cloud/DevOps",
+        "archLayer": "Infrastructure Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "topic-azure-architecture",
+      "name": "Azure Enterprise Services & Key Vault",
+      "level": "Cloud",
+      "badge": "Ready",
+      "description": "Azure Enterprise Services & Key Vault within Cloud Platforms & DevOps",
+      "guidePath": "guides/03_cloud_devops/02_azure_enterprise.md",
+      "clusterId": "cloud-devops",
+      "taxonomies": {
+        "sdlcPhase": "Security & Compliance",
+        "techDomain": "Cloud/DevOps",
+        "archLayer": "Infrastructure Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "leaf-azure-architecture-1",
+      "name": "1. Azure Compute: App Services vs Azure Functions",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Azure Enterprise Services & Key Vault",
+      "guidePath": "guides/03_cloud_devops/02_azure_enterprise.md",
+      "clusterId": "cloud-devops",
+      "taxonomies": {
+        "sdlcPhase": "Security & Compliance",
+        "techDomain": "Cloud/DevOps",
+        "archLayer": "Infrastructure Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-azure-architecture-2",
+      "name": "2. Azure Cosmos DB: The 5 Consistency Models",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Azure Enterprise Services & Key Vault",
+      "guidePath": "guides/03_cloud_devops/02_azure_enterprise.md",
+      "clusterId": "cloud-devops",
+      "taxonomies": {
+        "sdlcPhase": "Security & Compliance",
+        "techDomain": "Cloud/DevOps",
+        "archLayer": "Infrastructure Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-azure-architecture-3",
+      "name": "3. Azure Enterprise Security: Key Vault & Managed Identities",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Azure Enterprise Services & Key Vault",
+      "guidePath": "guides/03_cloud_devops/02_azure_enterprise.md",
+      "clusterId": "cloud-devops",
+      "taxonomies": {
+        "sdlcPhase": "Security & Compliance",
+        "techDomain": "Cloud/DevOps",
+        "archLayer": "Infrastructure Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-azure-architecture-4",
+      "name": "4. Azure Messaging Landscape: Service Bus vs Event Hubs vs Event Grid",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Azure Enterprise Services & Key Vault",
+      "guidePath": "guides/03_cloud_devops/02_azure_enterprise.md",
+      "clusterId": "cloud-devops",
+      "taxonomies": {
+        "sdlcPhase": "Security & Compliance",
+        "techDomain": "Cloud/DevOps",
+        "archLayer": "Infrastructure Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "topic-containers-k8s",
+      "name": "Docker, Kubernetes & Helm",
+      "level": "Platform",
+      "badge": "Ready",
+      "description": "Docker, Kubernetes & Helm within Cloud Platforms & DevOps",
+      "guidePath": "guides/03_cloud_devops/03_docker_kubernetes.md",
+      "clusterId": "cloud-devops",
+      "taxonomies": {
+        "sdlcPhase": "Deployment & Ops",
+        "techDomain": "Cloud/DevOps",
+        "archLayer": "Infrastructure Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "leaf-containers-k8s-1",
+      "name": "1. Docker & Linux Container Internals",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Docker, Kubernetes & Helm",
+      "guidePath": "guides/03_cloud_devops/03_docker_kubernetes.md",
+      "clusterId": "cloud-devops",
+      "taxonomies": {
+        "sdlcPhase": "Deployment & Ops",
+        "techDomain": "Cloud/DevOps",
+        "archLayer": "Infrastructure Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-containers-k8s-2",
+      "name": "2. Kubernetes Architecture & Control Plane Mechanics",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Docker, Kubernetes & Helm",
+      "guidePath": "guides/03_cloud_devops/03_docker_kubernetes.md",
+      "clusterId": "cloud-devops",
+      "taxonomies": {
+        "sdlcPhase": "Deployment & Ops",
+        "techDomain": "Cloud/DevOps",
+        "archLayer": "Infrastructure Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-containers-k8s-3",
+      "name": "3. Production Deployments, Probes & Auto-Scaling",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Docker, Kubernetes & Helm",
+      "guidePath": "guides/03_cloud_devops/03_docker_kubernetes.md",
+      "clusterId": "cloud-devops",
+      "taxonomies": {
+        "sdlcPhase": "Deployment & Ops",
+        "techDomain": "Cloud/DevOps",
+        "archLayer": "Infrastructure Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-containers-k8s-4",
+      "name": "4. Helm Charts & Enterprise Package Management",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Docker, Kubernetes & Helm",
+      "guidePath": "guides/03_cloud_devops/03_docker_kubernetes.md",
+      "clusterId": "cloud-devops",
+      "taxonomies": {
+        "sdlcPhase": "Deployment & Ops",
+        "techDomain": "Cloud/DevOps",
+        "archLayer": "Infrastructure Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "topic-iac-cicd",
+      "name": "Terraform, GitHub Actions & CI/CD Security",
+      "level": "DevOps",
+      "badge": "Ready",
+      "description": "Terraform, GitHub Actions & CI/CD Security within Cloud Platforms & DevOps",
+      "guidePath": "guides/03_cloud_devops/04_terraform_cicd_pipelines.md",
+      "clusterId": "cloud-devops",
+      "taxonomies": {
+        "sdlcPhase": "Security & Compliance",
+        "techDomain": "Cloud/DevOps",
+        "archLayer": "Infrastructure Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "leaf-iac-cicd-1",
+      "name": "1. Terraform Architecture & State Management",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Terraform, GitHub Actions & CI/CD Security",
+      "guidePath": "guides/03_cloud_devops/04_terraform_cicd_pipelines.md",
+      "clusterId": "cloud-devops",
+      "taxonomies": {
+        "sdlcPhase": "Security & Compliance",
+        "techDomain": "Cloud/DevOps",
+        "archLayer": "Infrastructure Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-iac-cicd-2",
+      "name": "2. Enterprise CI/CD Pipeline Architecture & Quality Gates",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Terraform, GitHub Actions & CI/CD Security",
+      "guidePath": "guides/03_cloud_devops/04_terraform_cicd_pipelines.md",
+      "clusterId": "cloud-devops",
+      "taxonomies": {
+        "sdlcPhase": "Security & Compliance",
+        "techDomain": "Cloud/DevOps",
+        "archLayer": "Infrastructure Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-iac-cicd-3",
+      "name": "3. Keyless Cloud Authentication with OIDC (OpenID Connect)",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Terraform, GitHub Actions & CI/CD Security",
+      "guidePath": "guides/03_cloud_devops/04_terraform_cicd_pipelines.md",
+      "clusterId": "cloud-devops",
+      "taxonomies": {
+        "sdlcPhase": "Security & Compliance",
+        "techDomain": "Cloud/DevOps",
+        "archLayer": "Infrastructure Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "domain-security-data",
+      "name": "Security & Data Engineering",
+      "level": "Domain Pillar",
+      "badge": "Enterprise",
+      "icon": "🔐",
+      "description": "OAuth2 / OIDC, JWT, SAML, RBAC, OWASP Top 10, SQL Server Tuning, Execution Plans, and DynamoDB.",
+      "guidePath": "guides/04_security_database/README.md",
+      "clusterId": "security-data",
+      "taxonomies": {
+        "sdlcPhase": "Security & Compliance",
+        "techDomain": "Security/Data",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 24
+    },
+    {
+      "id": "topic-auth-security",
+      "name": "OAuth2, OpenID Connect & JWT Token Lifecycle",
+      "level": "Security",
+      "badge": "Ready",
+      "description": "OAuth2, OpenID Connect & JWT Token Lifecycle within Security & Data Engineering",
+      "guidePath": "guides/04_security_database/01_oauth2_oidc_jwt.md",
+      "clusterId": "security-data",
+      "taxonomies": {
+        "sdlcPhase": "Security & Compliance",
+        "techDomain": "Security/Data",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "leaf-auth-security-1",
+      "name": "1. OAuth 2.0 vs OpenID Connect (OIDC)",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in OAuth2, OpenID Connect & JWT Token Lifecycle",
+      "guidePath": "guides/04_security_database/01_oauth2_oidc_jwt.md",
+      "clusterId": "security-data",
+      "taxonomies": {
+        "sdlcPhase": "Security & Compliance",
+        "techDomain": "Security/Data",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-auth-security-2",
+      "name": "2. Authorization Code Flow with PKCE (Proof Key for Code Exchange)",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in OAuth2, OpenID Connect & JWT Token Lifecycle",
+      "guidePath": "guides/04_security_database/01_oauth2_oidc_jwt.md",
+      "clusterId": "security-data",
+      "taxonomies": {
+        "sdlcPhase": "Security & Compliance",
+        "techDomain": "Security/Data",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-auth-security-3",
+      "name": "3. JSON Web Token (JWT) Anatomy & Cryptographic Signing",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in OAuth2, OpenID Connect & JWT Token Lifecycle",
+      "guidePath": "guides/04_security_database/01_oauth2_oidc_jwt.md",
+      "clusterId": "security-data",
+      "taxonomies": {
+        "sdlcPhase": "Security & Compliance",
+        "techDomain": "Security/Data",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-auth-security-4",
+      "name": "4. Token Revocation & Refresh Token Rotation (RTR)",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in OAuth2, OpenID Connect & JWT Token Lifecycle",
+      "guidePath": "guides/04_security_database/01_oauth2_oidc_jwt.md",
+      "clusterId": "security-data",
+      "taxonomies": {
+        "sdlcPhase": "Security & Compliance",
+        "techDomain": "Security/Data",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "topic-owasp-top10",
+      "name": "OWASP Top 10 & Enterprise Secure Coding",
+      "level": "Security",
+      "badge": "Ready",
+      "description": "OWASP Top 10 & Enterprise Secure Coding within Security & Data Engineering",
+      "guidePath": "guides/04_security_database/02_owasp_secure_coding.md",
+      "clusterId": "security-data",
+      "taxonomies": {
+        "sdlcPhase": "Security & Compliance",
+        "techDomain": "Security/Data",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "leaf-owasp-top10-1",
+      "name": "1. OWASP Top 10 Enterprise Breakdown & Mitigations",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in OWASP Top 10 & Enterprise Secure Coding",
+      "guidePath": "guides/04_security_database/02_owasp_secure_coding.md",
+      "clusterId": "security-data",
+      "taxonomies": {
+        "sdlcPhase": "Security & Compliance",
+        "techDomain": "Security/Data",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-owasp-top10-2",
+      "name": "2. Zero-Trust Architecture Principles",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in OWASP Top 10 & Enterprise Secure Coding",
+      "guidePath": "guides/04_security_database/02_owasp_secure_coding.md",
+      "clusterId": "security-data",
+      "taxonomies": {
+        "sdlcPhase": "Security & Compliance",
+        "techDomain": "Security/Data",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "topic-sqlserver-tuning",
+      "name": "Relational DB Engine Tuning: SQL Server & PostgreSQL (JSONB, pgvector)",
+      "level": "Data",
+      "badge": "Ready",
+      "description": "Relational DB Engine Tuning: SQL Server & PostgreSQL (JSONB, pgvector) within Security & Data Engineering",
+      "guidePath": "guides/04_security_database/03_sql_query_tuning.md",
+      "clusterId": "security-data",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Security/Data",
+        "archLayer": "Persistence Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "leaf-sqlserver-tuning-1",
+      "name": "1. SQL Server Storage Engine: Pages, Extents & B-Trees",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Relational DB Engine Tuning: SQL Server & PostgreSQL (JSONB, pgvector)",
+      "guidePath": "guides/04_security_database/03_sql_query_tuning.md",
+      "clusterId": "security-data",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Security/Data",
+        "archLayer": "Persistence Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-sqlserver-tuning-2",
+      "name": "2. Key Execution Plan Operators & Performance Killers",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Relational DB Engine Tuning: SQL Server & PostgreSQL (JSONB, pgvector)",
+      "guidePath": "guides/04_security_database/03_sql_query_tuning.md",
+      "clusterId": "security-data",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Security/Data",
+        "archLayer": "Persistence Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-sqlserver-tuning-3",
+      "name": "3. Index Optimization: Covering Indexes & Column Order",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Relational DB Engine Tuning: SQL Server & PostgreSQL (JSONB, pgvector)",
+      "guidePath": "guides/04_security_database/03_sql_query_tuning.md",
+      "clusterId": "security-data",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Security/Data",
+        "archLayer": "Persistence Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-sqlserver-tuning-4",
+      "name": "4. Diagnostic Dynamic Management Views (DMVs)",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Relational DB Engine Tuning: SQL Server & PostgreSQL (JSONB, pgvector)",
+      "guidePath": "guides/04_security_database/03_sql_query_tuning.md",
+      "clusterId": "security-data",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Security/Data",
+        "archLayer": "Persistence Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-sqlserver-tuning-5",
+      "name": "5. Transaction Isolation Levels & Locking",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Relational DB Engine Tuning: SQL Server & PostgreSQL (JSONB, pgvector)",
+      "guidePath": "guides/04_security_database/03_sql_query_tuning.md",
+      "clusterId": "security-data",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Security/Data",
+        "archLayer": "Persistence Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-sqlserver-tuning-6",
+      "name": "6. PostgreSQL Core Architecture & Capabilities",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Relational DB Engine Tuning: SQL Server & PostgreSQL (JSONB, pgvector)",
+      "guidePath": "guides/04_security_database/03_sql_query_tuning.md",
+      "clusterId": "security-data",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Security/Data",
+        "archLayer": "Persistence Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "topic-dynamodb-nosql",
+      "name": "DynamoDB Data Modeling & Single-Table Design",
+      "level": "Data",
+      "badge": "Ready",
+      "description": "DynamoDB Data Modeling & Single-Table Design within Security & Data Engineering",
+      "guidePath": "guides/04_security_database/04_dynamodb_data_modeling.md",
+      "clusterId": "security-data",
+      "taxonomies": {
+        "sdlcPhase": "Design & Architecture",
+        "techDomain": "Security/Data",
+        "archLayer": "Persistence Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "leaf-dynamodb-nosql-1",
+      "name": "1. DynamoDB Architecture & Partition Key Mechanics",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in DynamoDB Data Modeling & Single-Table Design",
+      "guidePath": "guides/04_security_database/04_dynamodb_data_modeling.md",
+      "clusterId": "security-data",
+      "taxonomies": {
+        "sdlcPhase": "Design & Architecture",
+        "techDomain": "Security/Data",
+        "archLayer": "Persistence Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-dynamodb-nosql-2",
+      "name": "2. The Single-Table Design Philosophy",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in DynamoDB Data Modeling & Single-Table Design",
+      "guidePath": "guides/04_security_database/04_dynamodb_data_modeling.md",
+      "clusterId": "security-data",
+      "taxonomies": {
+        "sdlcPhase": "Design & Architecture",
+        "techDomain": "Security/Data",
+        "archLayer": "Persistence Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-dynamodb-nosql-3",
+      "name": "3. Global Secondary Indexes (GSI) & Sparse Indexes",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in DynamoDB Data Modeling & Single-Table Design",
+      "guidePath": "guides/04_security_database/04_dynamodb_data_modeling.md",
+      "clusterId": "security-data",
+      "taxonomies": {
+        "sdlcPhase": "Design & Architecture",
+        "techDomain": "Security/Data",
+        "archLayer": "Persistence Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-dynamodb-nosql-4",
+      "name": "4. Capacity Planning: RCU, WCU & Hot Partitioning",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in DynamoDB Data Modeling & Single-Table Design",
+      "guidePath": "guides/04_security_database/04_dynamodb_data_modeling.md",
+      "clusterId": "security-data",
+      "taxonomies": {
+        "sdlcPhase": "Design & Architecture",
+        "techDomain": "Security/Data",
+        "archLayer": "Persistence Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "domain-frontend-engineering",
+      "name": "Frontend Engineering (Foundations → Angular → React)",
+      "level": "Domain Pillar",
+      "badge": "Full Stack",
+      "icon": "🎨",
+      "description": "Unified Frontend Path: HTML5/CSS3 Foundations → Core JS/TS → Angular (RxJS/Signals) → React (Fiber/Hooks/RTK).",
+      "guidePath": "guides/05_frontend_engineering/README.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 24
+    },
+    {
+      "id": "topic-fe-foundations",
+      "name": "HTML5 Semantics, CSS3 Flexbox/Grid, Core Web Vitals",
+      "level": "Level 1: Foundations",
+      "badge": "Ready",
+      "description": "HTML5 Semantics, CSS3 Flexbox/Grid, Core Web Vitals within Frontend Engineering (Foundations → Angular → React)",
+      "guidePath": "guides/05_frontend_engineering/01_fe_foundations.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Testing & Quality",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "leaf-fe-foundations-1",
+      "name": "1. HTML5 Semantics & Accessibility (A11y)",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in HTML5 Semantics, CSS3 Flexbox/Grid, Core Web Vitals",
+      "guidePath": "guides/05_frontend_engineering/01_fe_foundations.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Testing & Quality",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-fe-foundations-2",
+      "name": "2. Modern CSS3: Flexbox vs CSS Grid",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in HTML5 Semantics, CSS3 Flexbox/Grid, Core Web Vitals",
+      "guidePath": "guides/05_frontend_engineering/01_fe_foundations.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Testing & Quality",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-fe-foundations-3",
+      "name": "3. Core Web Vitals (CWV) Optimization from First Principles",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in HTML5 Semantics, CSS3 Flexbox/Grid, Core Web Vitals",
+      "guidePath": "guides/05_frontend_engineering/01_fe_foundations.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Testing & Quality",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "topic-browser-rendering",
+      "name": "Browser Rendering Pipeline & DOM Paint Cycles",
+      "level": "Level 1: Foundations",
+      "badge": "Ready",
+      "description": "Browser Rendering Pipeline & DOM Paint Cycles within Frontend Engineering (Foundations → Angular → React)",
+      "guidePath": "guides/05_frontend_engineering/02_browser_rendering.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "leaf-browser-rendering-1",
+      "name": "1. The 5 Stages of the Browser Rendering Pipeline",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Browser Rendering Pipeline & DOM Paint Cycles",
+      "guidePath": "guides/05_frontend_engineering/02_browser_rendering.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-browser-rendering-2",
+      "name": "2. Forced Synchronous Layout & Layout Thrashing",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Browser Rendering Pipeline & DOM Paint Cycles",
+      "guidePath": "guides/05_frontend_engineering/02_browser_rendering.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-browser-rendering-3",
+      "name": "3. GPU Hardware Acceleration & Composite Layers",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Browser Rendering Pipeline & DOM Paint Cycles",
+      "guidePath": "guides/05_frontend_engineering/02_browser_rendering.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "topic-js-core",
+      "name": "ES6+ Closures, Prototypes, Event Loop & Promises",
+      "level": "Level 2: Core JS & TypeScript",
+      "badge": "Ready",
+      "description": "ES6+ Closures, Prototypes, Event Loop & Promises within Frontend Engineering (Foundations → Angular → React)",
+      "guidePath": "guides/05_frontend_engineering/03_js_core_event_loop.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "leaf-js-core-1",
+      "name": "1. Google V8 Engine Architecture: Ignition & TurboFan",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in ES6+ Closures, Prototypes, Event Loop & Promises",
+      "guidePath": "guides/05_frontend_engineering/03_js_core_event_loop.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-js-core-2",
+      "name": "2. Execution Context & Closures from First Principles",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in ES6+ Closures, Prototypes, Event Loop & Promises",
+      "guidePath": "guides/05_frontend_engineering/03_js_core_event_loop.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-js-core-3",
+      "name": "3. The Event Loop & Microtask Priority Mechanics",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in ES6+ Closures, Prototypes, Event Loop & Promises",
+      "guidePath": "guides/05_frontend_engineering/03_js_core_event_loop.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "topic-ts-advanced",
+      "name": "TypeScript Type System, Generics & Utility Types",
+      "level": "Level 2: Core JS & TypeScript",
+      "badge": "Ready",
+      "description": "TypeScript Type System, Generics & Utility Types within Frontend Engineering (Foundations → Angular → React)",
+      "guidePath": "guides/05_frontend_engineering/04_typescript_advanced.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "leaf-ts-advanced-1",
+      "name": "1. Conditional Types & the infer Keyword",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in TypeScript Type System, Generics & Utility Types",
+      "guidePath": "guides/05_frontend_engineering/04_typescript_advanced.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-ts-advanced-2",
+      "name": "2. Discriminated Unions & Exhaustiveness Checking",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in TypeScript Type System, Generics & Utility Types",
+      "guidePath": "guides/05_frontend_engineering/04_typescript_advanced.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-ts-advanced-3",
+      "name": "3. Mapped Types & Key Remapping via as",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in TypeScript Type System, Generics & Utility Types",
+      "guidePath": "guides/05_frontend_engineering/04_typescript_advanced.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-ts-advanced-4",
+      "name": "4. Template Literal Types for Type-Safe Routing & Events",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in TypeScript Type System, Generics & Utility Types",
+      "guidePath": "guides/05_frontend_engineering/04_typescript_advanced.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "topic-angular-arch",
+      "name": "Angular Architecture, DI, Components & Lifecycle",
+      "level": "Level 3: Angular Ecosystem",
+      "badge": "Ready",
+      "description": "Angular Architecture, DI, Components & Lifecycle within Frontend Engineering (Foundations → Angular → React)",
+      "guidePath": "guides/05_frontend_engineering/05_angular_architecture.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Design & Architecture",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "leaf-angular-arch-1",
+      "name": "1. Standalone Components vs Legacy NgModules",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Angular Architecture, DI, Components & Lifecycle",
+      "guidePath": "guides/05_frontend_engineering/05_angular_architecture.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Design & Architecture",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-angular-arch-2",
+      "name": "2. Hierarchical Dependency Injection (Injector Tree)",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Angular Architecture, DI, Components & Lifecycle",
+      "guidePath": "guides/05_frontend_engineering/05_angular_architecture.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Design & Architecture",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-angular-arch-3",
+      "name": "3. Change Detection: Zone.js vs OnPush Strategy",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Angular Architecture, DI, Components & Lifecycle",
+      "guidePath": "guides/05_frontend_engineering/05_angular_architecture.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Design & Architecture",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-angular-arch-4",
+      "name": "4. Modern Control Flow & Deferrable Views (Angular 17+)",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Angular Architecture, DI, Components & Lifecycle",
+      "guidePath": "guides/05_frontend_engineering/05_angular_architecture.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Design & Architecture",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "topic-rxjs-signals",
+      "name": "RxJS Streams, NgRx Store & Angular Signals",
+      "level": "Level 3: Angular Ecosystem",
+      "badge": "Ready",
+      "description": "RxJS Streams, NgRx Store & Angular Signals within Frontend Engineering (Foundations → Angular → React)",
+      "guidePath": "guides/05_frontend_engineering/06_rxjs_ngrx_signals.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "leaf-rxjs-signals-1",
+      "name": "1. RxJS Reactive Streams & The 4 Higher-Order Operators",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in RxJS Streams, NgRx Store & Angular Signals",
+      "guidePath": "guides/05_frontend_engineering/06_rxjs_ngrx_signals.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-rxjs-signals-2",
+      "name": "2. NgRx Store: Unidirectional Event-Sourced Architecture",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in RxJS Streams, NgRx Store & Angular Signals",
+      "guidePath": "guides/05_frontend_engineering/06_rxjs_ngrx_signals.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-rxjs-signals-3",
+      "name": "3. Angular Signals: Fine-Grained Push-Pull Reactivity",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in RxJS Streams, NgRx Store & Angular Signals",
+      "guidePath": "guides/05_frontend_engineering/06_rxjs_ngrx_signals.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "topic-react-fiber",
+      "name": "React Fiber, Virtual DOM Reconciliation & JSX Internals",
+      "level": "Level 4: React Ecosystem",
+      "badge": "Ready",
+      "description": "React Fiber, Virtual DOM Reconciliation & JSX Internals within Frontend Engineering (Foundations → Angular → React)",
+      "guidePath": "guides/05_frontend_engineering/07_react_fiber_reconciliation.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "leaf-react-fiber-1",
+      "name": "1. Why the Virtual DOM & React Fiber Exist",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in React Fiber, Virtual DOM Reconciliation & JSX Internals",
+      "guidePath": "guides/05_frontend_engineering/07_react_fiber_reconciliation.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-react-fiber-2",
+      "name": "2. The Fiber Node Data Structure",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in React Fiber, Virtual DOM Reconciliation & JSX Internals",
+      "guidePath": "guides/05_frontend_engineering/07_react_fiber_reconciliation.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-react-fiber-3",
+      "name": "3. The Two-Phase Lifecycle: Render Phase vs Commit Phase",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in React Fiber, Virtual DOM Reconciliation & JSX Internals",
+      "guidePath": "guides/05_frontend_engineering/07_react_fiber_reconciliation.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-react-fiber-4",
+      "name": "4. Reconciliation Diffing Heuristics",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in React Fiber, Virtual DOM Reconciliation & JSX Internals",
+      "guidePath": "guides/05_frontend_engineering/07_react_fiber_reconciliation.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "topic-react-hooks-rtk",
+      "name": "Custom Hooks, Context vs Redux Toolkit (RTK) Event Sourcing",
+      "level": "Level 4: React Ecosystem",
+      "badge": "Ready",
+      "description": "Custom Hooks, Context vs Redux Toolkit (RTK) Event Sourcing within Frontend Engineering (Foundations → Angular → React)",
+      "guidePath": "guides/05_frontend_engineering/08_react_hooks_redux_toolkit.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "leaf-react-hooks-rtk-1",
+      "name": "1. React Hooks Execution Model & Stale Closures",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Custom Hooks, Context vs Redux Toolkit (RTK) Event Sourcing",
+      "guidePath": "guides/05_frontend_engineering/08_react_hooks_redux_toolkit.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-react-hooks-rtk-2",
+      "name": "2. When to Use useMemo & useCallback (Senior Trade-Offs)",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Custom Hooks, Context vs Redux Toolkit (RTK) Event Sourcing",
+      "guidePath": "guides/05_frontend_engineering/08_react_hooks_redux_toolkit.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-react-hooks-rtk-3",
+      "name": "3. The State Management Spectrum: Context API vs Redux Toolkit",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Custom Hooks, Context vs Redux Toolkit (RTK) Event Sourcing",
+      "guidePath": "guides/05_frontend_engineering/08_react_hooks_redux_toolkit.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-react-hooks-rtk-4",
+      "name": "4. Redux Toolkit (RTK) & Immer Proxy Mutations",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Custom Hooks, Context vs Redux Toolkit (RTK) Event Sourcing",
+      "guidePath": "guides/05_frontend_engineering/08_react_hooks_redux_toolkit.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-react-hooks-rtk-5",
+      "name": "5. Server State vs Client State (RTK Query / Apollo Client)",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Custom Hooks, Context vs Redux Toolkit (RTK) Event Sourcing",
+      "guidePath": "guides/05_frontend_engineering/08_react_hooks_redux_toolkit.md",
+      "clusterId": "frontend-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Frontend",
+        "archLayer": "Presentation Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "domain-ai-engineering",
+      "name": "AI Enablement & Modern SDLC",
+      "level": "Domain Pillar",
+      "badge": "Modern Tech",
+      "icon": "🤖",
+      "description": "Azure OpenAI, RAG Architectures, Vector Databases, Semantic Kernel, and AI-Assisted Development.",
+      "guidePath": "guides/06_ai_engineering/README.md",
+      "clusterId": "ai-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Maintenance & Ops",
+        "techDomain": "AI",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 24
+    },
+    {
+      "id": "topic-rag-architecture",
+      "name": "Retrieval-Augmented Generation (RAG) & Vector Search",
+      "level": "AI",
+      "badge": "Ready",
+      "description": "Retrieval-Augmented Generation (RAG) & Vector Search within AI Enablement & Modern SDLC",
+      "guidePath": "guides/06_ai_engineering/01_rag_vector_search.md",
+      "clusterId": "ai-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "AI",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "leaf-rag-architecture-1",
+      "name": "1. The End-to-End RAG Architecture",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Retrieval-Augmented Generation (RAG) & Vector Search",
+      "guidePath": "guides/06_ai_engineering/01_rag_vector_search.md",
+      "clusterId": "ai-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "AI",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-rag-architecture-2",
+      "name": "2. Document Chunking Strategies",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Retrieval-Augmented Generation (RAG) & Vector Search",
+      "guidePath": "guides/06_ai_engineering/01_rag_vector_search.md",
+      "clusterId": "ai-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "AI",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-rag-architecture-3",
+      "name": "3. High-Dimensional Vector Embeddings & Similarity Metrics",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Retrieval-Augmented Generation (RAG) & Vector Search",
+      "guidePath": "guides/06_ai_engineering/01_rag_vector_search.md",
+      "clusterId": "ai-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "AI",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-rag-architecture-4",
+      "name": "4. Hybrid Search & Reciprocal Rank Fusion (RRF)",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Retrieval-Augmented Generation (RAG) & Vector Search",
+      "guidePath": "guides/06_ai_engineering/01_rag_vector_search.md",
+      "clusterId": "ai-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "AI",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "topic-azure-openai",
+      "name": "Azure OpenAI Services & Semantic Kernel in .NET",
+      "level": "AI",
+      "badge": "Ready",
+      "description": "Azure OpenAI Services & Semantic Kernel in .NET within AI Enablement & Modern SDLC",
+      "guidePath": "guides/06_ai_engineering/02_azure_openai_semantic_kernel.md",
+      "clusterId": "ai-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Deployment & Ops",
+        "techDomain": "AI",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "leaf-azure-openai-1",
+      "name": "1. Azure OpenAI Enterprise Security Foundations",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Azure OpenAI Services & Semantic Kernel in .NET",
+      "guidePath": "guides/06_ai_engineering/02_azure_openai_semantic_kernel.md",
+      "clusterId": "ai-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Deployment & Ops",
+        "techDomain": "AI",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-azure-openai-2",
+      "name": "2. Microsoft Semantic Kernel Architecture",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Azure OpenAI Services & Semantic Kernel in .NET",
+      "guidePath": "guides/06_ai_engineering/02_azure_openai_semantic_kernel.md",
+      "clusterId": "ai-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Deployment & Ops",
+        "techDomain": "AI",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-azure-openai-3",
+      "name": "3. Native Plugin Implementation & Tool Calling",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in Azure OpenAI Services & Semantic Kernel in .NET",
+      "guidePath": "guides/06_ai_engineering/02_azure_openai_semantic_kernel.md",
+      "clusterId": "ai-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Deployment & Ops",
+        "techDomain": "AI",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "topic-ai-sdlc",
+      "name": "AI-Powered SDLC, Copilot, Prompt Engineering & Code Gen",
+      "level": "SDLC",
+      "badge": "Ready",
+      "description": "AI-Powered SDLC, Copilot, Prompt Engineering & Code Gen within AI Enablement & Modern SDLC",
+      "guidePath": "guides/06_ai_engineering/03_ai_assisted_sdlc.md",
+      "clusterId": "ai-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Maintenance & Ops",
+        "techDomain": "AI",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "leaf-ai-sdlc-1",
+      "name": "1. Core Prompt Engineering Paradigms for Senior Engineers",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in AI-Powered SDLC, Copilot, Prompt Engineering & Code Gen",
+      "guidePath": "guides/06_ai_engineering/03_ai_assisted_sdlc.md",
+      "clusterId": "ai-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Maintenance & Ops",
+        "techDomain": "AI",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-ai-sdlc-2",
+      "name": "2. AI-Assisted Unit Test Generation & Quality Gates",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in AI-Powered SDLC, Copilot, Prompt Engineering & Code Gen",
+      "guidePath": "guides/06_ai_engineering/03_ai_assisted_sdlc.md",
+      "clusterId": "ai-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Maintenance & Ops",
+        "techDomain": "AI",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    },
+    {
+      "id": "leaf-ai-sdlc-3",
+      "name": "3. LLM Security & Guardrails (OWASP Top 10 for LLMs)",
+      "level": "Deep Concept",
+      "badge": "Granular",
+      "description": "Section in AI-Powered SDLC, Copilot, Prompt Engineering & Code Gen",
+      "guidePath": "guides/06_ai_engineering/03_ai_assisted_sdlc.md",
+      "clusterId": "ai-engineering",
+      "taxonomies": {
+        "sdlcPhase": "Maintenance & Ops",
+        "techDomain": "AI",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 8
+    }
+  ],
+  "links": [
+    {
+      "source": "root-web-app-dev",
+      "target": "domain-dotnet-backend",
+      "type": "structural",
+      "label": "Pillar Branch"
+    },
+    {
+      "source": "domain-dotnet-backend",
+      "target": "topic-csharp-fundamentals",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "topic-csharp-fundamentals",
+      "target": "leaf-csharp-fundamentals-1",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-csharp-fundamentals",
+      "target": "leaf-csharp-fundamentals-2",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-csharp-fundamentals",
+      "target": "leaf-csharp-fundamentals-3",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-csharp-fundamentals",
+      "target": "leaf-csharp-fundamentals-4",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "domain-dotnet-backend",
+      "target": "topic-aspnet-webapi",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "topic-aspnet-webapi",
+      "target": "leaf-aspnet-webapi-1",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-aspnet-webapi",
+      "target": "leaf-aspnet-webapi-2",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-aspnet-webapi",
+      "target": "leaf-aspnet-webapi-3",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-aspnet-webapi",
+      "target": "leaf-aspnet-webapi-4",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-aspnet-webapi",
+      "target": "leaf-aspnet-webapi-5",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "domain-dotnet-backend",
+      "target": "topic-efcore-tuning",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "topic-efcore-tuning",
+      "target": "leaf-efcore-tuning-1",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-efcore-tuning",
+      "target": "leaf-efcore-tuning-2",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-efcore-tuning",
+      "target": "leaf-efcore-tuning-3",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-efcore-tuning",
+      "target": "leaf-efcore-tuning-4",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-efcore-tuning",
+      "target": "leaf-efcore-tuning-5",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-efcore-tuning",
+      "target": "leaf-efcore-tuning-6",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "domain-dotnet-backend",
+      "target": "topic-async-concurrency",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "topic-async-concurrency",
+      "target": "leaf-async-concurrency-1",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-async-concurrency",
+      "target": "leaf-async-concurrency-2",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-async-concurrency",
+      "target": "leaf-async-concurrency-3",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-async-concurrency",
+      "target": "leaf-async-concurrency-4",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-async-concurrency",
+      "target": "leaf-async-concurrency-5",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "domain-dotnet-backend",
+      "target": "topic-grpc-signalr",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "topic-grpc-signalr",
+      "target": "leaf-grpc-signalr-1",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-grpc-signalr",
+      "target": "leaf-grpc-signalr-2",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-grpc-signalr",
+      "target": "leaf-grpc-signalr-3",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-grpc-signalr",
+      "target": "leaf-grpc-signalr-4",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-grpc-signalr",
+      "target": "leaf-grpc-signalr-5",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "root-web-app-dev",
+      "target": "domain-distributed-systems",
+      "type": "structural",
+      "label": "Pillar Branch"
+    },
+    {
+      "source": "domain-distributed-systems",
+      "target": "topic-microservices-patterns",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "topic-microservices-patterns",
+      "target": "leaf-microservices-patterns-1",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-microservices-patterns",
+      "target": "leaf-microservices-patterns-2",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-microservices-patterns",
+      "target": "leaf-microservices-patterns-3",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-microservices-patterns",
+      "target": "leaf-microservices-patterns-4",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "domain-distributed-systems",
+      "target": "topic-ddd-cqrs",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "topic-ddd-cqrs",
+      "target": "leaf-ddd-cqrs-1",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-ddd-cqrs",
+      "target": "leaf-ddd-cqrs-2",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-ddd-cqrs",
+      "target": "leaf-ddd-cqrs-3",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-ddd-cqrs",
+      "target": "leaf-ddd-cqrs-4",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "domain-distributed-systems",
+      "target": "topic-saga-outbox",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "topic-saga-outbox",
+      "target": "leaf-saga-outbox-1",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-saga-outbox",
+      "target": "leaf-saga-outbox-2",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-saga-outbox",
+      "target": "leaf-saga-outbox-3",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-saga-outbox",
+      "target": "leaf-saga-outbox-4",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "domain-distributed-systems",
+      "target": "topic-hld-lld",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "topic-hld-lld",
+      "target": "leaf-hld-lld-1",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-hld-lld",
+      "target": "leaf-hld-lld-2",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-hld-lld",
+      "target": "leaf-hld-lld-3",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-hld-lld",
+      "target": "leaf-hld-lld-4",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-hld-lld",
+      "target": "leaf-hld-lld-5",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "root-web-app-dev",
+      "target": "domain-cloud-devops",
+      "type": "structural",
+      "label": "Pillar Branch"
+    },
+    {
+      "source": "domain-cloud-devops",
+      "target": "topic-aws-architecture",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "topic-aws-architecture",
+      "target": "leaf-aws-architecture-1",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-aws-architecture",
+      "target": "leaf-aws-architecture-2",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-aws-architecture",
+      "target": "leaf-aws-architecture-3",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "domain-cloud-devops",
+      "target": "topic-azure-architecture",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "topic-azure-architecture",
+      "target": "leaf-azure-architecture-1",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-azure-architecture",
+      "target": "leaf-azure-architecture-2",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-azure-architecture",
+      "target": "leaf-azure-architecture-3",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-azure-architecture",
+      "target": "leaf-azure-architecture-4",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "domain-cloud-devops",
+      "target": "topic-containers-k8s",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "topic-containers-k8s",
+      "target": "leaf-containers-k8s-1",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-containers-k8s",
+      "target": "leaf-containers-k8s-2",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-containers-k8s",
+      "target": "leaf-containers-k8s-3",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-containers-k8s",
+      "target": "leaf-containers-k8s-4",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "domain-cloud-devops",
+      "target": "topic-iac-cicd",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "topic-iac-cicd",
+      "target": "leaf-iac-cicd-1",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-iac-cicd",
+      "target": "leaf-iac-cicd-2",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-iac-cicd",
+      "target": "leaf-iac-cicd-3",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "root-web-app-dev",
+      "target": "domain-security-data",
+      "type": "structural",
+      "label": "Pillar Branch"
+    },
+    {
+      "source": "domain-security-data",
+      "target": "topic-auth-security",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "topic-auth-security",
+      "target": "leaf-auth-security-1",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-auth-security",
+      "target": "leaf-auth-security-2",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-auth-security",
+      "target": "leaf-auth-security-3",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-auth-security",
+      "target": "leaf-auth-security-4",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "domain-security-data",
+      "target": "topic-owasp-top10",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "topic-owasp-top10",
+      "target": "leaf-owasp-top10-1",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-owasp-top10",
+      "target": "leaf-owasp-top10-2",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "domain-security-data",
+      "target": "topic-sqlserver-tuning",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "topic-sqlserver-tuning",
+      "target": "leaf-sqlserver-tuning-1",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-sqlserver-tuning",
+      "target": "leaf-sqlserver-tuning-2",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-sqlserver-tuning",
+      "target": "leaf-sqlserver-tuning-3",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-sqlserver-tuning",
+      "target": "leaf-sqlserver-tuning-4",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-sqlserver-tuning",
+      "target": "leaf-sqlserver-tuning-5",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-sqlserver-tuning",
+      "target": "leaf-sqlserver-tuning-6",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "domain-security-data",
+      "target": "topic-dynamodb-nosql",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "topic-dynamodb-nosql",
+      "target": "leaf-dynamodb-nosql-1",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-dynamodb-nosql",
+      "target": "leaf-dynamodb-nosql-2",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-dynamodb-nosql",
+      "target": "leaf-dynamodb-nosql-3",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-dynamodb-nosql",
+      "target": "leaf-dynamodb-nosql-4",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "root-web-app-dev",
+      "target": "domain-frontend-engineering",
+      "type": "structural",
+      "label": "Pillar Branch"
+    },
+    {
+      "source": "domain-frontend-engineering",
+      "target": "topic-fe-foundations",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "topic-fe-foundations",
+      "target": "leaf-fe-foundations-1",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-fe-foundations",
+      "target": "leaf-fe-foundations-2",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-fe-foundations",
+      "target": "leaf-fe-foundations-3",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "domain-frontend-engineering",
+      "target": "topic-browser-rendering",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "topic-browser-rendering",
+      "target": "leaf-browser-rendering-1",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-browser-rendering",
+      "target": "leaf-browser-rendering-2",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-browser-rendering",
+      "target": "leaf-browser-rendering-3",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "domain-frontend-engineering",
+      "target": "topic-js-core",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "topic-js-core",
+      "target": "leaf-js-core-1",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-js-core",
+      "target": "leaf-js-core-2",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-js-core",
+      "target": "leaf-js-core-3",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "domain-frontend-engineering",
+      "target": "topic-ts-advanced",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "topic-ts-advanced",
+      "target": "leaf-ts-advanced-1",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-ts-advanced",
+      "target": "leaf-ts-advanced-2",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-ts-advanced",
+      "target": "leaf-ts-advanced-3",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-ts-advanced",
+      "target": "leaf-ts-advanced-4",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "domain-frontend-engineering",
+      "target": "topic-angular-arch",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "topic-angular-arch",
+      "target": "leaf-angular-arch-1",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-angular-arch",
+      "target": "leaf-angular-arch-2",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-angular-arch",
+      "target": "leaf-angular-arch-3",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-angular-arch",
+      "target": "leaf-angular-arch-4",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "domain-frontend-engineering",
+      "target": "topic-rxjs-signals",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "topic-rxjs-signals",
+      "target": "leaf-rxjs-signals-1",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-rxjs-signals",
+      "target": "leaf-rxjs-signals-2",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-rxjs-signals",
+      "target": "leaf-rxjs-signals-3",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "domain-frontend-engineering",
+      "target": "topic-react-fiber",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "topic-react-fiber",
+      "target": "leaf-react-fiber-1",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-react-fiber",
+      "target": "leaf-react-fiber-2",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-react-fiber",
+      "target": "leaf-react-fiber-3",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-react-fiber",
+      "target": "leaf-react-fiber-4",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "domain-frontend-engineering",
+      "target": "topic-react-hooks-rtk",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "topic-react-hooks-rtk",
+      "target": "leaf-react-hooks-rtk-1",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-react-hooks-rtk",
+      "target": "leaf-react-hooks-rtk-2",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-react-hooks-rtk",
+      "target": "leaf-react-hooks-rtk-3",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-react-hooks-rtk",
+      "target": "leaf-react-hooks-rtk-4",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-react-hooks-rtk",
+      "target": "leaf-react-hooks-rtk-5",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "root-web-app-dev",
+      "target": "domain-ai-engineering",
+      "type": "structural",
+      "label": "Pillar Branch"
+    },
+    {
+      "source": "domain-ai-engineering",
+      "target": "topic-rag-architecture",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "topic-rag-architecture",
+      "target": "leaf-rag-architecture-1",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-rag-architecture",
+      "target": "leaf-rag-architecture-2",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-rag-architecture",
+      "target": "leaf-rag-architecture-3",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-rag-architecture",
+      "target": "leaf-rag-architecture-4",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "domain-ai-engineering",
+      "target": "topic-azure-openai",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "topic-azure-openai",
+      "target": "leaf-azure-openai-1",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-azure-openai",
+      "target": "leaf-azure-openai-2",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-azure-openai",
+      "target": "leaf-azure-openai-3",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "domain-ai-engineering",
+      "target": "topic-ai-sdlc",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "topic-ai-sdlc",
+      "target": "leaf-ai-sdlc-1",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-ai-sdlc",
+      "target": "leaf-ai-sdlc-2",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-ai-sdlc",
+      "target": "leaf-ai-sdlc-3",
+      "type": "structural",
+      "label": "Sub-section"
+    },
+    {
+      "source": "topic-auth-security",
+      "target": "topic-aspnet-webapi",
+      "type": "cross_link",
+      "label": "Secures Web API"
+    },
+    {
+      "source": "topic-auth-security",
+      "target": "topic-microservices-patterns",
+      "type": "cross_link",
+      "label": "API Gateway Auth"
+    },
+    {
+      "source": "topic-auth-security",
+      "target": "topic-react-hooks-rtk",
+      "type": "cross_link",
+      "label": "Client Token Store"
+    },
+    {
+      "source": "topic-auth-security",
+      "target": "topic-owasp-top10",
+      "type": "cross_link",
+      "label": "Security Standard"
+    },
+    {
+      "source": "topic-efcore-tuning",
+      "target": "topic-sqlserver-tuning",
+      "type": "cross_link",
+      "label": "ORM Engine Sync"
+    },
+    {
+      "source": "topic-efcore-tuning",
+      "target": "topic-async-concurrency",
+      "type": "cross_link",
+      "label": "Async I/O Execution"
+    },
+    {
+      "source": "topic-ddd-cqrs",
+      "target": "topic-saga-outbox",
+      "type": "cross_link",
+      "label": "Eventual Consistency"
+    },
+    {
+      "source": "topic-ddd-cqrs",
+      "target": "topic-microservices-patterns",
+      "type": "cross_link",
+      "label": "Bounded Context"
+    },
+    {
+      "source": "topic-grpc-signalr",
+      "target": "topic-browser-rendering",
+      "type": "cross_link",
+      "label": "Real-time WebSocket"
+    },
+    {
+      "source": "topic-grpc-signalr",
+      "target": "topic-microservices-patterns",
+      "type": "cross_link",
+      "label": "Internal RPC"
+    },
+    {
+      "source": "topic-containers-k8s",
+      "target": "topic-aws-architecture",
+      "type": "cross_link",
+      "label": "EKS Serverless"
+    },
+    {
+      "source": "topic-containers-k8s",
+      "target": "topic-azure-architecture",
+      "type": "cross_link",
+      "label": "AKS Infrastructure"
+    },
+    {
+      "source": "topic-iac-cicd",
+      "target": "topic-containers-k8s",
+      "type": "cross_link",
+      "label": "Deploy Manifests"
+    },
+    {
+      "source": "topic-rag-architecture",
+      "target": "topic-sqlserver-tuning",
+      "type": "cross_link",
+      "label": "Vector Search pgvector"
+    },
+    {
+      "source": "topic-azure-openai",
+      "target": "topic-csharp-fundamentals",
+      "type": "cross_link",
+      "label": "Semantic Kernel SDK"
+    },
+    {
+      "source": "topic-react-fiber",
+      "target": "topic-js-core",
+      "type": "cross_link",
+      "label": "Reconciliation Loop"
+    },
+    {
+      "source": "topic-angular-arch",
+      "target": "topic-rxjs-signals",
+      "type": "cross_link",
+      "label": "Reactive Data Flow"
+    },
+    {
+      "source": "topic-ts-advanced",
+      "target": "topic-react-hooks-rtk",
+      "type": "cross_link",
+      "label": "Typed Store & Props"
+    },
+    {
+      "source": "topic-fe-foundations",
+      "target": "topic-browser-rendering",
+      "type": "cross_link",
+      "label": "DOM Reflow & Repaint"
+    },
+    {
+      "source": "topic-hld-lld",
+      "target": "topic-dynamodb-nosql",
+      "type": "cross_link",
+      "label": "High Throughput Storage"
+    }
+  ]
+}

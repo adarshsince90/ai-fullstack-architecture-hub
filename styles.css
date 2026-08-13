@@ -593,23 +593,66 @@ body {
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 
+/* Simulators View Domain Grouping & Dividers */
+.simulator-domain-group {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.sim-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.sim-group-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sim-group-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.65rem;
+  border-radius: 12px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--accent-cyan);
+}
+
+.sim-section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-light), transparent);
+  margin: 2rem 0;
+  opacity: 0.75;
+}
+
 /* Simulators Grid */
 .simulators-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1.25rem;
-  margin-top: 1.5rem;
+  margin-top: 0.75rem;
 }
 
 .sim-card {
   background-color: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  padding: 1.5rem;
+  padding: 1.35rem 1.5rem;
   cursor: pointer;
-  transition: all 0.25s;
+  transition: all 0.25s ease;
   display: flex;
   flex-direction: column;
+  min-height: 210px;
+  max-width: 420px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .sim-card:hover {
@@ -619,14 +662,18 @@ body {
 }
 
 .sim-icon {
-  font-size: 2rem;
-  margin-bottom: 0.75rem;
+  font-size: 1.8rem;
+  margin-bottom: 0.65rem;
 }
 
 .sim-title {
-  font-size: 1.05rem;
+  font-size: 1.02rem;
   font-weight: 600;
   margin-bottom: 0.4rem;
+  min-height: 2.7rem;
+  line-height: 1.35;
+  display: flex;
+  align-items: center;
 }
 
 .sim-desc {
@@ -1723,4 +1770,256 @@ body {
   font-size: 0.82rem;
   resize: none;
   font-family: var(--font-sans);
+}
+
+/* ==========================================================================
+   Interactive Mind Map Graph Dashboard & Frosted Modal
+   ========================================================================== */
+
+.graph-dashboard-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.graph-toolbar {
+  position: sticky;
+  top: 0.75rem;
+  z-index: 100;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 243, 255, 0.25);
+  padding: 0.55rem 0.95rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 243, 255, 0.12);
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.toolbar-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted, #94a3b8);
+  margin-right: 0.25rem;
+}
+
+.btn-axis {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted, #94a3b8);
+  border: 1px solid transparent;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-axis:hover {
+  color: #fff;
+  background: rgba(0, 243, 255, 0.15);
+  border-color: rgba(0, 243, 255, 0.3);
+}
+
+.btn-axis.active {
+  background: rgba(0, 243, 255, 0.2);
+  color: #00f3ff;
+  border-color: #00f3ff;
+  box-shadow: 0 0 12px rgba(0, 243, 255, 0.4);
+}
+
+.graph-search-input {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--border-color, #334155);
+  color: #fff;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  outline: none;
+}
+
+.graph-search-input:focus {
+  border-color: #00f3ff;
+  box-shadow: 0 0 8px rgba(0, 243, 255, 0.3);
+}
+
+.graph-canvas-wrapper {
+  width: 100%;
+  height: 1400px;
+  min-height: 1400px;
+  background: radial-gradient(circle at 50% 50%, #0b1120 0%, #050811 100%);
+  border: 1px solid rgba(0, 243, 255, 0.2);
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 243, 255, 0.05);
+}
+
+.graph-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: default;
+}
+
+/* Frosted Glass Node Detail Modal */
+.graph-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(8px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.graph-modal-content {
+  background: rgba(30, 41, 59, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 1.5rem 1.75rem;
+  width: 90%;
+  max-width: 520px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  color: #fff;
+}
+
+.graph-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1.25rem;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.graph-modal-close:hover {
+  color: #fff;
+}
+
+.graph-modal-header h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0.4rem 0 0.2rem 0;
+  color: #f8fafc;
+}
+
+.gmodal-subtitle {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.graph-modal-body {
+  margin-top: 1rem;
+}
+
+.gmodal-taxonomies {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  background: rgba(15, 23, 42, 0.5);
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  font-size: 0.78rem;
+}
+
+.gtax-pill {
+  color: #cbd5e1;
+}
+
+.gmodal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* Color Legend Bar */
+.graph-legend-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.85rem;
+  margin-bottom: 0.75rem;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--border-color, #334155);
+  padding: 0.4rem 0.85rem;
+  border-radius: 8px;
+}
+
+.legend-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted, #94a3b8);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.legend-chip {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+}
+
+.legend-root { color: #818cf8; }
+.legend-backend { color: #34d399; }
+.legend-distributed { color: #22d3ee; }
+.legend-cloud { color: #7dd3fc; }
+.legend-security { color: #fbbf24; }
+.legend-frontend { color: #f472b6; }
+.legend-ai { color: #c084fc; }
+
+/* Rich Recap Definition Box inside Modal */
+.gmodal-recap-box {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  max-height: 320px;
+  overflow-y: auto;
+  margin-bottom: 0.85rem;
+}
+
+.recap-section-item {
+  margin-bottom: 0.65rem;
+}
+
+.recap-section-item:last-child {
+  margin-bottom: 0;
+}
+
+.recap-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #38bdf8;
+  display: block;
+  margin-bottom: 0.15rem;
+}
+
+.recap-section-item p {
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: #cbd5e1;
+  margin: 0;
 }
