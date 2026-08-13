@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
 [![Zero Dependencies](https://img.shields.io/badge/Dependencies-Zero-success.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
-[![GitHub Pages Ready](https://img.shields.io/badge/Deployment-GitHub%20Pages-blueviolet.svg)](#-deployment)
+[![GitHub Pages Ready](https://img.shields.io/badge/Deployment-GitHub%20Pages-blueviolet.svg)](https://adarshsince90.github.io/ai-fullstack-architecture-hub/)
 
 > An interactive, production-grade knowledge base & visual simulation system for **Senior Full-Stack Engineers, Lead Software Engineers, and Systems Architects** (10+ years depth across .NET 8/10, Cloud Native AWS/Azure, Distributed Systems, Modern Frontend, and AI Enablement).
 
