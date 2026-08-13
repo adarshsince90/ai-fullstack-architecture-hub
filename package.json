@@ -1,0 +1,20 @@
+{
+  "name": "ai-fullstack-architecture-hub",
+  "version": "2.0.0",
+  "description": "Senior & Lead Full-Stack Engineering Master Prep Hub",
+  "main": "app.js",
+  "scripts": {
+    "test": "node tests/smoke.test.js",
+    "build:graph": "node scripts/build_graph_topology.js"
+  },
+  "keywords": [
+    "dotnet",
+    "distributed-systems",
+    "cloud-architecture",
+    "frontend-engineering",
+    "system-design",
+    "ai-engineering"
+  ],
+  "author": "Antigravity Pair Programmer",
+  "license": "MIT"
+}

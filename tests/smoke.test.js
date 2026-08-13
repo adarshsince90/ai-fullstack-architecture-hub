@@ -169,6 +169,33 @@ test('All guide paths in mindmap_schema.json point to valid existing files', () 
   assert.ok(checkedCount > 0, 'Mindmap schema should contain valid guide references');
 });
 
+// 10. Graph Topology JSON Integrity & Taxonomy Properties
+test('docs/graph_topology.json exists and contains valid technical nodes with taxonomy tags', () => {
+  const topologyPath = path.join(rootDir, 'docs/graph_topology.json');
+  assert.strictEqual(fs.existsSync(topologyPath), true, 'docs/graph_topology.json file must exist');
+
+  const topology = JSON.parse(fs.readFileSync(topologyPath, 'utf8'));
+  assert.ok(Array.isArray(topology.nodes), 'Topology must contain nodes array');
+  assert.ok(Array.isArray(topology.links), 'Topology must contain links array');
+  assert.ok(topology.nodes.length >= 130, `Topology node count should be >= 130 (Found: ${topology.nodes.length})`);
+  assert.ok(topology.links.length >= 130, `Topology link count should be >= 130 (Found: ${topology.links.length})`);
+
+  // Ensure root node exists
+  const rootNode = topology.nodes.find(n => n.id === 'root-web-app-dev');
+  assert.ok(rootNode, 'Topology must contain epicenter root-web-app-dev node');
+  assert.strictEqual(rootNode.name, 'Web Application Development');
+
+  // Verify all nodes have required taxonomy metadata
+  for (const node of topology.nodes) {
+    assert.ok(node.id, 'Node must have an id');
+    assert.ok(node.name, 'Node must have a name');
+    assert.ok(node.taxonomies, `Node ${node.id} must have taxonomies metadata`);
+    assert.ok(node.taxonomies.sdlcPhase, `Node ${node.id} must have sdlcPhase taxonomy tag`);
+    assert.ok(node.taxonomies.techDomain, `Node ${node.id} must have techDomain taxonomy tag`);
+    assert.ok(node.taxonomies.archLayer, `Node ${node.id} must have archLayer taxonomy tag`);
+  }
+});
+
 console.log('\n--- Summary ---');
 if (failures === 0) {
   console.log('🎉 ALL SMOKE TESTS PASSED CLEANLY!\n');
