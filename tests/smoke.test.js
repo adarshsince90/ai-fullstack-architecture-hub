@@ -109,6 +109,66 @@ test('No local file:/// paths in README or PROGRESS', () => {
   }
 });
 
+// 7. All Guide Links in Definitions.md Exist & Target Valid Files
+test('All guide links in Definitions.md point to valid existing files', () => {
+  const recapContent = fs.readFileSync(path.join(rootDir, 'docs/Definitions.md'), 'utf8');
+  const linkRegex = /\[`?([^`\]]+)`?\]\(([^)]+)\)/g;
+  let match;
+  let guideLinkCount = 0;
+  while ((match = linkRegex.exec(recapContent)) !== null) {
+    const href = match[2].trim();
+    if (href.includes('guides/')) {
+      guideLinkCount++;
+      const cleanPath = href.replace(/^\.\//, '');
+      const fullPath = path.join(rootDir, cleanPath);
+      assert.strictEqual(fs.existsSync(fullPath), true, `Broken guide link in Definitions.md: ${href}`);
+    }
+  }
+  assert.ok(guideLinkCount > 0, 'Definitions.md should contain at least one guide link');
+});
+
+// 8. app.js Guide Link Interception & Path Normalization Regression Safeguards
+test('app.js includes regression safeguards for guide link interception & path normalization', () => {
+  const appJsContent = fs.readFileSync(path.join(rootDir, 'app.js'), 'utf8');
+  
+  // Ensure querySelectorAll does NOT use restrictive href^="guides/" which breaks on ./guides/
+  assert.strictEqual(
+    appJsContent.includes('querySelectorAll(\'a[href^="guides/"]\')'),
+    false,
+    'app.js must not use restrictive href^="guides/" selector that fails on ./ prefixed links'
+  );
+
+  // Ensure app.js contains path normalization stripping leading ./
+  assert.ok(
+    appJsContent.includes('replace(/^\\.\\//, \'\')'),
+    'app.js must include path normalization stripping leading ./'
+  );
+  
+  // Ensure guide link query selectors in app.js match relative links correctly
+  assert.ok(
+    appJsContent.includes('a[href*="guides/"]') || appJsContent.includes('a[href$=".md"]'),
+    'app.js must use flexible guide link selectors (a[href*="guides/"] or a[href$=".md"])'
+  );
+});
+
+// 9. All MindMap Schema Guide Paths Point to Existing Files
+test('All guide paths in mindmap_schema.json point to valid existing files', () => {
+  const schema = JSON.parse(fs.readFileSync(path.join(rootDir, 'docs/mindmap_schema.json'), 'utf8'));
+  let checkedCount = 0;
+  for (const domain of schema.domains || []) {
+    const topics = domain.subtopics || (domain.levels ? domain.levels.flatMap(l => l.topics) : []);
+    for (const t of topics) {
+      if (t.guide) {
+        checkedCount++;
+        const cleanPath = t.guide.replace(/^\.\//, '');
+        const fullPath = path.join(rootDir, cleanPath);
+        assert.strictEqual(fs.existsSync(fullPath), true, `MindMap schema guide path does not exist: ${t.guide}`);
+      }
+    }
+  }
+  assert.ok(checkedCount > 0, 'Mindmap schema should contain valid guide references');
+});
+
 console.log('\n--- Summary ---');
 if (failures === 0) {
   console.log('🎉 ALL SMOKE TESTS PASSED CLEANLY!\n');

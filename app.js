@@ -264,8 +264,9 @@ class MasterPrepApp {
   }
 
   // Open & Render Markdown Guide
-  async openGuide(guidePath, domainName, topicName, sourceElementId = null) {
+  async openGuide(rawGuidePath, domainName, topicName, sourceElementId = null) {
     try {
+      const guidePath = rawGuidePath ? rawGuidePath.replace(/^\.\//, '') : '';
       const response = await fetch(guidePath);
       if (!response.ok) throw new Error(`Guide file not found: ${guidePath}`);
       const markdown = await response.text();
@@ -312,10 +313,10 @@ class MasterPrepApp {
       }
 
       // Intercept inline guide-to-guide links & interactive simulator links in the rendered guide body
-      displayContainer.querySelectorAll('a[href^="guides/"]').forEach(link => {
+      displayContainer.querySelectorAll('a[href*="guides/"], a[href$=".md"]').forEach(link => {
         link.addEventListener('click', (e) => {
           e.preventDefault();
-          const targetPath = link.getAttribute('href');
+          const targetPath = (link.getAttribute('href') || '').replace(/^\.\//, '');
           app.openGuide(targetPath, domainName, link.textContent || 'Guide');
         });
         link.style.cursor = 'pointer';
@@ -521,10 +522,11 @@ class MasterPrepApp {
     this.updateRecapStats(completedTopics, totalTopics);
 
     // Intercept guide links rendered by marked.js so they open in the inline Guide Viewer
-    container.querySelectorAll('a[href^="guides/"]').forEach(link => {
+    container.querySelectorAll('a[href*="guides/"], a[href$=".md"]').forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
-        const guidePath = link.getAttribute('href');
+        const rawGuidePath = link.getAttribute('href');
+        const guidePath = rawGuidePath ? rawGuidePath.replace(/^\.\//, '') : '';
         // Extract domain and topic from the closest recap-topic-card
         const card = link.closest('.recap-topic-card');
         const topicTitle = card ? card.querySelector('.recap-topic-title')?.textContent?.trim() || 'Guide' : 'Guide';
