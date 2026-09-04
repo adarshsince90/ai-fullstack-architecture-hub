@@ -36,11 +36,13 @@ class MasterPrepApp {
         this.searchIndex = await indexRes.json();
       }
       this.renderLearningPaths();
+      this.renderPathwayStepper();
       this.renderDomainsTree();
       this.renderRecapDocument();
       this.initScrollListener();
       this.initGlobalSidebarState();
       this.loadAiChatHistory();
+      this.showMindmapView();
     } catch (err) {
       console.error('Failed to load schemas:', err);
     }
@@ -59,66 +61,224 @@ class MasterPrepApp {
     });
   }
 
-  // Render the Hero Learning Paths Cards
+  // Render the Sleek 4-Track Segmented Subheader Rail
   renderLearningPaths() {
     const container = document.getElementById('learning-paths-container');
-    if (!container || !this.schema.learningPaths) return;
+    if (!container || !this.schema?.learningPaths) return;
 
-    container.innerHTML = this.schema.learningPaths.map(path => `
-      <div class="path-card ${this.activePath === path.id ? 'active' : ''}" onclick="app.selectPath('${path.id}')">
-        <div>
-          <div class="path-title">
-            <span>🎯</span> ${path.name}
+    const trackMeta = {
+      'lead-fullstack': { icon: '🎯', shortTitle: 'Lead Full-Stack', subtitle: '6 Pillars • End-to-End' },
+      'system-design-mastery-path': { icon: '🏗️', shortTitle: 'Staff System Design', subtitle: 'HLD • Math • Primitives' },
+      'systems-architect': { icon: '☁️', shortTitle: 'Systems Architect', subtitle: 'Dist. Systems • Cloud' },
+      'frontend-mastery': { icon: '🎨', shortTitle: 'Frontend Mastery', subtitle: 'JS/TS • Angular • React' }
+    };
+
+    container.innerHTML = this.schema.learningPaths.map(path => {
+      const meta = trackMeta[path.id] || { icon: '🧭', shortTitle: path.name, subtitle: path.description };
+      const isActive = this.activePath === path.id;
+      const stepCount = path.sequence ? path.sequence.length : 0;
+      return `
+      <div class="track-pill-card ${isActive ? 'active' : ''}" onclick="app.selectPath('${path.id}')" title="Click to focus ${path.name} curriculum">
+        <div class="track-pill-icon">${meta.icon}</div>
+        <div class="track-pill-body">
+          <div class="track-pill-title">
+            <span>${meta.shortTitle}</span>
+            <span class="track-pill-badge">${stepCount} Steps</span>
           </div>
-          <div class="path-desc">${path.description}</div>
-        </div>
-        <div class="path-steps">
-          ${path.sequence.map(step => `<span class="path-step-badge">${step}</span>`).join('')}
+          <div class="track-pill-sub">${meta.subtitle}</div>
         </div>
       </div>
-    `).join('');
+    `}).join('');
+  }
+
+  // Render the Dynamic Pathway Stepper Bar
+  renderPathwayStepper() {
+    const stepperContainer = document.getElementById('pathway-stepper-container');
+    const heading = document.getElementById('mindmap-section-heading');
+    const subheading = document.getElementById('mindmap-section-subheading');
+    if (!stepperContainer) return;
+
+    if (!this.activePath || !this.schema?.learningPaths) {
+      stepperContainer.style.display = 'none';
+      stepperContainer.innerHTML = '';
+      if (heading) heading.textContent = '6 Core Engineering Domains';
+      if (subheading) subheading.textContent = 'Click any node to explore in-depth architectural guides, runnable code templates, and interactive simulators.';
+      return;
+    }
+
+    const path = this.schema.learningPaths.find(p => p.id === this.activePath);
+    if (!path) return;
+
+    // Calculate total topics and completed topics in this path
+    let totalTopics = 0;
+    let completedTopics = 0;
+
+    const stepItems = path.sequence.map((stepKey, idx) => {
+      // Find matching domain or frontend level
+      let domain = this.schema.domains.find(d => d.id === stepKey);
+      let stepName = stepKey;
+      let stepIcon = '📌';
+      let targetDomainId = stepKey;
+
+      if (domain) {
+        stepName = domain.name.split('&')[0].trim();
+        stepIcon = domain.icon || '📌';
+        targetDomainId = domain.id;
+        const subList = domain.subtopics || [];
+        totalTopics += subList.length;
+        completedTopics += subList.filter(s => this.recapChecked[s.id]).length;
+      } else if (path.id === 'frontend-mastery') {
+        const feDomain = this.schema.domains.find(d => d.id === 'frontend-engineering');
+        targetDomainId = 'frontend-engineering';
+        stepIcon = '🎨';
+        if (stepKey === 'frontend-foundations') stepName = 'Level 1: Foundations';
+        else if (stepKey === 'frontend-jsts') stepName = 'Level 2: JS/TS Core';
+        else if (stepKey === 'frontend-angular') stepName = 'Level 3: Angular Ecosystem';
+        else if (stepKey === 'frontend-react') stepName = 'Level 4: React Ecosystem';
+
+        if (feDomain && feDomain.levels) {
+          const matchedLevel = feDomain.levels.find(lvl => lvl.level.toLowerCase().includes(stepKey.replace('frontend-', '')) || lvl.level.toLowerCase().includes(stepName.toLowerCase()));
+          if (matchedLevel) {
+            totalTopics += matchedLevel.topics.length;
+            completedTopics += matchedLevel.topics.filter(t => this.recapChecked[t.id]).length;
+          }
+        }
+      }
+
+      return {
+        stepNum: idx + 1,
+        name: stepName,
+        icon: stepIcon,
+        targetDomainId: targetDomainId
+      };
+    });
+
+    const percent = totalTopics > 0 ? Math.round((completedTopics / totalTopics) * 100) : 0;
+
+    stepperContainer.style.display = 'block';
+    stepperContainer.innerHTML = `
+      <div class="pathway-stepper-card">
+        <div class="stepper-header">
+          <div class="stepper-title-group">
+            <span class="stepper-icon">🎯</span>
+            <div>
+              <div class="stepper-title">Career Track: ${path.name}</div>
+              <div class="stepper-desc">${path.description}</div>
+            </div>
+          </div>
+          <div class="stepper-actions">
+            <div class="stepper-stat-badge">
+              <span>📊 ${completedTopics}/${totalTopics} Topics Completed (${percent}%)</span>
+            </div>
+            <button class="btn btn-sm btn-outline stepper-reset-btn" onclick="app.clearPathSelection()" title="Reset to show all domains">
+              ✖ Show All Domains
+            </button>
+          </div>
+        </div>
+
+        <div class="stepper-track-label">⚡ RECOMMENDED STEP-BY-STEP PROGRESSION (CLICK TO JUMP):</div>
+        <div class="stepper-track">
+          ${stepItems.map((s, idx) => `
+            <button class="step-pill" onclick="app.scrollToStepDomain('${s.targetDomainId}')" title="Jump to Step ${s.stepNum}: ${s.name}">
+              <span class="step-num">${s.stepNum}</span>
+              <span>${s.icon}</span>
+              <span class="step-name">${s.name}</span>
+            </button>
+            ${idx < stepItems.length - 1 ? `<span class="step-arrow">➔</span>` : ''}
+          `).join('')}
+        </div>
+      </div>
+    `;
+
+    if (heading) heading.textContent = `Focused Track Curriculum: ${path.name}`;
+    if (subheading) subheading.textContent = `Follow the ${stepItems.length}-step structured sequence below or click any step above to jump directly to that module.`;
   }
 
   // Select/Filter by Path
   selectPath(pathId) {
-    this.activePath = this.activePath === pathId ? null : pathId;
-    this.renderLearningPaths();
-    this.highlightDomainCards();
-  }
-
-  highlightDomainCards() {
-    if (!this.activePath) {
-      document.querySelectorAll('.domain-card').forEach(card => card.style.opacity = '1');
-      return;
+    if (this.activePath === pathId) {
+      this.activePath = null;
+    } else {
+      this.activePath = pathId;
     }
-    const path = this.schema.learningPaths.find(p => p.id === this.activePath);
-    if (!path) return;
+    this.renderLearningPaths();
+    this.renderPathwayStepper();
+    this.renderDomainsTree();
 
-    document.querySelectorAll('.domain-card').forEach(card => {
-      const domainId = card.getAttribute('data-domain-id');
-      if (path.sequence.includes(domainId) || (path.id === 'frontend-mastery' && domainId === 'frontend-engineering')) {
-        card.style.opacity = '1';
-        card.style.borderColor = 'var(--accent-cyan)';
-      } else {
-        card.style.opacity = '0.35';
-        card.style.borderColor = 'var(--border-color)';
-      }
-    });
+    if (this.activePath) {
+      // Smooth scroll to the pathway stepper with offset so the user sees immediate feedback
+      requestAnimationFrame(() => {
+        const stepper = document.getElementById('pathway-stepper-container');
+        if (stepper) {
+          stepper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    }
   }
 
-  // Render the 6 Domain Cards & Mind Map Subtopics
+  // Clear Path Selection
+  clearPathSelection() {
+    this.activePath = null;
+    this.renderLearningPaths();
+    this.renderPathwayStepper();
+    this.renderDomainsTree();
+  }
+
+  // Scroll smoothly to a specific domain card in the curriculum and flash a pulse
+  scrollToStepDomain(domainId) {
+    const card = document.querySelector(`.domain-card[data-domain-id="${domainId}"]`);
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      card.classList.remove('highlight-pulse');
+      // Trigger reflow for animation restart
+      void card.offsetWidth;
+      card.classList.add('highlight-pulse');
+      setTimeout(() => {
+        card.classList.remove('highlight-pulse');
+      }, 1600);
+    }
+  }
+
+  // Render the Domain Cards & Mind Map Subtopics (Re-ordered if activePath is set)
   renderDomainsTree(filterText = '') {
     const container = document.getElementById('domains-tree-container');
-    if (!container || !this.schema.domains) return;
+    if (!container || !this.schema?.domains) return;
 
     const query = filterText.toLowerCase();
 
-    container.innerHTML = this.schema.domains.map(domain => {
+    // Determine domain list and order
+    let domainList = [...this.schema.domains];
+
+    if (this.activePath && !query) {
+      const path = this.schema.learningPaths.find(p => p.id === this.activePath);
+      if (path && path.sequence) {
+        if (path.id === 'frontend-mastery') {
+          // Keep only frontend engineering domain
+          domainList = domainList.filter(d => d.id === 'frontend-engineering');
+        } else {
+          // Re-order domains strictly according to path sequence
+          const ordered = [];
+          path.sequence.forEach(seqId => {
+            const d = domainList.find(item => item.id === seqId);
+            if (d && !ordered.includes(d)) ordered.push(d);
+          });
+          domainList = ordered;
+        }
+      }
+    }
+
+    container.innerHTML = domainList.map(domain => {
       // Check if domain matches query
       let matches = domain.name.toLowerCase().includes(query) || domain.description.toLowerCase().includes(query);
 
       let subtopicsHtml = '';
+      let domainTotal = 0;
+      let domainCompleted = 0;
+
       if (domain.subtopics) {
+        domainTotal = domain.subtopics.length;
+        domainCompleted = domain.subtopics.filter(s => this.recapChecked[s.id]).length;
+
         const filtered = domain.subtopics.filter(sub =>
           !query || matches || sub.name.toLowerCase().includes(query)
         );
@@ -127,18 +287,23 @@ class MasterPrepApp {
         subtopicsHtml = `
           <div class="subtopics-list">
             ${filtered.map(sub => `
-              <div class="subtopic-item" id="subtopic-${sub.id}" onclick="app.openGuide('${sub.guide}', '${domain.name}', '${sub.name}', 'subtopic-${sub.id}')" title="Click to read in-depth guide">
+              <div class="subtopic-item ${this.recapChecked[sub.id] ? 'completed' : ''}" id="subtopic-${sub.id}" onclick="app.openGuide('${sub.guide}', '${domain.name}', '${sub.name}', 'subtopic-${sub.id}')" title="Click to read in-depth guide">
                 <div class="subtopic-info">
-                  <span class="subtopic-dot"></span>
+                  <span class="subtopic-dot" style="${this.recapChecked[sub.id] ? 'background-color: var(--accent-emerald);' : ''}"></span>
                   <span class="subtopic-title">${sub.name}</span>
                 </div>
-                <span class="subtopic-badge">📖 Read Guide</span>
+                <span class="subtopic-badge">${this.recapChecked[sub.id] ? '✓ Mastered' : '📖 Read Guide'}</span>
               </div>
             `).join('')}
           </div>
         `;
       } else if (domain.levels) {
         // Multi-level for Frontend Engineering
+        domain.levels.forEach(lvl => {
+          domainTotal += lvl.topics.length;
+          domainCompleted += lvl.topics.filter(t => this.recapChecked[t.id]).length;
+        });
+
         subtopicsHtml = domain.levels.map(level => {
           const filteredTopics = level.topics.filter(t =>
             !query || matches || t.name.toLowerCase().includes(query)
@@ -150,12 +315,12 @@ class MasterPrepApp {
               <div class="level-title">📌 ${level.level}</div>
               <div class="subtopics-list">
                 ${filteredTopics.map(t => `
-                  <div class="subtopic-item" id="subtopic-${t.id}" onclick="app.openGuide('${t.guide}', '${domain.name}', '${t.name}', 'subtopic-${t.id}')" title="Click to read in-depth guide">
+                  <div class="subtopic-item ${this.recapChecked[t.id] ? 'completed' : ''}" id="subtopic-${t.id}" onclick="app.openGuide('${t.guide}', '${domain.name}', '${t.name}', 'subtopic-${t.id}')" title="Click to read in-depth guide">
                     <div class="subtopic-info">
-                      <span class="subtopic-dot"></span>
+                      <span class="subtopic-dot" style="${this.recapChecked[t.id] ? 'background-color: var(--accent-emerald);' : ''}"></span>
                       <span class="subtopic-title">${t.name}</span>
                     </div>
-                    <span class="subtopic-badge">📖 Read Guide</span>
+                    <span class="subtopic-badge">${this.recapChecked[t.id] ? '✓ Mastered' : '📖 Read Guide'}</span>
                   </div>
                 `).join('')}
               </div>
@@ -166,13 +331,35 @@ class MasterPrepApp {
 
       if (query && !matches) return '';
 
+      // Step indicator if path is active
+      let stepBadgeHtml = '';
+      if (this.activePath) {
+        const path = this.schema.learningPaths.find(p => p.id === this.activePath);
+        if (path) {
+          const stepIndex = path.sequence.indexOf(domain.id);
+          if (stepIndex !== -1) {
+            stepBadgeHtml = `
+              <div class="domain-step-badge">
+                <span>🎯 STEP ${stepIndex + 1} OF ${path.sequence.length}</span>
+                <span style="opacity: 0.6;">•</span>
+                <span>${path.name.split(' ')[0]} Track</span>
+              </div>
+            `;
+          }
+        }
+      }
+
+      const domainPct = domainTotal > 0 ? Math.round((domainCompleted / domainTotal) * 100) : 0;
+
       return `
         <div class="domain-card" data-domain-id="${domain.id}">
+          ${stepBadgeHtml}
           <div class="domain-header">
             <div class="domain-identity">
               <span class="domain-icon">${domain.icon}</span>
               <div>
                 <div class="domain-name">${domain.name}</div>
+                <div class="domain-progress-stat">Mastery: ${domainCompleted}/${domainTotal} Topics (${domainPct}%)</div>
               </div>
             </div>
             <span class="domain-badge">${domain.badge}</span>
@@ -722,11 +909,16 @@ class MasterPrepApp {
       bodyLayout.classList.remove('global-sidebar-collapsed');
       if (collapseBtn) collapseBtn.title = 'Collapse Menu';
     }
+
+    if (forceState === undefined) {
+      localStorage.setItem('global_sidebar_collapsed', shouldCollapse ? 'true' : 'false');
+    }
   }
 
   initGlobalSidebarState() {
     const savedState = localStorage.getItem('global_sidebar_collapsed');
-    const shouldCollapse = savedState === null ? true : savedState === 'true';
+    // Default to open (false) if not explicitly set to 'true'
+    const shouldCollapse = savedState === 'true';
     this.toggleGlobalSidebar(shouldCollapse);
   }
 
@@ -741,12 +933,14 @@ class MasterPrepApp {
   updateGlobalNavActive(viewId) {
     const gnavMap = {
       'recap-view': 'gnav-recap',
+      'system-design-hub-view': 'gnav-system-design',
       'graph-dashboard-view': 'gnav-graph',
       'mindmap-view': 'gnav-paths',
       'simulators-view': 'gnav-simulators'
     };
     const headerMap = {
       'recap-view': 'recap-btn',
+      'system-design-hub-view': 'system-design-btn',
       'graph-dashboard-view': 'graph-dashboard-btn',
       'mindmap-view': 'mindmap-toggle-btn',
       'simulators-view': 'simulators-btn'
@@ -953,7 +1147,7 @@ class MasterPrepApp {
 
   // Update Header Actions Active Highlight State
   updateHeaderActiveButton(activeId) {
-    const navButtons = ['recap-btn', 'graph-dashboard-btn', 'mindmap-toggle-btn', 'simulators-btn'];
+    const navButtons = ['recap-btn', 'system-design-btn', 'graph-dashboard-btn', 'mindmap-toggle-btn', 'simulators-btn'];
     navButtons.forEach(id => {
       const btn = document.getElementById(id);
       if (!btn) return;
@@ -967,6 +1161,67 @@ class MasterPrepApp {
     });
   }
 
+  // Switch Umbrella Track (Full-Stack Developer vs System Design Hub)
+  switchUmbrella(umbrellaId) {
+    document.querySelectorAll('.umbrella-tab').forEach(tab => tab.classList.remove('active'));
+    const activeTab = document.getElementById(`umbrella-${umbrellaId}`);
+    if (activeTab) activeTab.classList.add('active');
+
+    if (umbrellaId === 'system-design') {
+      this.showSystemDesignHubView();
+    } else {
+      this.showMindmapView();
+    }
+  }
+
+  // Switch to System Design Hub View
+  showSystemDesignHubView(isBackNavigation = false) {
+    if (this.graphEngine) this.graphEngine.stopAnimation();
+    this.updateGlobalNavActive('system-design-hub-view');
+    const graphView = document.getElementById('graph-dashboard-view');
+    if (graphView) graphView.style.display = 'none';
+    document.getElementById('guide-viewer-section').style.display = 'none';
+    const simView = document.getElementById('simulators-view');
+    if (simView) simView.style.display = 'none';
+    document.getElementById('mindmap-view').style.display = 'none';
+    document.getElementById('recap-view').style.display = 'none';
+    document.getElementById('system-design-hub-view').style.display = 'block';
+
+    this.updateBreadcrumb([
+      { text: 'Learning Paths', action: 'app.showMindmapView()' },
+      { text: 'System Design Hub', active: true }
+    ]);
+
+    if (!isBackNavigation) {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }
+
+  // Load Interactive System Design Module inside iframe
+  loadSystemDesignModule(moduleName) {
+    const iframe = document.getElementById('sd-module-iframe');
+    if (!iframe) return;
+
+    document.querySelectorAll('.sd-module-btn').forEach(btn => {
+      btn.classList.remove('btn-primary');
+      btn.classList.add('btn-outline');
+    });
+
+    let tabId = 'sd-tab-fundamentals';
+    if (moduleName === 'hld_framework') tabId = 'sd-tab-hld';
+    if (moduleName === 'architectural_primitives') tabId = 'sd-tab-primitives';
+    if (moduleName === 'case_studies') tabId = 'sd-tab-casestudies';
+    if (moduleName === 'observability_request_flow') tabId = 'sd-tab-observability';
+
+    const activeBtn = document.getElementById(tabId);
+    if (activeBtn) {
+      activeBtn.classList.remove('btn-outline');
+      activeBtn.classList.add('btn-primary');
+    }
+
+    iframe.src = `docs/system_design/${moduleName}.html`;
+  }
+
   // Switch to Quick Recap View
   showRecapView(isBackNavigation = false) {
     if (this.graphEngine) this.graphEngine.stopAnimation();
@@ -974,11 +1229,15 @@ class MasterPrepApp {
     const graphView = document.getElementById('graph-dashboard-view');
     if (graphView) graphView.style.display = 'none';
     document.getElementById('guide-viewer-section').style.display = 'none';
-    document.getElementById('simulators-view').style.display = 'none';
+    const simView = document.getElementById('simulators-view');
+    if (simView) simView.style.display = 'none';
     document.getElementById('mindmap-view').style.display = 'none';
+    const sdView = document.getElementById('system-design-hub-view');
+    if (sdView) sdView.style.display = 'none';
     document.getElementById('recap-view').style.display = 'block';
 
     this.updateBreadcrumb([
+      { text: 'Learning Paths', action: 'app.showMindmapView()' },
       { text: 'Master Knowledge Base & Quick Recap', active: true }
     ]);
 
@@ -987,20 +1246,22 @@ class MasterPrepApp {
     }
   }
 
-  // Switch to Mindmap View
+  // Switch to Mindmap View (Learning Paths)
   showMindmapView(isBackNavigation = false) {
     if (this.graphEngine) this.graphEngine.stopAnimation();
     this.updateGlobalNavActive('mindmap-view');
     const graphView = document.getElementById('graph-dashboard-view');
     if (graphView) graphView.style.display = 'none';
     document.getElementById('guide-viewer-section').style.display = 'none';
-    document.getElementById('simulators-view').style.display = 'none';
+    const simView = document.getElementById('simulators-view');
+    if (simView) simView.style.display = 'none';
     document.getElementById('recap-view').style.display = 'none';
+    const sdView = document.getElementById('system-design-hub-view');
+    if (sdView) sdView.style.display = 'none';
     document.getElementById('mindmap-view').style.display = 'block';
 
     this.updateBreadcrumb([
-      { text: 'Master Knowledge Base', action: 'app.showRecapView()' },
-      { text: 'Learning Paths', active: true }
+      { text: 'Learning Paths & Career Tracks', active: true }
     ]);
 
     if (!isBackNavigation) {
@@ -1017,7 +1278,10 @@ class MasterPrepApp {
     document.getElementById('guide-viewer-section').style.display = 'none';
     document.getElementById('mindmap-view').style.display = 'none';
     document.getElementById('recap-view').style.display = 'none';
-    document.getElementById('simulators-view').style.display = 'block';
+    const sdView = document.getElementById('system-design-hub-view');
+    if (sdView) sdView.style.display = 'none';
+    const simView = document.getElementById('simulators-view');
+    if (simView) simView.style.display = 'block';
 
     this.updateBreadcrumb([
       { text: 'Master Knowledge Base', action: 'app.showRecapView()' },

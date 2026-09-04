@@ -39,14 +39,17 @@
 
       <!-- Top Right Header Actions with Hover Text Expansion -->
       <div class="header-actions">
-        <button class="btn btn-primary nav-btn-icon" id="recap-btn" onclick="app.showRecapView()" title="Quick Recap (Interactive)">
-          <span class="nav-icon">📝</span><span class="nav-text">Quick Recap (Interactive)</span>
+        <button class="btn btn-primary nav-btn-icon" id="mindmap-toggle-btn" onclick="app.showMindmapView()" title="Learning Paths">
+          <span class="nav-icon">🧭</span><span class="nav-text">Learning Paths</span>
+        </button>
+        <button class="btn btn-outline nav-btn-icon" id="system-design-btn" onclick="app.showSystemDesignHubView()" title="System Design Hub">
+          <span class="nav-icon">🏗️</span><span class="nav-text">System Design Hub</span>
         </button>
         <button class="btn btn-outline nav-btn-icon" id="graph-dashboard-btn" onclick="app.showGraphDashboardView()" title="Graph Dashboard">
           <span class="nav-icon">🌐</span><span class="nav-text">Graph Dashboard</span>
         </button>
-        <button class="btn btn-outline nav-btn-icon" id="mindmap-toggle-btn" onclick="app.showMindmapView()" title="Learning Paths">
-          <span class="nav-icon">🧭</span><span class="nav-text">Learning Paths</span>
+        <button class="btn btn-outline nav-btn-icon" id="recap-btn" onclick="app.showRecapView()" title="Quick Recap (Interactive)">
+          <span class="nav-icon">📝</span><span class="nav-text">Quick Recap (Interactive)</span>
         </button>
         <button class="btn btn-outline nav-btn-icon" id="simulators-btn" onclick="app.showSimulatorsView()" title="Simulators">
           <span class="nav-icon">⚡</span><span class="nav-text">Simulators</span>
@@ -54,8 +57,8 @@
       </div>
     </header>
 
-    <!-- Application Body with Global Left Sidebar (Collapsed by default) -->
-    <div class="app-layout-body global-sidebar-collapsed" id="app-layout-body">
+    <!-- Application Body with Global Left Sidebar (Open by default) -->
+    <div class="app-layout-body" id="app-layout-body">
       <!-- Global Collapsible Left Navigation Menu Bar -->
       <aside class="global-left-sidebar" id="global-left-sidebar">
         <div class="gnav-top-header">
@@ -65,17 +68,21 @@
           </button>
         </div>
         <div class="gnav-list">
-          <button class="gnav-item-btn active" id="gnav-recap" onclick="app.showRecapView()" data-tooltip="Quick Recap (Interactive)">
-            <span class="gnav-icon">📝</span>
-            <span class="gnav-text">Quick Recap</span>
+          <button class="gnav-item-btn active" id="gnav-paths" onclick="app.showMindmapView()" data-tooltip="Learning Paths">
+            <span class="gnav-icon">🧭</span>
+            <span class="gnav-text">Learning Paths</span>
+          </button>
+          <button class="gnav-item-btn" id="gnav-system-design" onclick="app.showSystemDesignHubView()" data-tooltip="System Design Hub">
+            <span class="gnav-icon">🏗️</span>
+            <span class="gnav-text">System Design Hub</span>
           </button>
           <button class="gnav-item-btn" id="gnav-graph" onclick="app.showGraphDashboardView()" data-tooltip="Graph Dashboard">
             <span class="gnav-icon">🌐</span>
             <span class="gnav-text">Graph Dashboard</span>
           </button>
-          <button class="gnav-item-btn" id="gnav-paths" onclick="app.showMindmapView()" data-tooltip="Learning Paths">
-            <span class="gnav-icon">🧭</span>
-            <span class="gnav-text">Learning Paths</span>
+          <button class="gnav-item-btn" id="gnav-recap" onclick="app.showRecapView()" data-tooltip="Quick Recap (Interactive)">
+            <span class="gnav-icon">📝</span>
+            <span class="gnav-text">Quick Recap</span>
           </button>
           <button class="gnav-item-btn" id="gnav-simulators" onclick="app.showSimulatorsView()" data-tooltip="Simulators">
             <span class="gnav-icon">⚡</span>
@@ -91,6 +98,27 @@
       <div class="search-results-overlay" id="global-search-results" style="display: none;">
         <!-- Rendered dynamically by app.js -->
       </div>
+
+      <!-- SYSTEM DESIGN HUB VIEW -->
+      <section id="system-design-hub-view" class="view-section" style="display: none;">
+        <div class="paths-banner" style="background: linear-gradient(135deg, rgba(15,23,42,0.9), rgba(30,41,59,0.9)); border: 1px solid rgba(56,189,248,0.3); border-radius: 16px; padding: 24px; margin-bottom: 24px;">
+          <div class="section-badge">🏗️ STAFF SYSTEM DESIGN HUB</div>
+          <h2 class="banner-title" style="color: #38bdf8; font-size: 2rem;">System Design & Architecture Hub</h2>
+          <p class="section-desc">First-principles basics, interactive capacity calculators, architectural primitives, real-world case studies, and enterprise request flow & observability stack.</p>
+          
+          <div class="sd-hub-tabs" style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
+            <button class="btn btn-outline sd-module-btn" id="sd-tab-fundamentals" onclick="app.loadSystemDesignModule('fundamentals')">📖 1. Fundamentals</button>
+            <button class="btn btn-primary sd-module-btn" id="sd-tab-hld" onclick="app.loadSystemDesignModule('hld_framework')">📐 2. HLD Framework & Math</button>
+            <button class="btn btn-outline sd-module-btn" id="sd-tab-primitives" onclick="app.loadSystemDesignModule('architectural_primitives')">⚡ 3. Primitives & Simulators</button>
+            <button class="btn btn-outline sd-module-btn" id="sd-tab-casestudies" onclick="app.loadSystemDesignModule('case_studies')">🏛️ 4. Real-World Case Studies</button>
+            <button class="btn btn-outline sd-module-btn" id="sd-tab-observability" onclick="app.loadSystemDesignModule('observability_request_flow')">🔍 5. Request Flow & Observability</button>
+          </div>
+        </div>
+
+        <div id="system-design-frame-container" style="width: 100%; min-height: 850px; border-radius: 16px; overflow: hidden; background: #0f172a; border: 1px solid rgba(255,255,255,0.1);">
+          <iframe id="sd-module-iframe" src="docs/system_design/fundamentals.html" style="width: 100%; height: 850px; border: none;"></iframe>
+        </div>
+      </section>
 
       <!-- 0. GRAPH DASHBOARD VIEW -->
       <section id="graph-dashboard-view" class="view-section" style="display: none;">
@@ -151,15 +179,24 @@
       </section>
 
       <!-- 1. MIND MAP & LEARNING PATHS VIEW -->
-      <section id="mindmap-view" class="view-section" style="display: none;">
+      <section id="mindmap-view" class="view-section active">
 
-        <!-- Hero Learning Paths Selector -->
-        <div class="paths-banner">
-          <div class="section-badge">🧭 RECOMMENDED LEARNING PATHS</div>
-          <h2 class="banner-title">Choose Your Career Progression Track</h2>
-          <div class="paths-grid" id="learning-paths-container">
-            <!-- Rendered dynamically by app.js -->
+        <!-- Sticky Subheader Career Progression Track Navigator -->
+        <div class="tracks-sticky-bar" id="tracks-sticky-bar">
+          <div class="tracks-bar-inner">
+            <div class="tracks-bar-label">
+              <span>🧭</span>
+              <span class="badge-text">CAREER TRACKS</span>
+            </div>
+            <div class="tracks-grid-rail" id="learning-paths-container">
+              <!-- Rendered dynamically by app.js as 4 sleek equal-width pills -->
+            </div>
           </div>
+        </div>
+
+        <!-- Dynamic Career Pathway Flow Stepper & Progress Tracker -->
+        <div id="pathway-stepper-container" style="display: none;">
+          <!-- Injected dynamically by app.js when a path is selected -->
         </div>
 
         <!-- Master Domain Pillars Tree -->
@@ -167,8 +204,8 @@
           <div class="mindmap-header">
             <div>
               <div class="section-badge">🌳 CORE ENGINEERING DOMAINS</div>
-              <h2 class="section-title">6 Core Engineering Domains</h2>
-              <p class="section-desc">Click any node to explore in-depth architectural guides, runnable code templates,
+              <h2 class="section-title" id="mindmap-section-heading">6 Core Engineering Domains</h2>
+              <p class="section-desc" id="mindmap-section-subheading">Click any node to explore in-depth architectural guides, runnable code templates,
                 and interactive simulators.</p>
             </div>
           </div>
@@ -193,7 +230,7 @@
       </section>
 
       <!-- 3. QUICK RECAP SINGLE SCROLLABLE VIEW (WITH INTERACTIVE CHECKBOXES) -->
-      <section id="recap-view" class="view-section active">
+      <section id="recap-view" class="view-section" style="display: none;">
         <div class="recap-header-banner">
           <div class="recap-header-left">
             <div class="section-badge">⚡ UNIFIED MASTER KNOWLEDGE BASE</div>

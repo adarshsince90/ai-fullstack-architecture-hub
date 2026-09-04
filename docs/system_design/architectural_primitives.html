@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Architectural Primitives & Interactive Simulators</title>
+  <link rel="stylesheet" href="../../styles.css">
+  <style>
+    .sd-container { padding: 24px; max-width: 1200px; margin: 0 auto; font-family: 'Inter', sans-serif; color: #e2e8f0; }
+    .sd-card { background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 24px; margin-bottom: 24px; backdrop-filter: blur(12px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37); }
+    .sd-title { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 700; color: #38bdf8; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
+    .sd-badge { font-size: 0.75rem; padding: 4px 10px; background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; border-radius: 20px; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* Interactive Token Bucket Visualizer */
+    .tb-visualizer { background: #0f172a; border: 1px solid #334155; border-radius: 12px; padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 768px) { .tb-visualizer { grid-template-columns: 1fr; } }
+    .bucket-container { position: relative; height: 200px; width: 140px; margin: 0 auto; border: 4px solid #38bdf8; border-top: none; border-radius: 0 0 20px 20px; background: rgba(56, 189, 248, 0.05); display: flex; flex-direction: column-reverse; padding: 6px; gap: 4px; overflow: hidden; }
+    .token-pill { height: 16px; background: linear-gradient(90deg, #38bdf8, #818cf8); border-radius: 8px; box-shadow: 0 0 8px rgba(56, 189, 248, 0.8); }
+    
+    .tb-controls { display: flex; flex-direction: column; gap: 12px; justify-content: center; }
+    .btn-action { padding: 10px 16px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+    .btn-fire { background: #4ade80; color: #0f172a; }
+    .btn-fire:hover { background: #22c55e; }
+    .btn-burst { background: #f59e0b; color: #0f172a; }
+    .btn-burst:hover { background: #d97706; }
+
+    /* Ring Visualizer */
+    .ring-container { display: flex; justify-content: center; align-items: center; position: relative; height: 280px; }
+    canvas { background: #0f172a; border-radius: 50%; border: 1px solid #334155; }
+  </style>
+</head>
+<body>
+  <div class="sd-container">
+    
+    <!-- Token Bucket Visualizer -->
+    <div class="sd-card">
+      <div class="sd-title">
+        <span>⚡ Interactive Token Bucket Rate Limiter</span>
+        <span class="sd-badge">Live Simulator</span>
+      </div>
+      <p style="color: #94a3b8; font-size: 0.95rem;">
+        The Token Bucket algorithm refills tokens at a fixed rate $R$. Incoming requests consume 1 token. 
+        If the bucket is empty, the request is throttled ($429 \text{ Too Many Requests}$).
+      </p>
+
+      <div class="tb-visualizer">
+        <div style="text-align: center;">
+          <div class="bucket-container" id="token-bucket">
+            <!-- Tokens injected dynamically -->
+          </div>
+          <div style="margin-top: 10px; font-family: 'Fira Code', monospace; color: #38bdf8;">
+            Capacity: <span id="tb-count">5</span> / 8 Tokens
+          </div>
+        </div>
+
+        <div class="tb-controls">
+          <button class="btn-action btn-fire" onclick="sendRequest()">🚀 Send 1 Request</button>
+          <button class="btn-action btn-burst" onclick="sendBurst()">💥 Send Burst (5 Requests)</button>
+          <div style="font-size: 0.85rem; color: #94a3b8; line-height: 1.5; background: #1e293b; padding: 12px; border-radius: 8px;" id="tb-status">
+            System status: Idle. Tokens refilling at 1 token / sec.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Consistent Hashing Ring Visualizer -->
+    <div class="sd-card">
+      <div class="sd-title">
+        <span>⭕ Interactive Consistent Hashing Ring</span>
+        <span class="sd-badge">Node Remapping</span>
+      </div>
+      <p style="color: #94a3b8; font-size: 0.95rem;">
+        In Consistent Hashing, keys and servers are mapped to a $360^\circ$ hash ring. 
+        Adding or removing a server node only remaps keys belonging to the immediate clockwise neighbor.
+      </p>
+
+      <div class="ring-container">
+        <canvas id="hashRingCanvas" width="260" height="260"></canvas>
+      </div>
+
+      <div style="display: flex; justify-content: center; gap: 12px; margin-top: 16px;">
+        <button class="btn-action" style="background: #38bdf8; color: #0f172a;" onclick="addServerNode()">➕ Add Server Node</button>
+        <button class="btn-action" style="background: #ef4444; color: #ffffff;" onclick="removeServerNode()">➖ Remove Server Node</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Token Bucket Logic
+    let tokens = 5;
+    const maxCapacity = 8;
+
+    function renderBucket() {
+      const container = document.getElementById('token-bucket');
+      container.innerHTML = '';
+      for (let i = 0; i < tokens; i++) {
+        const pill = document.createElement('div');
+        pill.className = 'token-pill';
+        container.appendChild(pill);
+      }
+      document.getElementById('tb-count').innerText = tokens;
+    }
+
+    function sendRequest() {
+      const status = document.getElementById('tb-status');
+      if (tokens > 0) {
+        tokens--;
+        status.innerHTML = `<span style="color:#4ade80;">✅ Request Allowed!</span> 1 token consumed. Remaining: ${tokens}`;
+      } else {
+        status.innerHTML = `<span style="color:#ef4444;">⛔ Request Throttled (429)!</span> Bucket empty.`;
+      }
+      renderBucket();
+    }
+
+    function sendBurst() {
+      const status = document.getElementById('tb-status');
+      if (tokens >= 5) {
+        tokens -= 5;
+        status.innerHTML = `<span style="color:#f59e0b;">⚡ Burst Allowed!</span> 5 tokens consumed. Remaining: ${tokens}`;
+      } else {
+        const consumed = tokens;
+        tokens = 0;
+        status.innerHTML = `<span style="color:#ef4444;">⚠️ Partial Burst!</span> Allowed ${consumed} requests, throttled ${5 - consumed}.`;
+      }
+      renderBucket();
+    }
+
+    // Refill 1 token per second
+    setInterval(() => {
+      if (tokens < maxCapacity) {
+        tokens++;
+        renderBucket();
+      }
+    }, 1000);
+
+    renderBucket();
+
+    // Canvas Consistent Hashing Ring
+    let nodes = [0, 90, 180, 270];
+
+    function drawRing() {
+      const canvas = document.getElementById('hashRingCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = 90;
+
+      // Outer Ring
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      // Draw Server Nodes
+      nodes.forEach((angleDeg, idx) => {
+        const rad = (angleDeg * Math.PI) / 180;
+        const x = centerX + radius * Math.cos(rad);
+        const y = centerY + radius * Math.sin(rad);
+
+        ctx.beginPath();
+        ctx.arc(x, y, 10, 0, 2 * Math.PI);
+        ctx.fillStyle = idx % 2 === 0 ? '#4ade80' : '#a855f7';
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      });
+    }
+
+    function addServerNode() {
+      if (nodes.length < 12) {
+        const randomAngle = Math.floor(Math.random() * 360);
+        nodes.push(randomAngle);
+        drawRing();
+      }
+    }
+
+    function removeServerNode() {
+      if (nodes.length > 2) {
+        nodes.pop();
+        drawRing();
+      }
+    }
+
+    drawRing();
+  </script>
+</body>
+</html>
