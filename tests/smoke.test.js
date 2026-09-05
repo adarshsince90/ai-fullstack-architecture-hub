@@ -398,6 +398,106 @@ test('System Design Hub is mapped in mindmap_schema.json and graph_topology.json
   assert.ok(sdNode, 'graph_topology.json must contain domain-system-design-mastery node');
 });
 
+// 21. Multi-Theme Token Architecture & Switcher Tests
+test('5 Curated Themes are properly tokenized and wired in CSS, JS, and HTML', () => {
+  const stylesCss = fs.readFileSync(path.join(rootDir, 'styles.css'), 'utf8');
+  const appJs = fs.readFileSync(path.join(rootDir, 'app.js'), 'utf8');
+  const indexHtml = fs.readFileSync(path.join(rootDir, 'index.html'), 'utf8');
+
+  // Verify all 5 themes are defined in styles.css
+  const requiredThemes = ['obsidian-dark', 'slate-light', 'alpine-nord', 'warm-sepia', 'tokyo-midnight'];
+  for (const theme of requiredThemes) {
+    assert.ok(
+      stylesCss.includes(`data-theme="${theme}"`) || (theme === 'obsidian-dark' && stylesCss.includes(':root')),
+      `styles.css must declare token block for theme: ${theme}`
+    );
+  }
+
+  // Verify core token variables exist across light & dark themes
+  const requiredTokens = ['--bg-primary', '--bg-card', '--text-main', '--primary', '--glass-bg', '--glass-border'];
+  for (const token of requiredTokens) {
+    assert.ok(stylesCss.includes(token), `styles.css must declare core token: ${token}`);
+  }
+
+  // Verify app.js theme manager methods
+  assert.ok(appJs.includes('initTheme'), 'app.js must implement initTheme()');
+  assert.ok(appJs.includes('setTheme'), 'app.js must implement setTheme()');
+  assert.ok(appJs.includes('toggleThemeDropdown'), 'app.js must implement toggleThemeDropdown()');
+  assert.ok(appJs.includes('cycleTheme'), 'app.js must implement cycleTheme()');
+  for (const theme of requiredThemes) {
+    assert.ok(appJs.includes(`'${theme}'`), `app.js must register theme: ${theme}`);
+  }
+
+  // Verify index.html theme switcher components
+  assert.ok(indexHtml.includes('id="theme-switcher-container"'), 'index.html must contain theme-switcher-container');
+  assert.ok(indexHtml.includes('id="theme-dropdown-menu"'), 'index.html must contain theme-dropdown-menu');
+  assert.ok(indexHtml.includes('data-gnav-theme'), 'index.html sidebar must contain mobile theme switcher options');
+});
+
+// 22. Guide Reader Enhancements & Code Copy Buttons
+test('Guide Reader has reading progress bar, reading time badges, and copy buttons', () => {
+  const stylesCss = fs.readFileSync(path.join(rootDir, 'styles.css'), 'utf8');
+  const appJs = fs.readFileSync(path.join(rootDir, 'app.js'), 'utf8');
+  const indexHtml = fs.readFileSync(path.join(rootDir, 'index.html'), 'utf8');
+
+  // Verify markup and styles
+  assert.ok(indexHtml.includes('id="guide-reading-progress"'), 'index.html must contain guide-reading-progress element');
+  assert.ok(indexHtml.includes('id="guide-read-time-display"'), 'index.html must contain guide-read-time-display element');
+  assert.ok(stylesCss.includes('.guide-reading-progress'), 'styles.css must style guide-reading-progress');
+  assert.ok(stylesCss.includes('.copy-code-btn'), 'styles.css must style copy-code-btn');
+  assert.ok(stylesCss.includes('.code-block-wrapper'), 'styles.css must style code-block-wrapper');
+
+  // Verify app.js integration
+  assert.ok(appJs.includes('copyCodeSnippet'), 'app.js must implement copyCodeSnippet()');
+  assert.ok(appJs.includes('initSpotlightEffect'), 'app.js must implement initSpotlightEffect()');
+  assert.ok(appJs.includes('min read'), 'app.js must compute estimated reading time');
+});
+
+// 23. Global Universal Command Palette (⌘K / Ctrl+K)
+test('Command Palette is wired in index.html, styles.css, and app.js', () => {
+  const stylesCss = fs.readFileSync(path.join(rootDir, 'styles.css'), 'utf8');
+  const appJs = fs.readFileSync(path.join(rootDir, 'app.js'), 'utf8');
+  const indexHtml = fs.readFileSync(path.join(rootDir, 'index.html'), 'utf8');
+
+  // Verify modal markup
+  assert.ok(indexHtml.includes('id="command-palette-modal"'), 'index.html must contain command-palette-modal');
+  assert.ok(indexHtml.includes('id="cmd-palette-input"'), 'index.html must contain cmd-palette-input');
+  assert.ok(indexHtml.includes('id="cmd-results-list"'), 'index.html must contain cmd-results-list');
+
+  // Verify styles
+  assert.ok(stylesCss.includes('.command-palette-overlay'), 'styles.css must define command-palette-overlay');
+  assert.ok(stylesCss.includes('.command-palette-dialog'), 'styles.css must define command-palette-dialog');
+  assert.ok(stylesCss.includes('.cmd-item'), 'styles.css must define cmd-item');
+
+  // Verify controller methods
+  assert.ok(appJs.includes('initCommandPalette'), 'app.js must implement initCommandPalette()');
+  assert.ok(appJs.includes('openCommandPalette'), 'app.js must implement openCommandPalette()');
+  assert.ok(appJs.includes('filterCommandPalette'), 'app.js must implement filterCommandPalette()');
+  assert.ok(appJs.includes('executeCommandItem'), 'app.js must implement executeCommandItem()');
+});
+
+// 24. Header Interview Readiness Mastery Gauge
+test('Header Mastery Gauge is wired in index.html, styles.css, and app.js', () => {
+  const stylesCss = fs.readFileSync(path.join(rootDir, 'styles.css'), 'utf8');
+  const appJs = fs.readFileSync(path.join(rootDir, 'app.js'), 'utf8');
+  const indexHtml = fs.readFileSync(path.join(rootDir, 'index.html'), 'utf8');
+
+  // Verify header gauge markup & popover
+  assert.ok(indexHtml.includes('id="header-mastery-gauge"'), 'index.html must contain header-mastery-gauge');
+  assert.ok(indexHtml.includes('id="header-mastery-pct"'), 'index.html must contain header-mastery-pct');
+  assert.ok(indexHtml.includes('id="mastery-popover"'), 'index.html must contain mastery-popover');
+  assert.ok(indexHtml.includes('id="mastery-popover-list"'), 'index.html must contain mastery-popover-list');
+
+  // Verify CSS styles
+  assert.ok(stylesCss.includes('.header-mastery-gauge'), 'styles.css must define header-mastery-gauge');
+  assert.ok(stylesCss.includes('.mastery-progress-pill'), 'styles.css must define mastery-progress-pill');
+  assert.ok(stylesCss.includes('.mastery-popover'), 'styles.css must define mastery-popover');
+
+  // Verify app.js methods
+  assert.ok(appJs.includes('updateHeaderMasteryGauge'), 'app.js must implement updateHeaderMasteryGauge()');
+  assert.ok(appJs.includes('toggleMasteryPopover'), 'app.js must implement toggleMasteryPopover()');
+});
+
 console.log('\n--- Summary ---');
 if (failures === 0) {
   console.log('🎉 ALL SMOKE TESTS PASSED CLEANLY!\n');

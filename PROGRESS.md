@@ -99,3 +99,15 @@
 | Interactive Simulators (`.html`) | 9 | ✅ All Complete |
 | Staff System Design Modules (`.html`) | 5 | ✅ All Complete |
 | Knowledge Base Terms | 292 | ✅ All Complete |
+| Curated Modern UI Themes | 5 | ✅ All Complete |
+
+---
+
+## 🎨 UI/UX Modernization & Platform Polish Milestones
+
+- [x] **5-Theme CSS Design Token System** (`obsidian-dark`, `slate-light`, `alpine-nord`, `warm-sepia`, `tokyo-midnight`)
+- [x] **Header & Mobile Theme Switchers** (Dropdown Studio + Alt+T Shortcut + Mobile Drawer Grid)
+- [x] **Zero-Overhead Color Tokenization** Across all Cards, Sticky Headers, Rails, and Modals
+- [x] **Phase 1: Reader & Visual Polish**: Mouse Spotlight Glow FX (`--mouse-x/y`), Editorial Typography, 1-Click Code Copy Buttons, Dynamic Read-Time Badges (`⏱️ X min read`), and Sticky Reading Progress Scroll Tracker
+- [x] **Phase 2: Universal Command Palette**: `⌘K` / `Ctrl+K` and `/` Keyboard Jump Dialog with Live Instant Search across 24 Guides, 6 System Design Cases, 9 Simulators, Navigation, and Theme Switching
+- [x] **Phase 3: Header Interview Readiness Mastery Gauge**: Real-Time Header Mastery Bar & Percentage with Domain Breakdown Popover, Synchronized with Quick Recap Checklists

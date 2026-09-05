@@ -6,26 +6,46 @@
   <title>Real-World System Design Case Studies</title>
   <link rel="stylesheet" href="../../styles.css">
   <style>
-    .sd-container { padding: 24px; max-width: 1200px; margin: 0 auto; font-family: 'Inter', sans-serif; color: #e2e8f0; }
-    .sd-card { background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 24px; margin-bottom: 24px; backdrop-filter: blur(12px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37); }
-    .sd-title { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 700; color: #38bdf8; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
-    .sd-badge { font-size: 0.75rem; padding: 4px 10px; background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; border-radius: 20px; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.05em; }
+    body {
+      background: var(--bg-primary);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      margin: 0;
+      padding: 0;
+    }
+    .sd-container { padding: 24px; max-width: 1200px; margin: 0 auto; color: var(--text-main); }
+    .sd-card { background: var(--bg-card); border: var(--glass-border); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 24px; backdrop-filter: var(--glass-blur); box-shadow: var(--glass-shadow); }
+    .sd-title { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--primary); margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
+    .sd-badge { font-size: 0.75rem; padding: 4px 10px; background: var(--badge-bg); border: 1px solid var(--badge-border); border-radius: 20px; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+    .sd-intro { color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; font-size: 0.95rem; }
 
     /* Case Study Selector Tabs */
-    .cs-nav-tabs { display: flex; gap: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 12px; margin-bottom: 20px; }
-    .cs-tab-btn { padding: 10px 18px; background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; color: #94a3b8; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
-    .cs-tab-btn.active { background: #38bdf8; color: #0f172a; border-color: #38bdf8; box-shadow: 0 0 12px rgba(56, 189, 248, 0.4); }
+    .cs-nav-tabs { display: flex; gap: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+    .cs-tab-btn { padding: 10px 18px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-muted); font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+    .cs-tab-btn:hover { color: var(--text-main); border-color: var(--primary); }
+    .cs-tab-btn.active { background: var(--primary); color: #ffffff; border-color: var(--primary); box-shadow: 0 0 12px var(--primary-glow); }
 
     /* Sub-tabs inside case study */
-    .sub-tabs { display: flex; gap: 8px; margin: 16px 0; }
-    .sub-tab-btn { padding: 6px 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; color: #cbd5e1; font-size: 0.85rem; cursor: pointer; }
-    .sub-tab-btn.active { background: rgba(56, 189, 248, 0.2); border-color: #38bdf8; color: #38bdf8; }
+    .sub-tabs { display: flex; gap: 8px; margin: 16px 0; flex-wrap: wrap; }
+    .sub-tab-btn { padding: 6px 14px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-muted); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
+    .sub-tab-btn:hover { color: var(--text-main); }
+    .sub-tab-btn.active { background: var(--badge-bg); border-color: var(--primary); color: var(--primary); font-weight: 600; }
 
     .cs-content-section { display: none; }
     .cs-content-section.active { display: block; }
 
-    .arch-flow-diagram { background: #0f172a; border: 1px solid #334155; border-radius: 12px; padding: 20px; font-family: 'Fira Code', monospace; font-size: 0.85rem; color: #38bdf8; line-height: 1.5; overflow-x: auto; }
+    .case-title { color: var(--text-main); font-size: 1.25rem; font-weight: 700; margin-top: 0; margin-bottom: 10px; }
+    .case-desc { color: var(--text-muted); line-height: 1.6; margin-bottom: 14px; }
+    .case-desc strong { color: var(--text-main); }
+    .case-desc code { font-family: var(--font-mono); color: var(--primary); background: var(--bg-secondary); padding: 2px 6px; border-radius: 4px; }
+
+    .arch-flow-diagram { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; font-family: var(--font-mono); font-size: 0.85rem; color: var(--primary); line-height: 1.5; overflow-x: auto; box-shadow: var(--shadow-sm); }
+    .code-snippet-box { background: var(--bg-secondary); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color); font-family: var(--font-mono); font-size: 0.88rem; color: var(--accent-emerald); overflow-x: auto; }
   </style>
+  <script>
+    const currentTheme = window.parent?.app?.activeTheme || localStorage.getItem('hub_theme') || 'obsidian-dark';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+  </script>
 </head>
 <body>
   <div class="sd-container">
@@ -34,33 +54,33 @@
         <span>🏛️ Real-World System Design Case Studies</span>
         <span class="sd-badge">Interactive Problem Deep Dives</span>
       </div>
-      <p style="color: #94a3b8; font-size: 0.95rem;">
+      <p class="sd-intro">
         Select a real-world system architecture below to explore its functional specs, data flow, API design, database strategy, and bottleneck solutions.
       </p>
 
       <!-- Main Case Study Tabs -->
       <div class="cs-nav-tabs">
-        <button class="cs-tab-btn active" onclick="switchCaseStudy('tinyurl')">🔗 1. TinyURL Shortener</button>
-        <button class="cs-tab-btn" onclick="switchCaseStudy('whatsapp')">💬 2. WhatsApp Real-Time Chat</button>
-        <button class="cs-tab-btn" onclick="switchCaseStudy('netflix')">🎬 3. Netflix Video Streaming</button>
+        <button class="cs-tab-btn active" onclick="switchCaseStudy('tinyurl', event)">🔗 1. TinyURL Shortener</button>
+        <button class="cs-tab-btn" onclick="switchCaseStudy('whatsapp', event)">💬 2. WhatsApp Real-Time Chat</button>
+        <button class="cs-tab-btn" onclick="switchCaseStudy('netflix', event)">🎬 3. Netflix Video Streaming</button>
       </div>
 
       <!-- Case Study 1: TinyURL Shortener -->
       <div id="cs-tinyurl" class="cs-content-section active">
-        <h3 style="color:#f8fafc; margin-top:0;">TinyURL Architecture & Base62 Encoding</h3>
+        <h3 class="case-title">TinyURL Architecture & Base62 Encoding</h3>
         
         <div class="sub-tabs">
-          <button class="sub-tab-btn active" onclick="switchSubTab('tinyurl', 'overview')">Overview & Math</button>
-          <button class="sub-tab-btn" onclick="switchSubTab('tinyurl', 'flow')">Data Flow Diagram</button>
-          <button class="sub-tab-btn" onclick="switchSubTab('tinyurl', 'db')">DB Schema & API</button>
+          <button class="sub-tab-btn active" onclick="switchSubTab('tinyurl', 'overview', event)">Overview & Math</button>
+          <button class="sub-tab-btn" onclick="switchSubTab('tinyurl', 'flow', event)">Data Flow Diagram</button>
+          <button class="sub-tab-btn" onclick="switchSubTab('tinyurl', 'db', event)">DB Schema & API</button>
         </div>
 
         <div id="tinyurl-overview" class="sub-content">
-          <p style="color:#cbd5e1; line-height:1.6;">
+          <p class="case-desc">
             <strong>Core Requirements:</strong> Given a long URL (e.g., <code>https://example.com/long/path</code>), generate a unique 7-character alias (e.g., <code>tiny.url/aB3x9Z</code>). 
             When accessed, issue an HTTP 301/302 redirect.
           </p>
-          <ul>
+          <ul class="case-desc">
             <li><strong>Base62 Encoding:</strong> Uses <code>[a-z, A-Z, 0-9]</code> ($62$ characters). A 7-character string yields $62^7 \approx 3.5 \text{ Trillion}$ unique URLs.</li>
             <li><strong>Key Generation Service (KGS):</strong> Pre-generates random 7-character keys in memory to avoid key collisions during high-concurrent writes.</li>
           </ul>
@@ -80,8 +100,8 @@ CLIENT REQUEST ──► LOAD BALANCER (Nginx) ──► API GATEWAY (Rate Limit
         </div>
 
         <div id="tinyurl-db" class="sub-content" style="display:none;">
-          <h4 style="color:#38bdf8;">Database Schema (NoSQL / SQL)</h4>
-          <pre style="background:#1e293b; padding:12px; border-radius:8px; color:#4ade80;">
+          <h4 style="color:var(--primary); margin-top:10px;">Database Schema (NoSQL / SQL)</h4>
+          <pre class="code-snippet-box">
 Table: URL_Mapping {
   short_key   VARCHAR(7) PRIMARY KEY, -- e.g. "aB3x9Z"
   original_url TEXT NOT NULL,
@@ -95,8 +115,8 @@ Table: URL_Mapping {
 
       <!-- Case Study 2: WhatsApp Chat -->
       <div id="cs-whatsapp" class="cs-content-section">
-        <h3 style="color:#f8fafc; margin-top:0;">WhatsApp Real-Time Chat & Cassandra Persistence</h3>
-        <p style="color:#94a3b8;">Uses WebSockets for bi-directional real-time messaging, Cassandra for write-heavy chat log storage, and Kafka for message queuing.</p>
+        <h3 class="case-title">WhatsApp Real-Time Chat & Cassandra Persistence</h3>
+        <p class="case-desc">Uses WebSockets for bi-directional real-time messaging, Cassandra for write-heavy chat log storage, and Kafka for message queuing.</p>
         <div class="arch-flow-diagram">
 CLIENT A (WebSocket) ──► CHAT GATEWAY (Gateway Node) ──► KAFKA TOPIC ("chat-messages")
                                                               │
@@ -109,8 +129,8 @@ CLIENT A (WebSocket) ──► CHAT GATEWAY (Gateway Node) ──► KAFKA TOPIC
 
       <!-- Case Study 3: Netflix Streaming -->
       <div id="cs-netflix" class="cs-content-section">
-        <h3 style="color:#f8fafc; margin-top:0;">Netflix Video Processing & Adaptive Bitrate CDN</h3>
-        <p style="color:#94a3b8;">Asynchronous video transcoding pipeline splitting uploaded MP4 files into chunks, encoding them into HLS/DASH formats, and distributing to CloudFront/Open Connect CDNs.</p>
+        <h3 class="case-title">Netflix Video Processing & Adaptive Bitrate CDN</h3>
+        <p class="case-desc">Asynchronous video transcoding pipeline splitting uploaded MP4 files into chunks, encoding them into HLS/DASH formats, and distributing to CloudFront/Open Connect CDNs.</p>
         <div class="arch-flow-diagram">
 VIDEO UPLOAD ──► AWS S3 (Raw MP4) ──► EVENTBRIDGE ──► TRANSCODING WORKER POOL (FFmpeg)
                                                                │
@@ -125,21 +145,24 @@ VIDEO UPLOAD ──► AWS S3 (Raw MP4) ──► EVENTBRIDGE ──► TRANSCOD
   </div>
 
   <script>
-    function switchCaseStudy(csId) {
+    function switchCaseStudy(csId, e) {
       document.querySelectorAll('.cs-tab-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.cs-content-section').forEach(sec => sec.classList.remove('active'));
 
-      event.target.classList.add('active');
-      document.getElementById('cs-' + csId).classList.add('active');
+      if (e && e.currentTarget) e.currentTarget.classList.add('active');
+      const targetSec = document.getElementById('cs-' + csId);
+      if (targetSec) targetSec.classList.add('active');
     }
 
-    function switchSubTab(csId, subId) {
+    function switchSubTab(csId, subId, e) {
       const parent = document.getElementById('cs-' + csId);
+      if (!parent) return;
       parent.querySelectorAll('.sub-tab-btn').forEach(btn => btn.classList.remove('active'));
       parent.querySelectorAll('.sub-content').forEach(c => c.style.display = 'none');
 
-      event.target.classList.add('active');
-      document.getElementById(csId + '-' + subId).style.display = 'block';
+      if (e && e.currentTarget) e.currentTarget.classList.add('active');
+      const targetSub = document.getElementById(csId + '-' + subId);
+      if (targetSub) targetSub.style.display = 'block';
     }
   </script>
 </body>

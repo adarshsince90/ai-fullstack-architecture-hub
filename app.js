@@ -12,11 +12,150 @@ class MasterPrepApp {
     this.guideOriginScrollY = 0; // Scroll position to restore on back
     this.guideOriginElementId = null; // Element ID to highlight on back
 
+    // 5 Curated Theme Definitions (Zero runtime overhead)
+    this.themes = {
+      'obsidian-dark': { name: 'Obsidian Cyber', icon: '🌌', mode: 'dark', color: '#06b6d4' },
+      'slate-light': { name: 'Slate Studio', icon: '☀️', mode: 'light', color: '#2563eb' },
+      'alpine-nord': { name: 'Alpine Nord', icon: '🌲', mode: 'dark', color: '#88c0d0' },
+      'warm-sepia': { name: 'Warm Sepia', icon: '☕', mode: 'light', color: '#c25e00' },
+      'tokyo-midnight': { name: 'Tokyo Midnight', icon: '🌆', mode: 'dark', color: '#ec4899' }
+    };
+    this.activeTheme = 'obsidian-dark';
+
     const checklistKey = this.config.storage?.recapChecklist || 'master_prep_recap_checklist';
     this.recapChecked = JSON.parse(localStorage.getItem(checklistKey) || '{}');
     this.simulatorMap = this.config.simulators || {};
     this.searchIndex = [];
+    this.cmdSelectedIndex = 0;
+    this.cmdItems = [];
+    this.initTheme();
     this.init();
+  }
+
+  // Initialize theme system & listeners
+  initTheme() {
+    const savedTheme = localStorage.getItem('hub_theme') || localStorage.getItem('master_prep_theme');
+    if (savedTheme && this.themes[savedTheme]) {
+      this.setTheme(savedTheme, false);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+      this.setTheme('slate-light', false);
+    } else {
+      this.setTheme('obsidian-dark', false);
+    }
+
+    // Dismiss theme dropdown & mastery popover on outside click
+    document.addEventListener('click', (e) => {
+      const container = document.getElementById('theme-switcher-container');
+      const menu = document.getElementById('theme-dropdown-menu');
+      if (menu && menu.classList.contains('show')) {
+        if (!container || !container.contains(e.target)) {
+          menu.classList.remove('show');
+        }
+      }
+
+      const masteryGauge = document.getElementById('header-mastery-gauge');
+      const masteryPopover = document.getElementById('mastery-popover');
+      if (masteryPopover && masteryPopover.classList.contains('show')) {
+        if (!masteryGauge || !masteryGauge.contains(e.target)) {
+          masteryPopover.classList.remove('show');
+        }
+      }
+    });
+
+    // Keyboard shortcut: Alt+T to cycle theme
+    document.addEventListener('keydown', (e) => {
+      if (e.altKey && (e.key === 't' || e.key === 'T')) {
+        e.preventDefault();
+        this.cycleTheme();
+      }
+    });
+  }
+
+  // Set and apply theme
+  setTheme(themeId, save = true) {
+    if (!this.themes[themeId]) themeId = 'obsidian-dark';
+    this.activeTheme = themeId;
+    const themeMeta = this.themes[themeId];
+
+    // Apply data-theme attribute on root and body
+    document.documentElement.setAttribute('data-theme', themeId);
+    document.body.setAttribute('data-theme', themeId);
+
+    // Update Header Theme Button UI
+    const iconEl = document.getElementById('theme-active-icon');
+    const nameEl = document.getElementById('theme-active-name');
+    if (iconEl) iconEl.textContent = themeMeta.icon;
+    if (nameEl) nameEl.textContent = themeMeta.name;
+
+    // Update Mobile Sidebar Theme Name
+    const gnavNameEl = document.getElementById('gnav-theme-name');
+    if (gnavNameEl) gnavNameEl.textContent = themeMeta.name;
+
+    // Update Active indicators in Dropdown Menu
+    document.querySelectorAll('.theme-option-item').forEach(el => {
+      if (el.getAttribute('data-theme-id') === themeId) {
+        el.classList.add('active');
+      } else {
+        el.classList.remove('active');
+      }
+    });
+
+    // Update Active indicators in Mobile Sidebar
+    document.querySelectorAll('.gnav-theme-btn').forEach(el => {
+      if (el.getAttribute('data-gnav-theme') === themeId) {
+        el.classList.add('active');
+      } else {
+        el.classList.remove('active');
+      }
+    });
+
+    // Close Dropdown Menu
+    const dropdown = document.getElementById('theme-dropdown-menu');
+    if (dropdown) dropdown.classList.remove('show');
+
+    // Persist in localStorage
+    if (save) {
+      localStorage.setItem('hub_theme', themeId);
+    }
+
+    // Refresh graph canvas if open
+    if (this.graphEngine) {
+      this.graphEngine.resizeCanvas();
+    }
+
+    // Propagate theme to System Design Hub iframe if loaded
+    const sdIframe = document.getElementById('sd-module-iframe');
+    if (sdIframe) {
+      try {
+        if (sdIframe.contentDocument) {
+          sdIframe.contentDocument.documentElement.setAttribute('data-theme', themeId);
+          sdIframe.contentDocument.body.setAttribute('data-theme', themeId);
+        }
+      } catch (err) {
+        // Cross-origin guard if any
+      }
+    }
+  }
+
+  // Toggle or Cycle Themes
+  toggleTheme() {
+    const isLight = this.themes[this.activeTheme]?.mode === 'light';
+    this.setTheme(isLight ? 'obsidian-dark' : 'slate-light');
+  }
+
+  cycleTheme() {
+    const themeKeys = Object.keys(this.themes);
+    const currentIndex = themeKeys.indexOf(this.activeTheme);
+    const nextIndex = (currentIndex + 1) % themeKeys.length;
+    this.setTheme(themeKeys[nextIndex]);
+  }
+
+  toggleThemeDropdown(e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    const dropdown = document.getElementById('theme-dropdown-menu');
+    if (dropdown) {
+      dropdown.classList.toggle('show');
+    }
   }
 
   async init() {
@@ -39,6 +178,9 @@ class MasterPrepApp {
       this.renderPathwayStepper();
       this.renderDomainsTree();
       this.renderRecapDocument();
+      this.initSpotlightEffect();
+      this.initCommandPalette();
+      this.updateHeaderMasteryGauge();
       this.initScrollListener();
       this.initGlobalSidebarState();
       this.loadAiChatHistory();
@@ -48,15 +190,25 @@ class MasterPrepApp {
     }
   }
 
-  // Back to Top Scroll Listener
+  // Back to Top & Reading Progress Scroll Listener
   initScrollListener() {
     const topBtn = document.getElementById('back-to-top-btn');
-    if (!topBtn) return;
     window.addEventListener('scroll', () => {
-      if (window.scrollY > 300) {
-        topBtn.classList.add('visible');
-      } else {
-        topBtn.classList.remove('visible');
+      if (topBtn) {
+        if (window.scrollY > 300) {
+          topBtn.classList.add('visible');
+        } else {
+          topBtn.classList.remove('visible');
+        }
+      }
+
+      // Live Guide Reading Progress Bar
+      const progressBar = document.getElementById('guide-reading-progress');
+      const guideSection = document.getElementById('guide-viewer-section');
+      if (progressBar && guideSection && guideSection.style.display !== 'none') {
+        const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = totalHeight > 0 ? Math.min(100, Math.max(0, (window.scrollY / totalHeight) * 100)) : 0;
+        progressBar.style.width = `${progress}%`;
       }
     });
   }
@@ -490,6 +642,43 @@ class MasterPrepApp {
       displayContainer.innerHTML = htmlContent;
       document.getElementById('guide-title-display').textContent = `${domainName} » ${topicName}`;
       document.getElementById('raw-guide-link').setAttribute('href', guidePath);
+
+      // Compute estimated reading time (avg 200 words/min)
+      const wordCount = markdown.trim().split(/\s+/).length;
+      const readMinutes = Math.max(1, Math.ceil(wordCount / 200));
+      const readTimeBadge = document.getElementById('guide-read-time-display');
+      if (readTimeBadge) {
+        readTimeBadge.textContent = `⏱️ ${readMinutes} min read`;
+        readTimeBadge.style.display = 'inline-block';
+      }
+
+      // Reset reading progress bar
+      const progressBar = document.getElementById('guide-reading-progress');
+      if (progressBar) progressBar.style.width = '0%';
+
+      // Wrap code blocks with container & 1-click copy button
+      displayContainer.querySelectorAll('pre').forEach(pre => {
+        if (pre.parentElement && pre.parentElement.classList.contains('code-block-wrapper')) return;
+        const wrapper = document.createElement('div');
+        wrapper.className = 'code-block-wrapper';
+        pre.parentNode.insertBefore(wrapper, pre);
+        wrapper.appendChild(pre);
+
+        const codeEl = pre.querySelector('code');
+        let lang = 'CODE';
+        if (codeEl) {
+          const langMatch = Array.from(codeEl.classList).find(c => c.startsWith('language-') || c.startsWith('lang-'));
+          if (langMatch) lang = langMatch.replace(/^language-|^lang-/, '').toUpperCase();
+        }
+        wrapper.setAttribute('data-lang', lang);
+
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'copy-code-btn';
+        copyBtn.type = 'button';
+        copyBtn.innerHTML = '<span>📋</span> Copy';
+        copyBtn.onclick = () => app.copyCodeSnippet(copyBtn, pre);
+        wrapper.appendChild(copyBtn);
+      });
 
       // Configure Toolbar Interactive Simulator Button if a simulator exists for this guide
       const simBtn = document.getElementById('guide-sim-btn');
@@ -1191,7 +1380,7 @@ class MasterPrepApp {
     this.updateRecapStats(0, total);
   }
 
-  // Update Stats Bar
+  // Update Stats Bar & Header Mastery Gauge
   updateRecapStats(completed, total) {
     const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
 
@@ -1199,6 +1388,8 @@ class MasterPrepApp {
     document.querySelectorAll('#recap-total-count').forEach(el => el.textContent = total);
     document.querySelectorAll('#recap-percentage').forEach(el => el.textContent = `${percentage}%`);
     document.querySelectorAll('#recap-progress-fill').forEach(el => el.style.width = `${percentage}%`);
+
+    this.updateHeaderMasteryGauge(completed, total);
   }
 
   // Update Header Actions Active Highlight State
@@ -1274,6 +1465,17 @@ class MasterPrepApp {
       activeBtn.classList.remove('btn-outline');
       activeBtn.classList.add('btn-primary');
     }
+
+    iframe.onload = () => {
+      try {
+        if (iframe.contentDocument) {
+          iframe.contentDocument.documentElement.setAttribute('data-theme', this.activeTheme);
+          if (iframe.contentDocument.body) {
+            iframe.contentDocument.body.setAttribute('data-theme', this.activeTheme);
+          }
+        }
+      } catch (err) {}
+    };
 
     iframe.src = `docs/system_design/${moduleName}.html`;
   }
@@ -1956,6 +2158,344 @@ class MasterPrepApp {
       botMsgDiv.querySelector('.msg-content').innerHTML = `<span style="color: var(--accent-red)">Error: ${err.message}</span>`;
     }
     chatBody.scrollTop = chatBody.scrollHeight;
+  }
+
+  // ==========================================================================
+  // Phase 1: High-Performance Delegated Mouse Spotlight Glow & Code Copy
+  // ==========================================================================
+  initSpotlightEffect() {
+    document.addEventListener('pointermove', (e) => {
+      const card = e.target.closest('.domain-card, .track-pill-card, .recap-topic-card, .sim-card, .sd-case-card, .spotlight-card, .cmd-item');
+      if (card) {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+        card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+      }
+    }, { passive: true });
+  }
+
+  async copyCodeSnippet(btn, pre) {
+    try {
+      const code = pre.querySelector('code') ? pre.querySelector('code').innerText : pre.innerText;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(code);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = code;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+      btn.innerHTML = '<span>✅</span> Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.innerHTML = '<span>📋</span> Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    } catch (err) {
+      console.warn('Copy failed:', err);
+    }
+  }
+
+  // ==========================================================================
+  // Phase 2: Global Universal Command Palette (⌘K / Ctrl+K)
+  // ==========================================================================
+  initCommandPalette() {
+    const overlay = document.getElementById('command-palette-modal');
+    const input = document.getElementById('cmd-palette-input');
+    if (!overlay || !input) return;
+
+    window.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
+        e.preventDefault();
+        this.toggleCommandPalette();
+      } else if (e.key === 'Escape' && overlay.classList.contains('show')) {
+        e.preventDefault();
+        this.closeCommandPalette();
+      }
+    });
+
+    input.addEventListener('input', (e) => {
+      this.filterCommandPalette(e.target.value);
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        this.navigateCommandPalette(1);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        this.navigateCommandPalette(-1);
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        this.executeCommandItem(this.cmdSelectedIndex);
+      }
+    });
+  }
+
+  toggleCommandPalette() {
+    const overlay = document.getElementById('command-palette-modal');
+    if (overlay && overlay.classList.contains('show')) {
+      this.closeCommandPalette();
+    } else {
+      this.openCommandPalette();
+    }
+  }
+
+  openCommandPalette() {
+    const overlay = document.getElementById('command-palette-modal');
+    const input = document.getElementById('cmd-palette-input');
+    if (!overlay || !input) return;
+
+    overlay.classList.add('show');
+    overlay.style.display = 'flex';
+    input.value = '';
+    this.filterCommandPalette('');
+    setTimeout(() => input.focus(), 60);
+  }
+
+  closeCommandPalette() {
+    const overlay = document.getElementById('command-palette-modal');
+    if (overlay) {
+      overlay.classList.remove('show');
+      overlay.style.display = 'none';
+    }
+  }
+
+  closeCommandPaletteOnBackdrop(e) {
+    if (e.target === e.currentTarget) {
+      this.closeCommandPalette();
+    }
+  }
+
+  filterCommandPalette(rawQuery) {
+    const query = (rawQuery || '').trim().toLowerCase();
+    const resultsContainer = document.getElementById('cmd-results-list');
+    if (!resultsContainer) return;
+
+    this.cmdItems = [];
+    let html = '';
+
+    const navItems = [
+      { id: 'nav-paths', icon: '🧭', title: 'Learning Paths & Mind Map', subtitle: 'View full 6-domain engineering curriculum', badge: 'View', action: () => this.showMindmapView() },
+      { id: 'nav-sd', icon: '🏗️', title: 'System Design Hub', subtitle: 'Staff HLDs, Capacity Math & Visualizers', badge: 'Hub', action: () => this.showSystemDesignHubView() },
+      { id: 'nav-graph', icon: '🌐', title: 'Interactive Graph Dashboard', subtitle: 'Force-directed knowledge graph and node taxonomy', badge: 'Graph', action: () => this.showGraphDashboardView() },
+      { id: 'nav-recap', icon: '📝', title: 'Quick Recap & Mastery Checklist', subtitle: 'Unified definitions and interview readiness checklist', badge: 'Checklist', action: () => this.showRecapView() },
+      { id: 'nav-sims', icon: '⚡', title: 'Interactive Simulators Hub', subtitle: 'Live visual sandboxes & architectural step-throughs', badge: 'Simulators', action: () => this.showSimulatorsView() }
+    ];
+
+    const themeItems = Object.entries(this.themes).map(([key, t]) => ({
+      id: `theme-${key}`,
+      icon: t.icon,
+      title: `Switch Theme: ${t.name}`,
+      subtitle: `${t.mode.toUpperCase()} mode design system tokens`,
+      badge: 'Theme',
+      action: () => this.setTheme(key)
+    }));
+
+    const sdItems = [
+      { title: 'Ticketmaster / High-Concurrency Booking', path: 'docs/system_design/ticketmaster.html', domain: 'Distributed Locking & High Throughput' },
+      { title: 'Video Streaming & Transcoding (Netflix/YouTube)', path: 'docs/system_design/video_streaming.html', domain: 'Chunking, CDN & Resumable Upload' },
+      { title: 'Real-Time Chat & Collaboration (Discord/Slack)', path: 'docs/system_design/chat_architecture.html', domain: 'WebSockets, Presence & PubSub' },
+      { title: 'Scalable URL Shortener (Bitly)', path: 'docs/system_design/url_shortener.html', domain: 'Base62, Read-Heavy Caching & KGS' },
+      { title: 'Distributed Web Crawler (Googlebot)', path: 'docs/system_design/web_crawler.html', domain: 'Frontier, Politeness & Deduplication' },
+      { title: 'Proximity Service & Geospatial Search (Yelp/Uber)', path: 'docs/system_design/proximity_service.html', domain: 'Geohash, QuadTree & Spatial DB' }
+    ].map(c => ({
+      id: `sd-${c.path}`,
+      icon: '🏗️',
+      title: c.title,
+      subtitle: c.domain || 'System Design Case Study',
+      badge: 'System Design',
+      action: () => {
+        this.showSystemDesignHubView();
+        const iframe = document.getElementById('sd-module-iframe');
+        if (iframe) iframe.src = c.path;
+      }
+    }));
+
+    const simItems = Object.entries(this.simulatorMap || {}).map(([guide, sim]) => ({
+      id: `sim-${sim.url}`,
+      icon: '⚡',
+      title: sim.title || sim.label,
+      subtitle: `Simulator: ${sim.label}`,
+      badge: 'Simulator',
+      action: () => this.launchSimulator(sim.url, sim.title)
+    }));
+
+    const guideItems = (this.searchIndex || []).map(item => ({
+      id: `guide-${item.path}`,
+      icon: '📖',
+      title: item.title,
+      subtitle: item.domainDir ? `${item.domainDir.toUpperCase()} • Guide` : 'Architectural Guide',
+      badge: 'Guide',
+      action: () => this.openGuide(item.path, item.domainDir || 'Engineering', item.title)
+    }));
+
+    const matches = (item) => {
+      if (!query) return true;
+      return item.title.toLowerCase().includes(query) || item.subtitle.toLowerCase().includes(query) || item.badge.toLowerCase().includes(query);
+    };
+
+    const filteredNav = navItems.filter(matches);
+    const filteredThemes = themeItems.filter(matches);
+    const filteredSD = sdItems.filter(matches);
+    const filteredSims = simItems.filter(matches);
+    const filteredGuides = guideItems.filter(matches).slice(0, query ? 14 : 5);
+
+    const renderGroup = (title, items) => {
+      if (!items.length) return '';
+      let groupHtml = `<div class="cmd-group-title">${title}</div>`;
+      items.forEach(item => {
+        const itemIdx = this.cmdItems.length;
+        this.cmdItems.push(item);
+        groupHtml += `
+          <div class="cmd-item ${itemIdx === 0 ? 'selected' : ''}" id="cmd-item-${itemIdx}" data-index="${itemIdx}" onclick="app.executeCommandItem(${itemIdx})">
+            <div class="cmd-item-left">
+              <span class="cmd-item-icon">${item.icon}</span>
+              <div style="min-width: 0;">
+                <div class="cmd-item-title">${item.title}</div>
+                <div class="cmd-item-sub">${item.subtitle}</div>
+              </div>
+            </div>
+            <div class="cmd-item-right">
+              <span class="cmd-badge">${item.badge}</span>
+            </div>
+          </div>
+        `;
+      });
+      return groupHtml;
+    };
+
+    if (query) {
+      if (filteredGuides.length) html += renderGroup('📖 In-Depth Guides', filteredGuides);
+      if (filteredSD.length) html += renderGroup('🏗️ System Design Cases', filteredSD);
+      if (filteredSims.length) html += renderGroup('⚡ Interactive Simulators', filteredSims);
+      if (filteredNav.length) html += renderGroup('🧭 Navigation', filteredNav);
+      if (filteredThemes.length) html += renderGroup('🎨 Themes', filteredThemes);
+    } else {
+      html += renderGroup('🧭 Quick Navigation', filteredNav);
+      html += renderGroup('🏗️ System Design Hub', filteredSD.slice(0, 4));
+      html += renderGroup('⚡ Popular Simulators', filteredSims.slice(0, 3));
+      html += renderGroup('🎨 Switch Theme', filteredThemes);
+    }
+
+    if (this.cmdItems.length === 0) {
+      resultsContainer.innerHTML = `<div class="cmd-empty-state">No matching guides, topics, or commands found for "<strong>${rawQuery}</strong>"</div>`;
+      this.cmdSelectedIndex = 0;
+    } else {
+      resultsContainer.innerHTML = html;
+      this.cmdSelectedIndex = 0;
+      this.updateCommandSelection();
+    }
+  }
+
+  navigateCommandPalette(direction) {
+    if (!this.cmdItems.length) return;
+    this.cmdSelectedIndex = (this.cmdSelectedIndex + direction + this.cmdItems.length) % this.cmdItems.length;
+    this.updateCommandSelection();
+  }
+
+  updateCommandSelection() {
+    document.querySelectorAll('.cmd-item').forEach((el, idx) => {
+      if (idx === this.cmdSelectedIndex) {
+        el.classList.add('selected');
+        el.scrollIntoView({ block: 'nearest' });
+      } else {
+        el.classList.remove('selected');
+      }
+    });
+  }
+
+  executeCommandItem(index) {
+    if (this.cmdItems[index]) {
+      const item = this.cmdItems[index];
+      this.closeCommandPalette();
+      if (typeof item.action === 'function') {
+        item.action();
+      }
+    }
+  }
+
+  // ==========================================================================
+  // Phase 3: Header Interview Readiness Mastery Gauge & Breakdown Popover
+  // ==========================================================================
+  updateHeaderMasteryGauge(completed = null, total = null) {
+    if (completed === null || total === null) {
+      const checkboxes = document.querySelectorAll('.recap-checkbox');
+      if (checkboxes.length > 0) {
+        total = checkboxes.length;
+        completed = document.querySelectorAll('.recap-checkbox:checked').length;
+      } else if (this.schema?.domains) {
+        let t = 0;
+        let c = 0;
+        this.schema.domains.forEach(d => {
+          if (d.subtopics) {
+            t += d.subtopics.length;
+            c += d.subtopics.filter(s => this.recapChecked[s.id]).length;
+          }
+          if (d.levels) {
+            d.levels.forEach(lvl => {
+              if (lvl.topics) {
+                t += lvl.topics.length;
+                c += lvl.topics.filter(tp => this.recapChecked[tp.id]).length;
+              }
+            });
+          }
+        });
+        total = t;
+        completed = c;
+      } else {
+        total = 0;
+        completed = 0;
+      }
+    }
+
+    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+    const pctEl = document.getElementById('header-mastery-pct');
+    const fillEl = document.getElementById('header-mastery-fill');
+    const totalEl = document.getElementById('mastery-popover-total');
+    const listEl = document.getElementById('mastery-popover-list');
+
+    if (pctEl) pctEl.textContent = `${percentage}%`;
+    if (fillEl) fillEl.style.width = `${percentage}%`;
+    if (totalEl) totalEl.textContent = `${completed} / ${total} Mastered`;
+
+    if (listEl && this.schema?.domains) {
+      listEl.innerHTML = this.schema.domains.map(d => {
+        let domainTotal = 0;
+        let domainDone = 0;
+        if (d.subtopics) {
+          domainTotal += d.subtopics.length;
+          domainDone += d.subtopics.filter(s => this.recapChecked[s.id]).length;
+        }
+        if (d.levels) {
+          d.levels.forEach(lvl => {
+            if (lvl.topics) {
+              domainTotal += lvl.topics.length;
+              domainDone += lvl.topics.filter(tp => this.recapChecked[tp.id]).length;
+            }
+          });
+        }
+        const dPct = domainTotal > 0 ? Math.round((domainDone / domainTotal) * 100) : 0;
+        return `
+          <div class="mastery-popover-item">
+            <span>${d.icon || '📌'} <strong>${d.name.split('&')[0].trim()}</strong></span>
+            <span>${domainDone}/${domainTotal} (${dPct}%)</span>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  toggleMasteryPopover(e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    const popover = document.getElementById('mastery-popover');
+    if (popover) {
+      popover.classList.toggle('show');
+    }
   }
 }
 
