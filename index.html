@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Master Full-Stack & Systems Engineering Interview Hub</title>
   <meta name="description"
     content="Master Engineering Mind Map, Curated Learning Paths, Interactive Simulators and Guides for Senior Full Stack & Lead Engineers.">
@@ -14,7 +14,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=1.1.0">
+  <link rel="stylesheet" href="styles.css?v=1.2.0">
   <!-- Markdown Renderer for dynamic guide viewing -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
@@ -23,11 +23,16 @@
   <div class="app-container">
     <!-- Top Global Header -->
     <header class="global-header">
-      <div class="brand-section">
-        <div class="logo-icon">🚀</div>
-        <div>
-          <h1 class="app-title">Master Systems & Full-Stack Prep</h1>
-          <div class="app-subtitle">Senior / Lead Software Engineer & Architecture Prep Hub</div>
+      <div class="header-left-group">
+        <button class="mobile-menu-toggle-btn" id="mobile-menu-toggle-btn" onclick="app.toggleMobileSidebar()" aria-label="Toggle Navigation Menu">
+          <span class="mobile-menu-icon">☰</span>
+        </button>
+        <div class="brand-section">
+          <div class="logo-icon">🚀</div>
+          <div class="brand-titles">
+            <h1 class="app-title">Master Systems & Full-Stack Prep</h1>
+            <div class="app-subtitle">Senior / Lead Software Engineer & Architecture Prep Hub</div>
+          </div>
         </div>
       </div>
 
@@ -59,6 +64,9 @@
 
     <!-- Application Body with Global Left Sidebar (Open by default) -->
     <div class="app-layout-body" id="app-layout-body">
+      <!-- Dark Glass Backdrop for Mobile Off-Canvas Drawer -->
+      <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="app.closeMobileSidebar()"></div>
+
       <!-- Global Collapsible Left Navigation Menu Bar -->
       <aside class="global-left-sidebar" id="global-left-sidebar">
         <div class="gnav-top-header">
@@ -66,6 +74,7 @@
             <span class="toggle-icon">☰</span>
             <span class="toggle-label">Navigation Menu</span>
           </button>
+          <button class="gnav-mobile-close-btn" onclick="app.closeMobileSidebar()" aria-label="Close navigation menu">✕</button>
         </div>
         <div class="gnav-list">
           <button class="gnav-item-btn active" id="gnav-paths" onclick="app.showMindmapView()" data-tooltip="Learning Paths">
@@ -269,9 +278,16 @@
         </div>
 
         <!-- 2-Column Split: Sticky Tree Sidebar + Document Pane -->
-        <div class="recap-split-layout">
+        <div class="recap-tree-mobile-bar">
+          <button class="btn btn-sm btn-outline recap-tree-mobile-toggle" id="recap-tree-mobile-toggle" onclick="app.toggleRecapMobileTree()">
+            <span>🗂️ View Master Architecture Tree Index</span>
+            <span class="recap-tree-toggle-arrow">▾</span>
+          </button>
+        </div>
+
+        <div class="recap-split-layout" id="recap-split-layout">
           <!-- Left Sticky Sidebar Tree View -->
-          <aside class="recap-tree-sidebar">
+          <aside class="recap-tree-sidebar" id="recap-tree-sidebar">
             <div class="recap-tree-header">
               <div class="recap-tree-title-row">
                 <div class="recap-tree-title">🗂️ Master Architecture Tree</div>
@@ -589,9 +605,9 @@
     </div>
   </div>
 
-  <script src="config.js?v=1.1.0"></script>
-  <script src="scripts/graph_engine.js?v=1.1.0"></script>
-  <script src="app.js?v=1.1.0"></script>
+  <script src="config.js?v=1.2.1"></script>
+  <script src="scripts/graph_engine.js?v=1.2.1"></script>
+  <script src="app.js?v=1.2.1"></script>
 </body>
 
 </html>

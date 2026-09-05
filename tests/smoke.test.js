@@ -359,6 +359,45 @@ test('app.js and index.html support glassmorphic overlay modal and topic scroll 
   );
 });
 
+// 19. Staff System Design Hub HTML Modules & Interactive Components
+test('Staff System Design Hub modules exist with valid HTML and architectural content', () => {
+  const modules = [
+    'docs/system_design/hld_framework.html',
+    'docs/system_design/fundamentals.html',
+    'docs/system_design/architectural_primitives.html',
+    'docs/system_design/case_studies.html',
+    'docs/system_design/observability_request_flow.html'
+  ];
+
+  for (const m of modules) {
+    const fullPath = path.join(rootDir, m);
+    assert.strictEqual(fs.existsSync(fullPath), true, `Missing System Design module: ${m}`);
+    const content = fs.readFileSync(fullPath, 'utf8');
+    assert.ok(content.length > 500, `System Design module ${m} appears empty or truncated`);
+    assert.ok(content.toLowerCase().includes('<!doctype html') || content.toLowerCase().includes('<html'), `${m} must be valid HTML`);
+  }
+
+  // Verify HLD framework contains interactive capacity math elements
+  const hldContent = fs.readFileSync(path.join(rootDir, 'docs/system_design/hld_framework.html'), 'utf8');
+  assert.ok(hldContent.includes('calc-dau') || hldContent.includes('calculateCapacity') || hldContent.includes('Back-of-the-Envelope'), 'HLD framework must contain capacity calculations');
+
+  // Verify Observability module contains request flow tracing content
+  const obsContent = fs.readFileSync(path.join(rootDir, 'docs/system_design/observability_request_flow.html'), 'utf8');
+  assert.ok(obsContent.includes('Request Flow') || obsContent.includes('Observability') || obsContent.includes('OpenTelemetry'), 'Observability module must contain request flow architecture content');
+});
+
+// 20. System Design Hub Mapping in Mindmap Schema & Graph Topology
+test('System Design Hub is mapped in mindmap_schema.json and graph_topology.json', () => {
+  const schema = JSON.parse(fs.readFileSync(path.join(rootDir, 'docs/mindmap_schema.json'), 'utf8'));
+  const domain = schema.domains.find(d => d.id === 'system-design-mastery');
+  assert.ok(domain, 'mindmap_schema.json must contain system-design-mastery domain');
+  assert.ok(Array.isArray(domain.subtopics) && domain.subtopics.length >= 4, 'system-design-mastery domain must have subtopics');
+
+  const topology = JSON.parse(fs.readFileSync(path.join(rootDir, 'docs/graph_topology.json'), 'utf8'));
+  const sdNode = topology.nodes.find(n => n.id === 'domain-system-design-mastery');
+  assert.ok(sdNode, 'graph_topology.json must contain domain-system-design-mastery node');
+});
+
 console.log('\n--- Summary ---');
 if (failures === 0) {
   console.log('🎉 ALL SMOKE TESTS PASSED CLEANLY!\n');
@@ -367,4 +406,5 @@ if (failures === 0) {
   console.error(`❌ ${failures} TEST(S) FAILED!\n`);
   process.exit(1);
 }
+
 

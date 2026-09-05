@@ -52,17 +52,49 @@
 
 ---
 
+### 🏛️ Feature Beta: Staff System Design & Architecture Hub
+*Goal: Create an interactive, first-principles System Design preparation suite with live capacity calculators, architectural primitives, case studies, and enterprise request flow tracing.*
+
+#### Phase 1: Framework & Capacity Estimator
+- [x] Create `docs/system_design/hld_framework.html` implementing 4-step interview framework.
+- [x] Build live client-side Back-of-the-Envelope Capacity Math Calculator (QPS, Bandwidth, Storage, RAM, Cache sizing, SLA Availability Matrix).
+
+#### Phase 2: Architectural Fundamentals & Primitives
+- [x] Create `docs/system_design/fundamentals.html` covering CAP theorem, PACELC, Latency numbers, Consistency models, ACID vs BASE.
+- [x] Create `docs/system_design/architectural_primitives.html` with interactive Token Bucket Rate Limiter and Consistent Hashing Ring visualizer with virtual nodes.
+
+#### Phase 3: Real-World Case Studies & Distributed Tracing
+- [x] Create `docs/system_design/case_studies.html` covering URL Shortener, Real-Time Chat, Video Streaming, and Flash Sale Hot Item Reservation.
+- [x] Create `docs/system_design/observability_request_flow.html` with step-by-step Request Lifecycle simulator (DNS ➔ CDN ➔ ALB ➔ API Gateway ➔ Service Mesh ➔ Microservices ➔ DB) and live OpenTelemetry spans, Prometheus metrics, and ELK logs.
+
+#### Phase 4: Mind Map & Schema Integration
+- [x] Add `system-design-mastery` domain umbrella to `docs/mindmap_schema.json` and `docs/graph_topology.json`.
+- [x] Integrate System Design Hub view routing in `app.js` and styling in `styles.css`.
+
+---
+
+### 📱 Feature Gamma: Multi-Device & Mobile Responsiveness
+*Goal: Provide seamless desktop, tablet, and mobile viewing experience with touch-optimized controls and off-canvas drawers.*
+- [x] Add responsive CSS breakpoints (`@media (max-width: 1024px)`, `@media (max-width: 768px)`, `@media (max-width: 480px)`) in `styles.css`.
+- [x] Implement off-canvas sidebar drawer with smooth backdrop and mobile hamburger toggle in `app.js`.
+- [x] Enable touch gesture handling (`touchstart`, `touchmove`, `touchend`) and responsive canvas centering in `scripts/graph_engine.js`.
+
+---
+
+### 🤖 Feature Delta: Context-Aware BYOK AI Interview Coach
+*Goal: Provide client-side multi-provider AI mock interview and guidance capabilities.*
+- [x] Implement BYOK client-side model runner supporting Groq, Google Gemini, OpenAI, and OpenRouter in `app.js`.
+- [x] Context injection for current topic, guide contents, and definition card state.
+
+---
+
 ## 🔬 Long-Term R&D & Backlog Ideas
 
 ### 1. Interactive Architectural Scenario Simulators
 - **Concept**: Interactive visual playgrounds for testing system design trade-offs (e.g., simulating Saga pattern failure recoveries, Event Sourcing out-of-order event replay, Circuit Breaker trip states).
 - **Target Location**: `interactive/` section expansions.
 
-### 2. Embedded AI Knowledge Assistant & Code Reviewer
-- **Concept**: Integrates vector search / RAG over the hub's 200+ topic guides directly inside the UI.
-- **R&D Priority**: Medium.
-
-### 3. Interview Readiness Self-Assessment Engine
+### 2. Interview Readiness Self-Assessment & Flashcard Engine
 - **Concept**: Flashcard-style scenario challenges for Lead/Staff candidates connected to mind map nodes.
 - **R&D Priority**: Medium-High.
 
@@ -70,3 +102,5 @@
 
 ## 📝 Change & Update Log
 - **2026-08-13**: Initialized private strategy roadmap. Established 4-phase plan for Interactive Mind Map Graph Dashboard.
+- **2026-09-04**: Completed Feature Beta (Staff System Design & Architecture Hub with 5 interactive modules & request flow simulator).
+- **2026-09-05**: Completed Feature Gamma (Multi-Device & Mobile Responsiveness) and Feature Delta (Context-Aware BYOK AI Interview Coach). Synced all roadmaps and progress tracking.
