@@ -1,10 +1,10 @@
 {
   "title": "AI Full-Stack Architecture Hub - Multi-Connected Graph Topology",
-  "generatedAt": "2026-08-13T20:32:02.300Z",
+  "generatedAt": "2026-09-05T10:33:34.703Z",
   "stats": {
-    "totalNodes": 152,
-    "totalLinks": 171,
-    "structuralLinks": 151,
+    "totalNodes": 154,
+    "totalLinks": 173,
+    "structuralLinks": 153,
     "crossLinks": 20
   },
   "taxonomyCategories": {
@@ -96,11 +96,41 @@
       "val": 14
     },
     {
-      "id": "topic-sd-primitives-simulators",
-      "name": "Architectural Primitives (Token Bucket & Consistent Hashing)",
+      "id": "topic-sd-storage-caching",
+      "name": "Storage Engines (LSM/B-Tree), Bloom Filters & Advanced Caching",
       "level": "Staff",
       "badge": "Ready",
-      "description": "Architectural Primitives (Token Bucket & Consistent Hashing) within System Design & Architecture Hub",
+      "description": "Storage Engines (LSM/B-Tree), Bloom Filters & Advanced Caching within System Design & Architecture Hub",
+      "guidePath": "docs/system_design/storage_and_caching.html",
+      "clusterId": "system-design-mastery",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "topic-sd-consensus-transactions",
+      "name": "Distributed Consensus (Raft), Quorum Math, Locks & Saga Outbox",
+      "level": "Staff",
+      "badge": "Ready",
+      "description": "Distributed Consensus (Raft), Quorum Math, Locks & Saga Outbox within System Design & Architecture Hub",
+      "guidePath": "docs/system_design/consensus_and_transactions.html",
+      "clusterId": "system-design-mastery",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "topic-sd-primitives-simulators",
+      "name": "Architectural Primitives (Token Bucket, Sliding Window & Consistent Hashing)",
+      "level": "Staff",
+      "badge": "Ready",
+      "description": "Architectural Primitives (Token Bucket, Sliding Window & Consistent Hashing) within System Design & Architecture Hub",
       "guidePath": "docs/system_design/architectural_primitives.html",
       "clusterId": "system-design-mastery",
       "taxonomies": {
@@ -112,10 +142,10 @@
     },
     {
       "id": "topic-sd-case-studies",
-      "name": "Real-World Case Studies (TinyURL, WhatsApp, Netflix)",
+      "name": "Tier-1 Real-World Case Studies (Uber H3, Flash Sale Lua, Scheduler, TinyURL)",
       "level": "Staff",
       "badge": "Ready",
-      "description": "Real-World Case Studies (TinyURL, WhatsApp, Netflix) within System Design & Architecture Hub",
+      "description": "Tier-1 Real-World Case Studies (Uber H3, Flash Sale Lua, Scheduler, TinyURL) within System Design & Architecture Hub",
       "guidePath": "docs/system_design/case_studies.html",
       "clusterId": "system-design-mastery",
       "taxonomies": {
@@ -2338,6 +2368,18 @@
     {
       "source": "domain-system-design-mastery",
       "target": "topic-hld-lld-calculator",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "domain-system-design-mastery",
+      "target": "topic-sd-storage-caching",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "domain-system-design-mastery",
+      "target": "topic-sd-consensus-transactions",
       "type": "structural",
       "label": "Topic Branch"
     },

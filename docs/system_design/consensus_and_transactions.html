@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Distributed Consensus, Consistency & Transactions</title>
+  <link rel="stylesheet" href="../../styles.css">
+  <style>
+    body {
+      background: var(--bg-primary);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      margin: 0;
+      padding: 0;
+    }
+    .sd-container { padding: 24px; max-width: 1240px; margin: 0 auto; color: var(--text-main); }
+    .sd-card { background: var(--bg-card); border: var(--glass-border); border-radius: var(--radius-lg); padding: 26px; margin-bottom: 24px; backdrop-filter: var(--glass-blur); box-shadow: var(--glass-shadow); }
+    .sd-title { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--primary); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .sd-badge { font-size: 0.75rem; padding: 4px 12px; background: var(--badge-bg); border: 1px solid var(--badge-border); border-radius: 20px; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+    .sd-intro { color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; font-size: 0.95rem; }
+
+    /* Navigation Tabs */
+    .module-nav-tabs { display: flex; gap: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 14px; margin-bottom: 24px; flex-wrap: wrap; }
+    .nav-tab-btn { padding: 10px 18px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-muted); font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 8px; }
+    .nav-tab-btn:hover { color: var(--text-main); border-color: var(--primary); }
+    .nav-tab-btn.active { background: var(--primary); color: #ffffff; border-color: var(--primary); box-shadow: 0 0 14px var(--primary-glow); }
+
+    .tab-section { display: none; }
+    .tab-section.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Tables & Boxes */
+    .tradeoff-table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 0.88rem; }
+    .tradeoff-table th { background: var(--bg-secondary); color: var(--primary); text-align: left; padding: 12px 14px; border: 1px solid var(--border-color); font-weight: 600; }
+    .tradeoff-table td { padding: 12px 14px; border: 1px solid var(--border-color); color: var(--text-muted); line-height: 1.5; vertical-align: top; }
+    .tradeoff-table tr:hover td { background: var(--bg-accent-subtle); color: var(--text-main); }
+    .tradeoff-table strong { color: var(--text-main); }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 16px; }
+    @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .arch-box { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; }
+    .arch-box h4 { margin-top: 0; color: var(--primary); font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
+    .code-pill { font-family: var(--font-mono); background: var(--bg-card); border: 1px solid var(--border-color); padding: 2px 6px; border-radius: 4px; color: var(--accent-cyan); font-size: 0.82rem; }
+
+    /* Simulators */
+    .sim-panel { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 22px; margin-top: 20px; }
+    .sim-btn { padding: 8px 16px; border-radius: var(--radius-sm); border: none; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s ease; }
+    .sim-btn-primary { background: var(--primary); color: #fff; }
+    .sim-btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+    .sim-btn-danger { background: var(--accent-rose); color: #fff; }
+    .sim-btn-danger:hover { opacity: 0.9; transform: translateY(-1px); }
+    .sim-btn-secondary { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); }
+    .sim-btn-secondary:hover { border-color: var(--primary); }
+
+    /* Quorum Nodes Grid */
+    .nodes-grid { display: flex; gap: 12px; flex-wrap: wrap; margin: 18px 0; justify-content: center; }
+    .node-card { width: 90px; height: 100px; background: var(--bg-card); border: 2px solid var(--border-color); border-radius: var(--radius-md); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-family: var(--font-mono); font-size: 0.8rem; transition: all 0.3s ease; }
+    .node-card.written { border-color: var(--accent-emerald); background: rgba(16, 185, 129, 0.12); color: var(--accent-emerald); }
+    .node-card.read { border-color: var(--accent-cyan); background: rgba(6, 182, 212, 0.12); color: var(--accent-cyan); }
+    .node-card.overlap { border-color: var(--primary); background: rgba(99, 102, 241, 0.2); box-shadow: 0 0 12px var(--primary-glow); font-weight: 700; color: #fff; }
+
+    /* Saga Step Machine */
+    .saga-stepper { display: flex; gap: 14px; margin: 20px 0; overflow-x: auto; padding-bottom: 10px; }
+    .saga-step { flex: 1; min-width: 180px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 14px; text-align: center; font-size: 0.85rem; transition: all 0.3s ease; }
+    .saga-step.pending { border-color: var(--border-color); color: var(--text-muted); }
+    .saga-step.running { border-color: var(--accent-amber); background: rgba(245, 158, 11, 0.1); color: var(--accent-amber); transform: scale(1.03); }
+    .saga-step.success { border-color: var(--accent-emerald); background: rgba(16, 185, 129, 0.12); color: var(--accent-emerald); }
+    .saga-step.failed { border-color: var(--accent-rose); background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+    .saga-step.compensated { border-color: var(--accent-purple); background: rgba(168, 85, 247, 0.12); color: var(--accent-purple); }
+  </style>
+  <script>
+    const currentTheme = window.parent?.app?.activeTheme || localStorage.getItem('hub_theme') || 'obsidian-dark';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+  </script>
+</head>
+<body>
+  <div class="sd-container">
+    <div class="sd-card">
+      <div class="sd-title">
+        <span>⚖️ Distributed Consensus, Consistency & Transactions</span>
+        <span class="sd-badge">Staff Architecture Deep Dive</span>
+      </div>
+      <p class="sd-intro">
+        Explore consensus mechanics (Raft vs Paxos), tunable quorum consistency ($N, R, W$), distributed locks, the Martin Kleppmann fencing token dilemma, and production dual-write mitigation with Transactional Outbox and Saga patterns.
+      </p>
+
+      <!-- Navigation Tabs -->
+      <div class="module-nav-tabs">
+        <button class="nav-tab-btn active" onclick="switchTab('tab-consensus', event)">🤝 1. Consensus & Quorum Math</button>
+        <button class="nav-tab-btn" onclick="switchTab('tab-locks-saga', event)">🔒 2. Distributed Locks & Saga Outbox</button>
+        <button class="nav-tab-btn" onclick="switchTab('tab-quorum-sim', event)">🎯 3. Interactive Quorum Simulator</button>
+        <button class="nav-tab-btn" onclick="switchTab('tab-saga-sim', event)">🔄 4. Live Saga State Machine</button>
+      </div>
+
+      <!-- TAB 1: Consensus & Quorum -->
+      <div id="tab-consensus" class="tab-section active">
+        <h3>1. Consensus Protocols & Tunable Quorum Consistency</h3>
+        <p class="sd-intro">
+          In distributed systems, machines must agree on state transitions despite packet drops, network partitions, and machine crashes.
+        </p>
+
+        <table class="tradeoff-table">
+          <thead>
+            <tr>
+              <th>Protocol / Model</th>
+              <th>Core Mechanism</th>
+              <th>Guarantees & Trade-offs</th>
+              <th>Enterprise Examples</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Raft Consensus</strong></td>
+              <td>Leader-driven with strict term epochs, randomized election timeouts ($150\text{ms}-300\text{ms}$), and two-phase log commit.</td>
+              <td>Guarantees <strong>Linearizability</strong> and strict CP (Consistency/Partition tolerance). Requires majority $\lfloor N/2 \rfloor + 1$ nodes active.</td>
+              <td>etcd (Kubernetes metadata), HashiCorp Consul, CockroachDB, TiKV</td>
+            </tr>
+            <tr>
+              <td><strong>Dynamo-style Quorum ($N, R, W$)</strong></td>
+              <td>Peer-to-peer replication across $N$ nodes. Writes succeed when acknowledged by $W$ nodes; reads poll $R$ nodes.</td>
+              <td>
+                • <strong>Strong Consistency</strong> when $R + W > N$ (Guarantees at least 1 overlapping replica with latest version).<br>
+                • <strong>Eventual Consistency</strong> when $R + W \le N$ (Low latency, high availability, risk of stale reads).
+              </td>
+              <td>Apache Cassandra, Amazon DynamoDB, ScyllaDB, Riak</td>
+            </tr>
+            <tr>
+              <td><strong>Vector Clocks vs LWW</strong></td>
+              <td>Vector clocks track causality across distributed nodes: $V(A) < V(B)$. Last-Write-Wins (LWW) relies on physical NTP timestamps.</td>
+              <td>Vector clocks detect true concurrent conflicts but incur metadata growth. LWW is simple but silently overwrites data due to clock skew/drift.</td>
+              <td>DynamoDB (Version attributes), Cassandra (LWW column timestamps)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="grid-2">
+          <div class="arch-box">
+            <h4>💡 The Quorum Overlap Principle (Pigeonhole Theorem)</h4>
+            <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5;">
+              If a cluster has $N = 5$ replicas, and we set $W = 3$ (write to 3 nodes) and $R = 3$ (read from 3 nodes), then $R + W = 6 > 5$.<br>
+              By the Pigeonhole Principle, at least <strong>$1$ node in any read quorum must have participated in the latest write quorum</strong>. Comparing record version timestamps resolves the latest true state.
+            </p>
+          </div>
+          <div class="arch-box">
+            <h4>🔧 Background Entropy Resolution (Merkle Trees)</h4>
+            <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5;">
+              • <strong>Read Repair</strong>: When a read quorum encounters a stale node, it asynchronously pushes the newest version back to that stale node.<br>
+              • <strong>Anti-Entropy (Merkle Trees)</strong>: Replicas build hierarchical hash trees of key ranges. During background sync, nodes only compare sub-tree hashes, transferring only divergent data over the network.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: Locks, Fencing & Saga -->
+      <div id="tab-locks-saga" class="tab-section">
+        <h3>2. Distributed Locks, Fencing Tokens & Dual-Write Mitigation</h3>
+        <p class="sd-intro">
+          Preventing race conditions and dual-write data inconsistencies across independent microservices and databases.
+        </p>
+
+        <div class="arch-box" style="margin-bottom: 20px;">
+          <h4>🚨 The Martin Kleppmann Fencing Token Dilemma</h4>
+          <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5;">
+            A client acquires a distributed lock (e.g., Redis Redlock) with a 10-second TTL. 
+            Suddenly, the client experiences a <strong>15-second Stop-The-World (STW) Garbage Collection pause</strong>. 
+            The lock expires, and Client B acquires it. Client A wakes up, unaware its lock expired, and writes corrupting data to storage.
+          </p>
+          <div style="background: var(--bg-card); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); font-family: var(--font-mono); font-size: 0.85rem; color: var(--primary); margin-top: 10px;">
+            <strong>Solution: Monotonically Increasing Fencing Tokens</strong><br>
+            Lock Service returns token #33 ➔ Storage layer checks <code>UPDATE data SET val = 'x', token = 33 WHERE token &lt; 33;</code><br>
+            When delayed Client A tries writing with stale token #32, the storage layer rejects it immediately.
+          </div>
+        </div>
+
+        <table class="tradeoff-table">
+          <thead>
+            <tr>
+              <th>Pattern</th>
+              <th>Problem Solved</th>
+              <th>How It Works</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Transactional Outbox + CDC</strong></td>
+              <td>Dual-write hazard: Writing to DB and publishing to Kafka in a single request cannot be atomic without 2PC.</td>
+              <td>Write business data and an <code>outbox_event</code> in the <strong>same local DB ACID transaction</strong>. A CDC connector (Debezium) tails DB WAL / transaction log and streams to Kafka.</td>
+            </tr>
+            <tr>
+              <td><strong>Orchestrated Saga</strong></td>
+              <td>Distributed transactions across multiple microservices with complex compensation logic.</td>
+              <td>A centralized <strong>Saga Orchestrator state machine</strong> coordinates service steps via command queues and triggers backward compensating transactions on step failure.</td>
+            </tr>
+            <tr>
+              <td><strong>Choreographed Saga</strong></td>
+              <td>Distributed transaction coordination without a single orchestrator bottleneck.</td>
+              <td>Services listen to domain events and reactively execute local transactions and emit follow-up events. Best for simple 2-3 step flows; difficult to debug for large topologies.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- TAB 3: Interactive Quorum Simulator -->
+      <div id="tab-quorum-sim" class="tab-section">
+        <h3>3. Interactive Quorum ($N, R, W$) Consistency Simulator</h3>
+        <p class="sd-intro">
+          Adjust cluster replicas ($N$), Write quorum ($W$), and Read quorum ($R$) to observe quorum intersection and test strong vs eventual consistency live.
+        </p>
+
+        <div class="sim-panel">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px;">
+            <div>
+              <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-main);">Total Replicas ($N$): <span id="val-n" style="color:var(--primary); font-weight:700;">5</span></label>
+              <input type="range" id="slider-n" min="3" max="9" step="2" value="5" oninput="updateQuorumParams()" style="width: 100%;" />
+            </div>
+            <div>
+              <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-main);">Write Quorum ($W$): <span id="val-w" style="color:var(--accent-emerald); font-weight:700;">3</span></label>
+              <input type="range" id="slider-w" min="1" max="5" step="1" value="3" oninput="updateQuorumParams()" style="width: 100%;" />
+            </div>
+            <div>
+              <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-main);">Read Quorum ($R$): <span id="val-r" style="color:var(--accent-cyan); font-weight:700;">3</span></label>
+              <input type="range" id="slider-r" min="1" max="5" step="1" value="3" oninput="updateQuorumParams()" style="width: 100%;" />
+            </div>
+          </div>
+
+          <div id="quorum-formula-card" style="padding: 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 0.9rem; margin-bottom: 20px;">
+            <!-- Evaluated text -->
+          </div>
+
+          <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+            <button class="sim-btn sim-btn-primary" onclick="simulateQuorumReadWrite()">🧪 Run Live Write ➔ Read Test</button>
+          </div>
+
+          <div class="nodes-grid" id="nodes-container">
+            <!-- Node cards populated dynamically -->
+          </div>
+
+          <div id="quorum-log" style="padding: 12px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted);">
+            Ready. Click "Run Live Write ➔ Read Test" to simulate packet routing.
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: Live Saga State Machine -->
+      <div id="tab-saga-sim" class="tab-section">
+        <h3>4. Interactive Orchestrated Saga State Machine & Compensation Rollback</h3>
+        <p class="sd-intro">
+          Simulate an E-Commerce Order Saga with microservices (Order ➔ Inventory ➔ Payment ➔ Delivery) and observe automatic backward compensation upon payment failure.
+        </p>
+
+        <div class="sim-panel">
+          <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
+            <button class="sim-btn sim-btn-primary" onclick="runSaga(false)">✅ Execute Successful Order Saga</button>
+            <button class="sim-btn sim-btn-danger" onclick="runSaga(true)">⚠️ Trigger Payment Failure & Compensate</button>
+            <button class="sim-btn sim-btn-secondary" onclick="resetSaga()">🔄 Reset State</button>
+          </div>
+
+          <div class="saga-stepper">
+            <div class="saga-step pending" id="step-order">
+              <div style="font-weight: 700; margin-bottom: 4px;">1. Order Service</div>
+              <div style="font-size: 0.75rem;">Create PENDING Order</div>
+              <div class="step-status" style="margin-top: 6px; font-weight: 600;">IDLE</div>
+            </div>
+            <div class="saga-step pending" id="step-inventory">
+              <div style="font-weight: 700; margin-bottom: 4px;">2. Inventory Service</div>
+              <div style="font-size: 0.75rem;">Reserve Stock (SKU-102)</div>
+              <div class="step-status" style="margin-top: 6px; font-weight: 600;">IDLE</div>
+            </div>
+            <div class="saga-step pending" id="step-payment">
+              <div style="font-weight: 700; margin-bottom: 4px;">3. Payment Service</div>
+              <div style="font-size: 0.75rem;">Charge Card ($249.00)</div>
+              <div class="step-status" style="margin-top: 6px; font-weight: 600;">IDLE</div>
+            </div>
+            <div class="saga-step pending" id="step-shipping">
+              <div style="font-weight: 700; margin-bottom: 4px;">4. Shipping Service</div>
+              <div style="font-size: 0.75rem;">Generate Courier Label</div>
+              <div class="step-status" style="margin-top: 6px; font-weight: 600;">IDLE</div>
+            </div>
+          </div>
+
+          <div id="saga-log" style="padding: 12px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted);">
+            Saga Orchestrator ready. Choose a flow above.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function switchTab(tabId, ev) {
+      document.querySelectorAll('.tab-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      if (ev) ev.currentTarget.classList.add('active');
+    }
+
+    // --- QUORUM SIMULATOR LOGIC ---
+    let N = 5, W = 3, R = 3;
+
+    function updateQuorumParams() {
+      N = parseInt(document.getElementById('slider-n').value);
+      const maxQuorum = N;
+      const sliderW = document.getElementById('slider-w');
+      const sliderR = document.getElementById('slider-r');
+      sliderW.max = maxQuorum;
+      sliderR.max = maxQuorum;
+
+      W = Math.min(parseInt(sliderW.value), N);
+      R = Math.min(parseInt(sliderR.value), N);
+      sliderW.value = W;
+      sliderR.value = R;
+
+      document.getElementById('val-n').textContent = N;
+      document.getElementById('val-w').textContent = W;
+      document.getElementById('val-r').textContent = R;
+
+      const sum = W + R;
+      const card = document.getElementById('quorum-formula-card');
+      if (sum > N) {
+        card.innerHTML = `<span style="color:var(--accent-emerald);">✅ $R + W = ${R} + ${W} = ${sum} > N (${N}) ➔ STRONG CONSISTENCY GUARANTEED</span><br><span style="color:var(--text-muted); font-size:0.8rem;">Overlap guaranteed: At least <strong>${sum - N}</strong> node(s) will be in both write and read quorums.</span>`;
+      } else {
+        card.innerHTML = `<span style="color:var(--accent-amber);">⚠️ $R + W = ${R} + ${W} = ${sum} \le N (${N}) ➔ EVENTUAL CONSISTENCY (RISK OF STALE READS)</span><br><span style="color:var(--text-muted); font-size:0.8rem;">No overlap guaranteed. A read operation might completely miss the latest written replica.</span>`;
+      }
+      renderNodes([], []);
+    }
+
+    function renderNodes(writtenIndices, readIndices) {
+      const container = document.getElementById('nodes-container');
+      container.innerHTML = '';
+      for (let i = 0; i < N; i++) {
+        const card = document.createElement('div');
+        const isWritten = writtenIndices.includes(i);
+        const isRead = readIndices.includes(i);
+        let cls = 'node-card';
+        let badge = 'IDLE';
+
+        if (isWritten && isRead) {
+          cls += ' overlap';
+          badge = 'OVERLAP ⭐';
+        } else if (isWritten) {
+          cls += ' written';
+          badge = 'WRITE (v2)';
+        } else if (isRead) {
+          cls += ' read';
+          badge = 'READ (v1)';
+        }
+
+        card.className = cls;
+        card.innerHTML = `<span>Node ${i+1}</span><span style="font-size:0.65rem;">${badge}</span>`;
+        container.appendChild(card);
+      }
+    }
+
+    function simulateQuorumReadWrite() {
+      // Pick W random nodes to write
+      const all = Array.from({length: N}, (_, i) => i);
+      const shuffledWrite = [...all].sort(() => 0.5 - Math.random());
+      const written = shuffledWrite.slice(0, W);
+
+      // Pick R random nodes to read
+      const shuffledRead = [...all].sort(() => 0.5 - Math.random());
+      const read = shuffledRead.slice(0, R);
+
+      const overlap = written.filter(x => read.includes(x));
+      renderNodes(written, read);
+
+      const log = document.getElementById('quorum-log');
+      if (overlap.length > 0) {
+        log.innerHTML = `🟢 <strong>Read Succeeded:</strong> Read nodes [${read.map(x=>x+1).join(', ')}] intersected with write nodes [${written.map(x=>x+1).join(', ')}] on <strong>Node(s) ${overlap.map(x=>x+1).join(', ')}</strong>. Client successfully retrieved freshest record version (v2).`;
+      } else {
+        log.innerHTML = `🔴 <strong>Stale Read Anomaly:</strong> Read nodes [${read.map(x=>x+1).join(', ')}] did NOT overlap with written nodes [${written.map(x=>x+1).join(', ')}]. Client read stale data (v1).`;
+      }
+    }
+
+    // --- SAGA STEPPER LOGIC ---
+    function setStep(id, status, statusText) {
+      const el = document.getElementById(id);
+      el.className = `saga-step ${status}`;
+      el.querySelector('.step-status').textContent = statusText;
+    }
+
+    function resetSaga() {
+      ['step-order', 'step-inventory', 'step-payment', 'step-shipping'].forEach(id => {
+        setStep(id, 'pending', 'IDLE');
+      });
+      document.getElementById('saga-log').textContent = 'Saga Orchestrator ready.';
+    }
+
+    async function runSaga(shouldFail) {
+      resetSaga();
+      const log = document.getElementById('saga-log');
+
+      // Step 1: Order
+      setStep('step-order', 'running', 'CREATING...');
+      log.innerHTML = '⚙️ [Orchestrator] ➔ Sending <code>CreateOrderCommand</code> to Order Service...';
+      await new Promise(r => setTimeout(r, 600));
+      setStep('step-order', 'success', 'CREATED (PENDING)');
+
+      // Step 2: Inventory
+      setStep('step-inventory', 'running', 'RESERVING...');
+      log.innerHTML += '<br>⚙️ [Orchestrator] ➔ Sending <code>ReserveInventoryCommand</code> (SKU-102, Qty: 1)...';
+      await new Promise(r => setTimeout(r, 600));
+      setStep('step-inventory', 'success', 'RESERVED');
+
+      // Step 3: Payment
+      setStep('step-payment', 'running', 'CHARGING...');
+      log.innerHTML += '<br>⚙️ [Orchestrator] ➔ Sending <code>ProcessPaymentCommand</code> ($249.00)...';
+      await new Promise(r => setTimeout(r, 700));
+
+      if (shouldFail) {
+        setStep('step-payment', 'failed', 'DECLINED (402)');
+        log.innerHTML += '<br><span style="color:var(--accent-rose);">❌ [Payment Service] ➔ Card Declined (Insufficient Funds)! Triggering Compensating Transactions...</span>';
+        await new Promise(r => setTimeout(r, 600));
+
+        // Compensate Step 2 (Inventory)
+        setStep('step-inventory', 'compensated', 'STOCK RELEASED');
+        log.innerHTML += '<br>🔙 [Compensation] ➔ Executing <code>ReleaseInventoryCommand</code>... Stock Restored.';
+        await new Promise(r => setTimeout(r, 500));
+
+        // Compensate Step 1 (Order)
+        setStep('step-order', 'compensated', 'ORDER CANCELLED');
+        log.innerHTML += '<br>🔙 [Compensation] ➔ Updating Order status to <code>CANCELLED</code>. Saga rollback finished cleanly.';
+      } else {
+        setStep('step-payment', 'success', 'PAID ($249)');
+        log.innerHTML += '<br>✅ [Payment Service] ➔ Payment Confirmed.';
+
+        // Step 4: Shipping
+        setStep('step-shipping', 'running', 'DISPATCHING...');
+        await new Promise(r => setTimeout(r, 600));
+        setStep('step-shipping', 'success', 'LABEL GENERATED');
+        log.innerHTML += '<br>🎉 [Orchestrator] ➔ Shipping label generated. Order Saga completed successfully!';
+      }
+    }
+
+    // Initialize Quorum
+    updateQuorumParams();
+  </script>
+</body>
+</html>

@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Distributed Storage Engines & Advanced Caching Deep Dive</title>
+  <link rel="stylesheet" href="../../styles.css">
+  <style>
+    body {
+      background: var(--bg-primary);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      margin: 0;
+      padding: 0;
+    }
+    .sd-container { padding: 24px; max-width: 1240px; margin: 0 auto; color: var(--text-main); }
+    .sd-card { background: var(--bg-card); border: var(--glass-border); border-radius: var(--radius-lg); padding: 26px; margin-bottom: 24px; backdrop-filter: var(--glass-blur); box-shadow: var(--glass-shadow); }
+    .sd-title { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--primary); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .sd-badge { font-size: 0.75rem; padding: 4px 12px; background: var(--badge-bg); border: 1px solid var(--badge-border); border-radius: 20px; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+    .sd-intro { color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; font-size: 0.95rem; }
+
+    /* Module Navigation Tabs */
+    .module-nav-tabs { display: flex; gap: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 14px; margin-bottom: 24px; flex-wrap: wrap; }
+    .nav-tab-btn { padding: 10px 18px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-muted); font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 8px; }
+    .nav-tab-btn:hover { color: var(--text-main); border-color: var(--primary); }
+    .nav-tab-btn.active { background: var(--primary); color: #ffffff; border-color: var(--primary); box-shadow: 0 0 14px var(--primary-glow); }
+
+    .tab-section { display: none; }
+    .tab-section.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Concept & Comparison Tables */
+    .tradeoff-table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 0.88rem; }
+    .tradeoff-table th { background: var(--bg-secondary); color: var(--primary); text-align: left; padding: 12px 14px; border: 1px solid var(--border-color); font-weight: 600; }
+    .tradeoff-table td { padding: 12px 14px; border: 1px solid var(--border-color); color: var(--text-muted); line-height: 1.5; vertical-align: top; }
+    .tradeoff-table tr:hover td { background: var(--bg-accent-subtle); color: var(--text-main); }
+    .tradeoff-table strong { color: var(--text-main); }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 16px; }
+    @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .arch-box { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; }
+    .arch-box h4 { margin-top: 0; color: var(--primary); font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
+    .code-pill { font-family: var(--font-mono); background: var(--bg-card); border: 1px solid var(--border-color); padding: 2px 6px; border-radius: 4px; color: var(--accent-cyan); font-size: 0.82rem; }
+
+    /* Interactive Simulators */
+    .sim-panel { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; margin-top: 20px; }
+    .sim-title { font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+    .bit-array-grid { display: flex; gap: 4px; flex-wrap: wrap; margin: 14px 0; }
+    .bit-cell { width: 34px; height: 34px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 4px; font-family: var(--font-mono); font-size: 0.75rem; border: 1px solid var(--border-color); background: var(--bg-card); transition: all 0.2s ease; }
+    .bit-cell.active { background: var(--primary); color: #ffffff; font-weight: 700; border-color: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
+    .bit-idx { font-size: 0.6rem; color: var(--text-dim); }
+
+    .sim-btn { padding: 8px 16px; border-radius: var(--radius-sm); border: none; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s ease; }
+    .sim-btn-primary { background: var(--primary); color: #fff; }
+    .sim-btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+    .sim-btn-secondary { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); }
+    .sim-btn-secondary:hover { border-color: var(--primary); }
+
+    .lsm-viz-container { display: flex; flex-direction: column; gap: 16px; margin: 20px 0; }
+    .lsm-tier { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 14px; }
+    .lsm-tier-header { font-size: 0.85rem; font-weight: 700; color: var(--primary); text-transform: uppercase; margin-bottom: 8px; display: flex; justify-content: space-between; }
+    .lsm-blocks { display: flex; gap: 10px; flex-wrap: wrap; }
+    .lsm-block { padding: 8px 14px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-main); transition: all 0.3s ease; }
+    .lsm-block.flushing { border-color: var(--accent-amber); background: var(--badge-bg); transform: scale(1.04); }
+    .lsm-block.compacted { border-color: var(--accent-emerald); color: var(--accent-emerald); }
+  </style>
+  <script>
+    const currentTheme = window.parent?.app?.activeTheme || localStorage.getItem('hub_theme') || 'obsidian-dark';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+  </script>
+</head>
+<body>
+  <div class="sd-container">
+    <div class="sd-card">
+      <div class="sd-title">
+        <span>💾 Distributed Storage Engines & Advanced Caching</span>
+        <span class="sd-badge">Staff Architecture Deep Dive</span>
+      </div>
+      <p class="sd-intro">
+        Master first-principles storage engine mechanics (LSM-Trees vs B+Trees), compaction algorithms, write amplification, and robust distributed cache anomaly mitigation (Thundering Herd, Cache Penetration, Avalanche).
+      </p>
+
+      <!-- Navigation Tabs -->
+      <div class="module-nav-tabs">
+        <button class="nav-tab-btn active" onclick="switchTab('tab-engines', event)">🌲 1. LSM-Trees vs B+Trees</button>
+        <button class="nav-tab-btn" onclick="switchTab('tab-caching', event)">⚡ 2. Cache Anomaly Mitigation</button>
+        <button class="nav-tab-btn" onclick="switchTab('tab-bloom-sim', event)">🎯 3. Interactive Bloom Filter</button>
+        <button class="nav-tab-btn" onclick="switchTab('tab-lsm-sim', event)">🔄 4. Live LSM Write Simulator</button>
+      </div>
+
+      <!-- TAB 1: Storage Engines (LSM vs B+Tree) -->
+      <div id="tab-engines" class="tab-section active">
+        <h3>1. Storage Engine Fundamentals & Mechanical Sympathy</h3>
+        <p class="sd-intro">
+          Storage engines define how databases read from and write to disk/SSD. The fundamental trade-off is between <strong>Sequential I/O (LSM-Trees)</strong> for extreme write throughput and <strong>In-Place Updates (B+Trees)</strong> for low-latency point/range reads.
+        </p>
+
+        <table class="tradeoff-table">
+          <thead>
+            <tr>
+              <th>Dimension</th>
+              <th>LSM-Trees (Log-Structured Merge-Tree)</th>
+              <th>B+Trees (Clustered Index Pages)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Primary Database Mapping</strong></td>
+              <td>RocksDB, Apache Cassandra, Google Bigtable, ScyllaDB, DynamoDB (Storage Nodes)</td>
+              <td>PostgreSQL, MySQL InnoDB, SQL Server, Oracle, SQLite</td>
+            </tr>
+            <tr>
+              <td><strong>Write Path Mechanism</strong></td>
+              <td>Append-only sequentially to <strong>WAL</strong> + In-Memory <strong>MemTable</strong> (SkipList). Never modifies on-disk files in-place.</td>
+              <td>In-place update of 8KB/16KB disk pages + <strong>WAL / Redo Log</strong> for crash recovery. Requires page-level latching.</td>
+            </tr>
+            <tr>
+              <td><strong>Write Amplification (WA)</strong></td>
+              <td>Moderate to High during Compaction ($\approx 10\times - 30\times$), but disk writes are strictly <strong>sequential</strong> (fast on NVMe/SSD).</td>
+              <td>High random write overhead; updating 1 byte requires dirtying and flushing an entire 8KB/16KB page to disk.</td>
+            </tr>
+            <tr>
+              <td><strong>Read Path Mechanism</strong></td>
+              <td>MemTable $\rightarrow$ Bloom Filter $\rightarrow$ Block Cache $\rightarrow$ SSTable binary search $\rightarrow$ Merging multiple versions.</td>
+              <td>Direct root-to-leaf traversal ($O(\log_B N)$ page reads). Deterministic, single-page point read latency.</td>
+            </tr>
+            <tr>
+              <td><strong>Compaction Strategy</strong></td>
+              <td><strong>Size-Tiered</strong> (optimized for writes) vs <strong>Leveled Compaction</strong> (optimized for reads and low space amplification).</td>
+              <td>Vacuuming / Page splitting / B-Tree rebalancing during page fill factor saturation.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="grid-2">
+          <div class="arch-box">
+            <h4>🌿 LSM-Tree Write & Read Architecture</h4>
+            <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5;">
+              1. <strong>Write</strong>: Appends to Write-Ahead Log (WAL) for durability, then inserts into an in-memory sorted <code>MemTable</code>.<br>
+              2. <strong>Flush</strong>: When MemTable exceeds threshold (e.g., 64MB), it becomes immutable and is flushed to disk as a sorted string table (<span class="code-pill">SSTable</span>).<br>
+              3. <strong>Compaction</strong>: Background workers merge overlapping SSTables, purging deleted tombstones and keeping only newest key versions.
+            </p>
+          </div>
+          <div class="arch-box">
+            <h4>📑 B+Tree Page Balancing & Latches</h4>
+            <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.5;">
+              1. <strong>Tree Structure</strong>: Root node $\rightarrow$ Internal nodes (Routing pointers) $\rightarrow$ Leaf nodes containing full records linked sequentially.<br>
+              2. <strong>Concurrency</strong>: Requires Reader/Writer page latches (Lock coupling / latch crabbing) which can become lock bottlenecks under high concurrent writes.<br>
+              3. <strong>Best For</strong>: Heavy point queries and range scans where predictable $<2\text{ms}$ $p99$ latency is strictly required.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: Cache Anomaly Mitigation -->
+      <div id="tab-caching" class="tab-section">
+        <h3>2. Distributed Cache Anomalies & Production Mitigations</h3>
+        <p class="sd-intro">
+          When scaling caches (Redis/Memcached) under millions of QPS, three major anomalies can bring down upstream databases. Here is how Staff Engineers mitigate them.
+        </p>
+
+        <table class="tradeoff-table">
+          <thead>
+            <tr>
+              <th>Cache Anomaly</th>
+              <th>Failure Root Cause</th>
+              <th>Production Mitigation Strategy</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>1. Cache Stampede (Thundering Herd)</strong></td>
+              <td>A high-traffic "hot key" expires in Redis. Thousands of concurrent requests experience a cache miss simultaneously and hammer the primary DB.</td>
+              <td>
+                • <strong>Singleflight / Distributed Mutex</strong>: Only 1 request acquires a lock to recompute and populate the cache; other 9,999 requests wait for the result.<br>
+                • <strong>XFetch Probabilistic Early Expiration</strong>: Asynchronously refreshes cache before expiration when $\Delta \cdot \beta \cdot \ln(\text{rand}()) > \text{TTL}$.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>2. Cache Penetration</strong></td>
+              <td>Malicious clients or bad actors query non-existent keys (e.g., `user_id=-999999`) that bypass cache and repeatedly hit DB.</td>
+              <td>
+                • <strong>Bloom Filter at Edge/Gateway</strong>: Fast-rejects non-existent keys before touching Redis or DB.<br>
+                • <strong>Null Object Caching</strong>: Cache empty results (`{ "found": false }`) with a short 60s TTL.
+              </td>
+            </tr>
+            <tr>
+              <td><strong>3. Cache Avalanche</strong></td>
+              <td>Massive batch of cache keys created at the same time (e.g., midnight batch job) expire at the exact same second, dumping all read traffic on DB.</td>
+              <td>
+                • <strong>TTL Jitter / Entropy</strong>: Add random deviation to expiration: $\text{TTL} = \text{Base} + \text{Random}(0, \text{Jitter})$.<br>
+                • <strong>Multi-level Caching</strong>: Local in-memory L1 cache (Caffeine/MemoryCache) backed by distributed L2 Redis cluster.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="arch-box" style="margin-top: 20px;">
+          <h4>🛡️ Production Code Snippet: .NET Singleflight Stampede Protection</h4>
+          <pre style="background: var(--bg-card); padding: 14px; border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 0.85rem; color: var(--accent-emerald); overflow-x: auto;">
+public async Task&lt;ProductDto&gt; GetProductWithSingleflightAsync(string productId)
+{
+    var cacheKey = $"prod:{productId}";
+    var cached = await _redis.GetStringAsync(cacheKey);
+    if (cached != null) return JsonSerializer.Deserialize&lt;ProductDto&gt;(cached);
+
+    // SemaphoreSlim keyed per product to prevent Thundering Herd
+    var keyLock = _locks.GetOrAdd(productId, _ => new SemaphoreSlim(1, 1));
+    await keyLock.WaitAsync();
+    try
+    {
+        // Double-check cache inside lock
+        cached = await _redis.GetStringAsync(cacheKey);
+        if (cached != null) return JsonSerializer.Deserialize&lt;ProductDto&gt;(cached);
+
+        var product = await _db.Products.FindAsync(productId);
+        var jitterSeconds = Random.Shared.Next(30, 90);
+        await _redis.SetStringAsync(cacheKey, JsonSerializer.Serialize(product), 
+            new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10) + TimeSpan.FromSeconds(jitterSeconds) });
+        return product;
+    }
+    finally
+    {
+        keyLock.Release();
+    }
+}</pre>
+        </div>
+      </div>
+
+      <!-- TAB 3: Interactive Bloom Filter Simulator -->
+      <div id="tab-bloom-sim" class="tab-section">
+        <h3>3. Interactive Bloom Filter Simulator</h3>
+        <p class="sd-intro">
+          A Bloom filter is a space-efficient probabilistic data structure. It guarantees: <strong>No False Negatives</strong> (if it says "No", item is definitely absent), but has a controllable <strong>False Positive rate</strong> (if it says "Yes", item is *probably* present).
+        </p>
+
+        <div class="sim-panel">
+          <div class="sim-title">
+            <span>🔬 Live Bit Array ($m = 24$ bits, $k = 3$ Hash Functions)</span>
+          </div>
+
+          <div class="bit-array-grid" id="bloom-bits">
+            <!-- Dynamically populated bit cells -->
+          </div>
+
+          <div style="display: flex; gap: 12px; margin: 16px 0; flex-wrap: wrap; align-items: center;">
+            <input type="text" id="bloom-input" placeholder="e.g. user_101" style="padding: 8px 12px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-main); font-family: var(--font-mono);" />
+            <button class="sim-btn sim-btn-primary" onclick="bloomInsert()">➕ Insert Key into Filter</button>
+            <button class="sim-btn sim-btn-secondary" onclick="bloomQuery()">🔍 Test Membership</button>
+            <button class="sim-btn sim-btn-secondary" onclick="bloomReset()">🔄 Reset Filter</button>
+          </div>
+
+          <div id="bloom-result" style="padding: 12px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 0.88rem; color: var(--primary);">
+            Ready. Insert a key or test a query above.
+          </div>
+
+          <div style="margin-top: 14px; font-size: 0.85rem; color: var(--text-muted);">
+            <strong>Formula for False Positive Probability:</strong> $p \approx \left(1 - e^{-kn/m}\right)^k$<br>
+            Current State: Filter contains <span id="bloom-item-count" style="color:var(--primary); font-weight:700;">0</span> items. Estimated False Positive Rate: <span id="bloom-fp-rate" style="color:var(--accent-emerald); font-weight:700;">0.00%</span>.
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: Live LSM Write Simulator -->
+      <div id="tab-lsm-sim" class="tab-section">
+        <h3>4. Interactive LSM-Tree Step-by-Step Write & Compaction Flow</h3>
+        <p class="sd-intro">
+          Step through how high-throughput write streams are absorbed by in-memory structures and safely persisted and compacted into multi-level SSTables.
+        </p>
+
+        <div class="sim-panel">
+          <div style="display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;">
+            <button class="sim-btn sim-btn-primary" onclick="lsmWriteRecord()">✍️ 1. Write Record (WAL + MemTable)</button>
+            <button class="sim-btn sim-btn-secondary" onclick="lsmFlushMemTable()">⚡ 2. Flush to L0 SSTable</button>
+            <button class="sim-btn sim-btn-secondary" onclick="lsmRunCompaction()">🧹 3. Run Leveled Compaction (L0 ➔ L1)</button>
+            <button class="sim-btn sim-btn-secondary" onclick="lsmReset()">🔄 Reset</button>
+          </div>
+
+          <div class="lsm-viz-container">
+            <!-- Memory Tier -->
+            <div class="lsm-tier">
+              <div class="lsm-tier-header">
+                <span>🧠 In-Memory Tier (Volatile + WAL Protected)</span>
+                <span id="memtable-status" style="color: var(--accent-emerald);">MemTable Capacity: 0 / 4 Records</span>
+              </div>
+              <div class="lsm-blocks" id="memtable-blocks">
+                <span style="font-size:0.8rem; color:var(--text-dim);">MemTable is empty. Click "Write Record".</span>
+              </div>
+            </div>
+
+            <!-- L0 Disk Tier -->
+            <div class="lsm-tier">
+              <div class="lsm-tier-header">
+                <span>💽 Level 0 SSTables (Disk - Key ranges may overlap)</span>
+                <span id="l0-status">0 SSTables</span>
+              </div>
+              <div class="lsm-blocks" id="l0-blocks">
+                <span style="font-size:0.8rem; color:var(--text-dim);">No L0 SSTables flushed yet.</span>
+              </div>
+            </div>
+
+            <!-- L1 Compacted Tier -->
+            <div class="lsm-tier">
+              <div class="lsm-tier-header">
+                <span>📦 Level 1 SSTables (Disk - Strictly Non-Overlapping Key Ranges)</span>
+                <span id="l1-status">0 SSTables</span>
+              </div>
+              <div class="lsm-blocks" id="l1-blocks">
+                <span style="font-size:0.8rem; color:var(--text-dim);">No L1 compacted tables.</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="lsm-log" style="padding: 10px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-muted);">
+            LSM Engine Initialized. Ready for write ingestion.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Tab switching
+    function switchTab(tabId, ev) {
+      document.querySelectorAll('.tab-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      if (ev) ev.currentTarget.classList.add('active');
+    }
+
+    // --- BLOOM FILTER SIMULATOR LOGIC ---
+    const M_BITS = 24;
+    const K_HASH = 3;
+    let bloomBits = new Array(M_BITS).fill(0);
+    let bloomInsertedItems = new Set();
+
+    function hash1(str) {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) hash = (hash * 31 + str.charCodeAt(i)) % M_BITS;
+      return Math.abs(hash);
+    }
+    function hash2(str) {
+      let hash = 5381;
+      for (let i = 0; i < str.length; i++) hash = ((hash << 5) + hash + str.charCodeAt(i)) % M_BITS;
+      return Math.abs(hash);
+    }
+    function hash3(str) {
+      let hash = 0x811c9dc5;
+      for (let i = 0; i < str.length; i++) hash = (hash ^ str.charCodeAt(i)) * 16777619 % M_BITS;
+      return Math.abs(hash);
+    }
+
+    function renderBloomBits() {
+      const container = document.getElementById('bloom-bits');
+      container.innerHTML = '';
+      bloomBits.forEach((val, idx) => {
+        const cell = document.createElement('div');
+        cell.className = `bit-cell ${val ? 'active' : ''}`;
+        cell.innerHTML = `<span>${val}</span><span class="bit-idx">${idx}</span>`;
+        container.appendChild(cell);
+      });
+      document.getElementById('bloom-item-count').textContent = bloomInsertedItems.size;
+      const n = bloomInsertedItems.size;
+      const p = Math.pow(1 - Math.exp(-K_HASH * n / M_BITS), K_HASH) * 100;
+      document.getElementById('bloom-fp-rate').textContent = p.toFixed(2) + '%';
+    }
+
+    function bloomInsert() {
+      const input = document.getElementById('bloom-input');
+      const val = input.value.trim();
+      if (!val) return;
+      const h1 = hash1(val), h2 = hash2(val), h3 = hash3(val);
+      bloomBits[h1] = 1;
+      bloomBits[h2] = 1;
+      bloomBits[h3] = 1;
+      bloomInsertedItems.add(val);
+      renderBloomBits();
+      document.getElementById('bloom-result').innerHTML = `✅ Inserted "<strong style="color:var(--accent-emerald);">${val}</strong>". Flipped bit positions: [${h1}, ${h2}, ${h3}] to 1.`;
+      input.value = '';
+    }
+
+    function bloomQuery() {
+      const input = document.getElementById('bloom-input');
+      const val = input.value.trim();
+      if (!val) return;
+      const h1 = hash1(val), h2 = hash2(val), h3 = hash3(val);
+      const isPresent = bloomBits[h1] === 1 && bloomBits[h2] === 1 && bloomBits[h3] === 1;
+      if (isPresent) {
+        const actuallyIn = bloomInsertedItems.has(val);
+        document.getElementById('bloom-result').innerHTML = `🟢 Query "<strong style="color:var(--primary);">${val}</strong>": Bits [${h1}, ${h2}, ${h3}] are ALL 1 ➔ <strong>PROBABLY IN SET</strong> (${actuallyIn ? 'True Positive' : '⚠️ False Positive!'})`;
+      } else {
+        document.getElementById('bloom-result').innerHTML = `🔴 Query "<strong style="color:var(--accent-rose);">${val}</strong>": Zero bit encountered at [${[h1, h2, h3].filter(i => bloomBits[i] === 0).join(', ')}] ➔ <strong>DEFINITELY NOT IN SET</strong> (100% Guaranteed)`;
+      }
+    }
+
+    function bloomReset() {
+      bloomBits = new Array(M_BITS).fill(0);
+      bloomInsertedItems.clear();
+      renderBloomBits();
+      document.getElementById('bloom-result').textContent = 'Filter reset to initial empty state.';
+    }
+
+    // --- LSM WRITE SIMULATOR LOGIC ---
+    let memTable = [];
+    let l0Tables = [];
+    let l1Tables = [];
+    let writeSeq = 1;
+
+    function renderLSM() {
+      const memEl = document.getElementById('memtable-blocks');
+      if (memTable.length === 0) {
+        memEl.innerHTML = '<span style="font-size:0.8rem; color:var(--text-dim);">MemTable is empty. Click "Write Record".</span>';
+      } else {
+        memEl.innerHTML = memTable.map(k => `<span class="lsm-block">${k}</span>`).join('');
+      }
+      document.getElementById('memtable-status').textContent = `MemTable Capacity: ${memTable.length} / 4 Records`;
+
+      const l0El = document.getElementById('l0-blocks');
+      if (l0Tables.length === 0) {
+        l0El.innerHTML = '<span style="font-size:0.8rem; color:var(--text-dim);">No L0 SSTables flushed yet.</span>';
+      } else {
+        l0El.innerHTML = l0Tables.map((t, idx) => `<span class="lsm-block flushing">L0_SST_${idx+1}: [${t.join(', ')}]</span>`).join('');
+      }
+      document.getElementById('l0-status').textContent = `${l0Tables.length} SSTables`;
+
+      const l1El = document.getElementById('l1-blocks');
+      if (l1Tables.length === 0) {
+        l1El.innerHTML = '<span style="font-size:0.8rem; color:var(--text-dim);">No L1 compacted tables.</span>';
+      } else {
+        l1El.innerHTML = l1Tables.map((t, idx) => `<span class="lsm-block compacted">L1_SST_${idx+1}: [${t.join(', ')}]</span>`).join('');
+      }
+      document.getElementById('l1-status').textContent = `${l1Tables.length} Compacted Tables`;
+    }
+
+    function lsmWriteRecord() {
+      const key = `k${writeSeq++}:v${Math.floor(Math.random()*900+100)}`;
+      memTable.push(key);
+      document.getElementById('lsm-log').innerHTML = `📝 Wrote <code>${key}</code> sequentially to WAL and SkipList MemTable.`;
+      if (memTable.length >= 4) {
+        document.getElementById('lsm-log').innerHTML += `<br><span style="color:var(--accent-amber);">⚠️ MemTable full! Auto-triggering flush to Level 0 SSTable...</span>`;
+        lsmFlushMemTable();
+      } else {
+        renderLSM();
+      }
+    }
+
+    function lsmFlushMemTable() {
+      if (memTable.length === 0) return;
+      const flushed = [...memTable].sort();
+      l0Tables.push(flushed);
+      memTable = [];
+      renderLSM();
+      document.getElementById('lsm-log').innerHTML = `💾 Flushed immutable MemTable to disk as <strong>L0 SSTable</strong> with Bloom filter & index block.`;
+      if (l0Tables.length >= 3) {
+        document.getElementById('lsm-log').innerHTML += `<br><span style="color:var(--accent-cyan);">⚙️ L0 threshold reached (3 tables). Auto-running Leveled Compaction into L1...</span>`;
+        setTimeout(lsmRunCompaction, 600);
+      }
+    }
+
+    function lsmRunCompaction() {
+      if (l0Tables.length === 0) return;
+      // Merge all L0 tables into sorted L1
+      const merged = [].concat(...l0Tables).sort();
+      l1Tables.push(merged);
+      l0Tables = [];
+      renderLSM();
+      document.getElementById('lsm-log').innerHTML = `🧹 <strong>Compaction Complete:</strong> Merged L0 SSTables into strictly sorted non-overlapping L1 SSTable, purging stale versions and tombstones.`;
+    }
+
+    function lsmReset() {
+      memTable = [];
+      l0Tables = [];
+      l1Tables = [];
+      writeSeq = 1;
+      renderLSM();
+      document.getElementById('lsm-log').textContent = 'LSM engine reset.';
+    }
+
+    // Initialize simulators on load
+    renderBloomBits();
+    renderLSM();
+  </script>
+</body>
+</html>

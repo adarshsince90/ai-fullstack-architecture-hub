@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Real-World System Design Case Studies</title>
+  <title>Tier-1 Real-World System Design Case Studies</title>
   <link rel="stylesheet" href="../../styles.css">
   <style>
     body {
@@ -13,34 +13,152 @@
       margin: 0;
       padding: 0;
     }
-    .sd-container { padding: 24px; max-width: 1200px; margin: 0 auto; color: var(--text-main); }
-    .sd-card { background: var(--bg-card); border: var(--glass-border); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 24px; backdrop-filter: var(--glass-blur); box-shadow: var(--glass-shadow); }
-    .sd-title { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--primary); margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
-    .sd-badge { font-size: 0.75rem; padding: 4px 10px; background: var(--badge-bg); border: 1px solid var(--badge-border); border-radius: 20px; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
-    .sd-intro { color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; font-size: 0.95rem; }
+    .sd-container { padding: 24px; max-width: 1280px; margin: 0 auto; color: var(--text-main); }
+    .sd-card { background: var(--bg-card); border: var(--glass-border); border-radius: var(--radius-lg); padding: 26px; margin-bottom: 24px; backdrop-filter: var(--glass-blur); box-shadow: var(--glass-shadow); }
+    .sd-title { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--primary); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .sd-badge { font-size: 0.75rem; padding: 4px 12px; background: var(--badge-bg); border: 1px solid var(--badge-border); border-radius: 20px; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+    .sd-intro { color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; font-size: 0.95rem; }
 
     /* Case Study Selector Tabs */
-    .cs-nav-tabs { display: flex; gap: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 20px; flex-wrap: wrap; }
-    .cs-tab-btn { padding: 10px 18px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-muted); font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
-    .cs-tab-btn:hover { color: var(--text-main); border-color: var(--primary); }
-    .cs-tab-btn.active { background: var(--primary); color: #ffffff; border-color: var(--primary); box-shadow: 0 0 12px var(--primary-glow); }
+    .cs-nav-tabs { display: flex; gap: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 14px; margin-bottom: 24px; flex-wrap: wrap; }
+    .cs-tab-btn { padding: 10px 16px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-muted); font-weight: 600; font-size: 0.88rem; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 8px; }
+    .cs-tab-btn:hover { color: var(--text-main); border-color: var(--primary); transform: translateY(-1px); }
+    .cs-tab-btn.active { background: var(--primary); color: #ffffff; border-color: var(--primary); box-shadow: 0 0 16px var(--primary-glow); }
 
     /* Sub-tabs inside case study */
     .sub-tabs { display: flex; gap: 8px; margin: 16px 0; flex-wrap: wrap; }
-    .sub-tab-btn { padding: 6px 14px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-muted); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
-    .sub-tab-btn:hover { color: var(--text-main); }
-    .sub-tab-btn.active { background: var(--badge-bg); border-color: var(--primary); color: var(--primary); font-weight: 600; }
+    .sub-tab-btn { padding: 8px 16px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-muted); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+    .sub-tab-btn:hover { color: var(--text-main); border-color: var(--border-focus); }
+    .sub-tab-btn.active { background: var(--badge-bg); border-color: var(--primary); color: var(--primary); box-shadow: inset 0 0 8px var(--primary-glow); }
 
     .cs-content-section { display: none; }
-    .cs-content-section.active { display: block; }
+    .cs-content-section.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-    .case-title { color: var(--text-main); font-size: 1.25rem; font-weight: 700; margin-top: 0; margin-bottom: 10px; }
-    .case-desc { color: var(--text-muted); line-height: 1.6; margin-bottom: 14px; }
+    .case-title { color: var(--text-main); font-size: 1.4rem; font-weight: 700; margin-top: 0; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    .case-desc { color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; font-size: 0.94rem; }
     .case-desc strong { color: var(--text-main); }
-    .case-desc code { font-family: var(--font-mono); color: var(--primary); background: var(--bg-secondary); padding: 2px 6px; border-radius: 4px; }
+    .case-desc code { font-family: var(--font-mono); color: var(--primary); background: var(--bg-secondary); padding: 2px 6px; border-radius: 4px; font-size: 0.88em; }
 
-    .arch-flow-diagram { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; font-family: var(--font-mono); font-size: 0.85rem; color: var(--primary); line-height: 1.5; overflow-x: auto; box-shadow: var(--shadow-sm); }
-    .code-snippet-box { background: var(--bg-secondary); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color); font-family: var(--font-mono); font-size: 0.88rem; color: var(--accent-emerald); overflow-x: auto; }
+    .math-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin: 18px 0; }
+    .math-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 14px; }
+    .math-card-label { font-size: 0.75rem; text-transform: uppercase; color: var(--text-dim); font-weight: 600; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .math-card-val { font-size: 1.35rem; font-weight: 700; color: var(--primary); font-family: var(--font-mono); }
+    .math-card-detail { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+
+    /* ========================================================================= */
+    /* MODERN VISUAL DATA FLOW PIPELINE STYLES */
+    /* ========================================================================= */
+    .flow-pipeline-container { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 22px; margin: 18px 0; }
+    .flow-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
+    .flow-header-title { font-weight: 700; color: var(--text-main); font-size: 1.05rem; display: flex; align-items: center; gap: 8px; }
+    
+    .pipeline-steps { display: flex; flex-direction: column; gap: 12px; position: relative; }
+    .pipeline-step-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      position: relative;
+    }
+    .pipeline-step-card:hover {
+      border-color: var(--primary);
+      transform: translateX(4px);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+    }
+    .pipeline-step-card.active-step {
+      border-color: var(--primary);
+      background: var(--badge-bg);
+      box-shadow: 0 0 16px var(--primary-glow);
+    }
+    .pipeline-step-left { display: flex; align-items: center; gap: 14px; flex: 1; }
+    .step-num-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px var(--primary-glow);
+    }
+    .step-info { display: flex; flex-direction: column; }
+    .step-name { font-weight: 700; font-size: 0.92rem; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+    .step-desc { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+    .pipeline-step-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .proto-badge { font-size: 0.72rem; padding: 3px 8px; border-radius: 4px; font-family: var(--font-mono); font-weight: 600; background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--primary); }
+    .latency-badge { font-size: 0.72rem; padding: 3px 8px; border-radius: 4px; font-family: var(--font-mono); font-weight: 600; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); color: #10b981; }
+
+    .flow-connector {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 18px;
+      position: relative;
+    }
+    .flow-connector::before {
+      content: "";
+      position: absolute;
+      width: 2px;
+      height: 100%;
+      background: var(--border-color);
+    }
+    .flow-connector-arrow {
+      font-size: 0.85rem;
+      color: var(--primary);
+      background: var(--bg-secondary);
+      padding: 0 4px;
+      z-index: 1;
+    }
+
+    .step-inspector-box {
+      margin-top: 18px;
+      padding: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      font-size: 0.86rem;
+      line-height: 1.6;
+    }
+    .inspector-title { font-weight: 700; color: var(--primary); font-size: 0.95rem; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .inspector-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px; }
+    @media (max-width: 768px) { .inspector-grid { grid-template-columns: 1fr; } }
+    .inspector-section-label { font-size: 0.75rem; text-transform: uppercase; color: var(--text-dim); font-weight: 700; margin-bottom: 4px; }
+    .inspector-code { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 8px 12px; font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent-emerald); overflow-x: auto; }
+
+    /* Interactive Simulators */
+    .sim-panel { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 22px; margin-top: 18px; }
+    .sim-title { font-weight: 700; color: var(--text-main); font-size: 1.1rem; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .sim-desc { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5; }
+    .sim-controls { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+    .sim-btn { padding: 9px 18px; border-radius: var(--radius-sm); border: none; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px; }
+    .sim-btn-primary { background: var(--primary); color: #fff; box-shadow: 0 2px 8px var(--primary-glow); }
+    .sim-btn-primary:hover { opacity: 0.92; transform: translateY(-1px); }
+    .sim-btn-secondary { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); }
+    .sim-btn-secondary:hover { border-color: var(--primary); color: var(--primary); }
+    .sim-input { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 12px; border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 0.85rem; }
+    .sim-input:focus { outline: none; border-color: var(--primary); }
+
+    .tradeoff-table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 0.88rem; }
+    .tradeoff-table th { background: var(--bg-secondary); color: var(--primary); text-align: left; padding: 12px 14px; border: 1px solid var(--border-color); font-weight: 600; }
+    .tradeoff-table td { padding: 12px 14px; border: 1px solid var(--border-color); color: var(--text-muted); line-height: 1.5; vertical-align: top; }
+    .tradeoff-table strong { color: var(--text-main); }
+
+    .log-box { margin-top: 14px; padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 0.84rem; color: var(--text-main); line-height: 1.5; }
+    .badge-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+    .badge-tag.pass { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-tag.fail { background: rgba(244, 63, 94, 0.15); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.3); }
+    .badge-tag.warn { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
   </style>
   <script>
     const currentTheme = window.parent?.app?.activeTheme || localStorage.getItem('hub_theme') || 'obsidian-dark';
@@ -51,93 +169,1254 @@
   <div class="sd-container">
     <div class="sd-card">
       <div class="sd-title">
-        <span>🏛️ Real-World System Design Case Studies</span>
-        <span class="sd-badge">Interactive Problem Deep Dives</span>
+        <span>🏛️ Tier-1 Real-World System Design Case Studies</span>
+        <span class="sd-badge">Staff Architecture Blueprints</span>
       </div>
       <p class="sd-intro">
-        Select a real-world system architecture below to explore its functional specs, data flow, API design, database strategy, and bottleneck solutions.
+        Deep-dive production blueprints for Top Tier-1 system design interviews. Every case study follows the 4-Step Framework: <strong>Capacity Calculations</strong> $\rightarrow$ <strong>Interactive Data Flow Pipeline</strong> $\rightarrow$ <strong>Failure Modes & Deep Dives</strong> $\rightarrow$ <strong>Interactive Visual Simulators</strong>.
       </p>
 
       <!-- Main Case Study Tabs -->
       <div class="cs-nav-tabs">
-        <button class="cs-tab-btn active" onclick="switchCaseStudy('tinyurl', event)">🔗 1. TinyURL Shortener</button>
-        <button class="cs-tab-btn" onclick="switchCaseStudy('whatsapp', event)">💬 2. WhatsApp Real-Time Chat</button>
-        <button class="cs-tab-btn" onclick="switchCaseStudy('netflix', event)">🎬 3. Netflix Video Streaming</button>
+        <button class="cs-tab-btn active" onclick="switchCaseStudy('uber', event)">🚗 1. Uber / Lyft Geospatial</button>
+        <button class="cs-tab-btn" onclick="switchCaseStudy('flashsale', event)">⚡ 2. Flash Sale Reservation</button>
+        <button class="cs-tab-btn" onclick="switchCaseStudy('scheduler', event)">⏱️ 3. Distributed Job Scheduler</button>
+        <button class="cs-tab-btn" onclick="switchCaseStudy('crawler', event)">🕷️ 4. Distributed Web Crawler</button>
+        <button class="cs-tab-btn" onclick="switchCaseStudy('tinyurl', event)">🔗 5. TinyURL Shortener</button>
+        <button class="cs-tab-btn" onclick="switchCaseStudy('whatsapp', event)">💬 6. WhatsApp Real-Time Chat</button>
+        <button class="cs-tab-btn" onclick="switchCaseStudy('netflix', event)">🎬 7. Netflix Video Transcoding</button>
       </div>
 
-      <!-- Case Study 1: TinyURL Shortener -->
-      <div id="cs-tinyurl" class="cs-content-section active">
-        <h3 class="case-title">TinyURL Architecture & Base62 Encoding</h3>
+      <!-- ================================================================= -->
+      <!-- CASE STUDY 1: UBER / LYFT GEOSPATIAL -->
+      <!-- ================================================================= -->
+      <div id="cs-uber" class="cs-content-section active">
+        <div class="case-title">
+          <span>🚗 Uber / Lyft Geospatial Ride Matching & Dispatch Engine</span>
+          <span class="badge-tag pass">Real-Time Geospatial</span>
+        </div>
         
         <div class="sub-tabs">
-          <button class="sub-tab-btn active" onclick="switchSubTab('tinyurl', 'overview', event)">Overview & Math</button>
-          <button class="sub-tab-btn" onclick="switchSubTab('tinyurl', 'flow', event)">Data Flow Diagram</button>
-          <button class="sub-tab-btn" onclick="switchSubTab('tinyurl', 'db', event)">DB Schema & API</button>
+          <button class="sub-tab-btn active" onclick="switchSubTab('uber', 'overview', event)">📐 Scale Math & Trade-offs</button>
+          <button class="sub-tab-btn" onclick="switchSubTab('uber', 'flow', event)">🔄 Interactive Data Flow Pipeline</button>
+          <button class="sub-tab-btn" onclick="switchSubTab('uber', 'sim', event)">🎯 Live H3 Hexagon Simulator</button>
         </div>
 
-        <div id="tinyurl-overview" class="sub-content">
-          <p class="case-desc">
-            <strong>Core Requirements:</strong> Given a long URL (e.g., <code>https://example.com/long/path</code>), generate a unique 7-character alias (e.g., <code>tiny.url/aB3x9Z</code>). 
-            When accessed, issue an HTTP 301/302 redirect.
-          </p>
-          <ul class="case-desc">
-            <li><strong>Base62 Encoding:</strong> Uses <code>[a-z, A-Z, 0-9]</code> ($62$ characters). A 7-character string yields $62^7 \approx 3.5 \text{ Trillion}$ unique URLs.</li>
-            <li><strong>Key Generation Service (KGS):</strong> Pre-generates random 7-character keys in memory to avoid key collisions during high-concurrent writes.</li>
-          </ul>
+        <div id="uber-overview" class="sub-content">
+          <div class="math-grid">
+            <div class="math-card">
+              <div class="math-card-label">Active Drivers Write QPS</div>
+              <div class="math-card-val">250,000 / sec</div>
+              <div class="math-card-detail">1M drivers pinging GPS every 4s ($10^6 / 4$)</div>
+            </div>
+            <div class="math-card">
+              <div class="math-card-label">Rider Search Read QPS</div>
+              <div class="math-card-val">50,000 / sec</div>
+              <div class="math-card-detail">Nearby driver searches with &lt;50ms SLA</div>
+            </div>
+            <div class="math-card">
+              <div class="math-card-label">Driver Location Memory</div>
+              <div class="math-card-val">64 MB RAM</div>
+              <div class="math-card-detail">$10^6 \times 64\text{ bytes} \approx 64\text{ MB}$ (Fits in Redis cache)</div>
+            </div>
+            <div class="math-card">
+              <div class="math-card-label">Network Ingestion Bandwidth</div>
+              <div class="math-card-val">16 MB/sec</div>
+              <div class="math-card-detail">$250\text{k QPS} \times 64\text{ bytes} \approx 16\text{ MB/s}$</div>
+            </div>
+          </div>
+
+          <table class="tradeoff-table">
+            <thead>
+              <tr>
+                <th>Spatial Indexing Strategy</th>
+                <th>Core Mechanism</th>
+                <th>Trade-offs & Verdict</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>QuadTree</strong></td>
+                <td>Hierarchical 2D grid partitioned into 4 quadrants when point capacity exceeds threshold.</td>
+                <td>Dynamic updates require tree re-balancing and page-level locking; poor for 250k dynamic writes/sec.</td>
+              </tr>
+              <tr>
+                <td><strong>Geohash (Base32)</strong></td>
+                <td>Interleaved latitude/longitude binary bits prefix-encoded into string squares.</td>
+                <td>Non-uniform edge distortion near poles and boundary discontinuity (neighboring squares have different prefixes).</td>
+              </tr>
+              <tr>
+                <td><strong>Uber H3 (Hexagonal Grid) ⭐</strong></td>
+                <td>Hierarchical discrete global grid using hexagons (Resolutions 0-15).</td>
+                <td><strong>Equidistant neighbors:</strong> Every hexagon has exactly 6 neighbors at identical distances ($k$-ring radius search is $O(1)$ without distortion).</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
-        <div id="tinyurl-flow" class="sub-content" style="display:none;">
-          <div class="arch-flow-diagram">
-CLIENT REQUEST ──► LOAD BALANCER (Nginx) ──► API GATEWAY (Rate Limiter)
-                                                    │
-                 ┌──────────────────────────────────┴──────────────────────────────────┐
-                 ▼ (Read: Redirect)                                                    ▼ (Write: Shorten URL)
-       REDIS DISTRIBUTED CACHE ──(Cache Miss)──► RDBMS READ REPLICAS               KEY GENERATION SVC (KGS)
-                 │                                                                     │
-          (Return HTTP 301)                                                     Fetch Pre-generated Key &
-                                                                                Write to Primary DB
+        <div id="uber-flow" class="sub-content" style="display:none;">
+          <div class="flow-pipeline-container">
+            <div class="flow-header">
+              <div class="flow-header-title">🔄 End-to-End Ingestion & Dispatch Flow Pipeline</div>
+              <button class="sim-btn sim-btn-primary" onclick="animatePipeline('uber')">🚀 Trace Live Request Flow</button>
+            </div>
+            
+            <div class="pipeline-steps" id="uber-steps">
+              <div class="pipeline-step-card active-step" onclick="inspectStep('uber', 1)" id="uber-step-1">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">1</div>
+                  <div class="step-info">
+                    <div class="step-name">📍 Driver GPS Telemetry Ingestion</div>
+                    <div class="step-desc">1M active drivers stream [Lat, Lon, Bearing, Speed] every 4 seconds.</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">WebSocket / TCP</span>
+                  <span class="latency-badge">&lt; 8ms</span>
+                </div>
+              </div>
+
+              <div class="flow-connector"><span class="flow-connector-arrow">▼</span></div>
+
+              <div class="pipeline-step-card" onclick="inspectStep('uber', 2)" id="uber-step-2">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">2</div>
+                  <div class="step-info">
+                    <div class="step-name">⚡ Netty Gateway & Ingestion Service</div>
+                    <div class="step-desc">Terminates stateful TCP sessions and computes Uber H3 Resolution 8 cell index.</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">gRPC Async</span>
+                  <span class="latency-badge">&lt; 3ms</span>
+                </div>
+              </div>
+
+              <div class="flow-connector"><span class="flow-connector-arrow">▼</span></div>
+
+              <div class="pipeline-step-card" onclick="inspectStep('uber', 3)" id="uber-step-3">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">3</div>
+                  <div class="step-info">
+                    <div class="step-name">🗺️ Redis In-Memory Geospatial H3 Index</div>
+                    <div class="step-desc">Updates H3 cell hash set (<code>H3_Index ➔ Set[Driver_ID, Coordinates, Ts]</code>). 15s TTL.</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">Redis HSET</span>
+                  <span class="latency-badge">&lt; 2ms</span>
+                </div>
+              </div>
+
+              <div class="flow-connector"><span class="flow-connector-arrow">▼</span></div>
+
+              <div class="pipeline-step-card" onclick="inspectStep('uber', 4)" id="uber-step-4">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">4</div>
+                  <div class="step-info">
+                    <div class="step-name">📈 Kafka Stream & Apache Flink Surge Engine</div>
+                    <div class="step-desc">Asynchronously aggregates supply vs demand density across 10-second sliding windows.</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">Kafka Pub/Sub</span>
+                  <span class="latency-badge">&lt; 15ms</span>
+                </div>
+              </div>
+
+              <div class="flow-connector"><span class="flow-connector-arrow">▼</span></div>
+
+              <div class="pipeline-step-card" onclick="inspectStep('uber', 5)" id="uber-step-5">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">5</div>
+                  <div class="step-info">
+                    <div class="step-name">🤝 Ride Matching & Bipartite Dispatch Engine</div>
+                    <div class="step-desc">Performs $k$-ring concentric search ($r=0, 1, 2$), computes ETA, and pushes ride offer.</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">Push APNS / FCM</span>
+                  <span class="latency-badge">&lt; 35ms</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="step-inspector-box" id="uber-inspector">
+              <div class="inspector-title">🔍 Step Inspector: <span id="uber-insp-title">Driver GPS Telemetry Ingestion</span></div>
+              <div id="uber-insp-desc">Drivers transmit micro-payloads containing device ID, current coordinates, and timestamp over sticky WebSocket connections.</div>
+              <div class="inspector-grid">
+                <div>
+                  <div class="inspector-section-label">Protocol Payload Sample</div>
+                  <pre class="inspector-code" id="uber-insp-payload">{"driver_id": "drv_8941", "lat": 37.7749, "lon": -122.4194, "bearing": 184.2, "speed_mph": 28.5, "ts": 1725538800}</pre>
+                </div>
+                <div>
+                  <div class="inspector-section-label">Failure Mode & Resiliency</div>
+                  <div class="inspector-code" id="uber-insp-fail" style="color:var(--accent-amber);">If driver loses cell signal, Redis key auto-expires in 15 seconds. Matching engine gracefully excludes stale driver.</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div id="tinyurl-db" class="sub-content" style="display:none;">
-          <h4 style="color:var(--primary); margin-top:10px;">Database Schema (NoSQL / SQL)</h4>
+        <div id="uber-sim" class="sub-content" style="display:none;">
+          <div class="sim-panel">
+            <div class="sim-title">🎯 Live Uber H3 Hexagonal Grid & Concentric $k$-Ring Dispatcher</div>
+            <div class="sim-desc">
+              Visualizes dynamic rider request matching against active drivers clustered in hexagonal H3 cells. Click below to test nearest driver matching across expanding $k$-rings ($r=0, 1, 2$).
+            </div>
+            <div style="display:flex; justify-content:center; margin-bottom:14px;">
+              <canvas id="uberCanvas" width="480" height="260" style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md);"></canvas>
+            </div>
+            <div class="sim-controls" style="justify-content:center;">
+              <button class="sim-btn sim-btn-primary" onclick="simulateUberMatch()">🚖 Simulate Rider Request & Match</button>
+              <button class="sim-btn sim-btn-secondary" onclick="initUberGrid()">🔄 Reset Grid</button>
+            </div>
+            <div id="uber-log" class="log-box" style="text-align:center;">
+              Grid Initialized. 6 Active Drivers in Hexagonal Cells.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- CASE STUDY 2: FLASH SALE RESERVATION -->
+      <!-- ================================================================= -->
+      <div id="cs-flashsale" class="cs-content-section">
+        <div class="case-title">
+          <span>⚡ High-Concurrency Flash Sale & Inventory Reservation</span>
+          <span class="badge-tag pass">High Concurrency</span>
+        </div>
+        
+        <div class="sub-tabs">
+          <button class="sub-tab-btn active" onclick="switchSubTab('flashsale', 'overview', event)">📐 Scale Math & Bottlenecks</button>
+          <button class="sub-tab-btn" onclick="switchSubTab('flashsale', 'flow', event)">🔄 Interactive Data Flow Pipeline</button>
+          <button class="sub-tab-btn" onclick="switchSubTab('flashsale', 'lua', event)">🛡️ Atomic Redis Lua Script</button>
+          <button class="sub-tab-btn" onclick="switchSubTab('flashsale', 'sim', event)">🎯 Concurrency Race Simulator</button>
+        </div>
+
+        <div id="flashsale-overview" class="sub-content">
+          <div class="math-grid">
+            <div class="math-card">
+              <div class="math-card-label">Peak Instantaneous QPS</div>
+              <div class="math-card-val">100,000 QPS</div>
+              <div class="math-card-detail">Exact spike at 12:00:00 PM flash sale start</div>
+            </div>
+            <div class="math-card">
+              <div class="math-card-label">Inventory Item Pool</div>
+              <div class="math-card-val">500 Units</div>
+              <div class="math-card-detail">Strict zero-overselling SLA requirement</div>
+            </div>
+            <div class="math-card">
+              <div class="math-card-label">DB Connection Pool Limit</div>
+              <div class="math-card-val">500 Conns</div>
+              <div class="math-card-detail">Direct DB row locking crashes at &gt;1,000 QPS</div>
+            </div>
+            <div class="math-card">
+              <div class="math-card-label">Order Creation Worker Queue</div>
+              <div class="math-card-val">Kafka / RabbitMQ</div>
+              <div class="math-card-detail">Write leveling: batch 100 orders/sec into RDBMS</div>
+            </div>
+          </div>
+          <div class="case-desc">
+            <strong>The Core Problem:</strong> 50,000 customers trying to purchase 100 limited iPhone units at 12:00:00 PM. Relational DB row-level locking (<code>SELECT stock FROM inventory WHERE id=1 FOR UPDATE;</code>) saturates DB connection pools and crashes the database.
+          </div>
+        </div>
+
+        <div id="flashsale-flow" class="sub-content" style="display:none;">
+          <div class="flow-pipeline-container">
+            <div class="flow-header">
+              <div class="flow-header-title">🔄 High-Concurrency Flash Sale Request Pipeline</div>
+              <button class="sim-btn sim-btn-primary" onclick="animatePipeline('flashsale')">🚀 Trace Live Request Flow</button>
+            </div>
+            
+            <div class="pipeline-steps" id="flashsale-steps">
+              <div class="pipeline-step-card active-step" onclick="inspectStep('flashsale', 1)" id="flashsale-step-1">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">1</div>
+                  <div class="step-info">
+                    <div class="step-name">⚡ NGINX / Cloudflare Edge Rate Limiter</div>
+                    <div class="step-desc">Token bucket filter drops 80% invalid/bot burst traffic before hitting origin.</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">HTTP/2 Edge</span>
+                  <span class="latency-badge">&lt; 5ms</span>
+                </div>
+              </div>
+
+              <div class="flow-connector"><span class="flow-connector-arrow">▼</span></div>
+
+              <div class="pipeline-step-card" onclick="inspectStep('flashsale', 2)" id="flashsale-step-2">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">2</div>
+                  <div class="step-info">
+                    <div class="step-name">🛡️ Flash Sale Inventory Service (Go / .NET)</div>
+                    <div class="step-desc">Dispatches atomic Lua script directly to in-memory Redis cluster.</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">gRPC In-Memory</span>
+                  <span class="latency-badge">&lt; 2ms</span>
+                </div>
+              </div>
+
+              <div class="flow-connector"><span class="flow-connector-arrow">▼</span></div>
+
+              <div class="pipeline-step-card" onclick="inspectStep('flashsale', 3)" id="flashsale-step-3">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">3</div>
+                  <div class="step-info">
+                    <div class="step-name">🔒 Redis In-Memory Atomic Lua Execution</div>
+                    <div class="step-desc">Single-threaded event loop atomically checks <code>stock &gt; 0</code> and deducts. Zero race conditions.</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">Redis EVALSHA</span>
+                  <span class="latency-badge">&lt; 1ms</span>
+                </div>
+              </div>
+
+              <div class="flow-connector"><span class="flow-connector-arrow">▼</span></div>
+
+              <div class="pipeline-step-card" onclick="inspectStep('flashsale', 4)" id="flashsale-step-4">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">4</div>
+                  <div class="step-info">
+                    <div class="step-name">📨 Kafka Queue ("orders_to_create")</div>
+                    <div class="step-desc">Buffers successful reservations. Failed requests receive HTTP 410 (Sold Out) immediately.</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">Kafka Write-Leveling</span>
+                  <span class="latency-badge">&lt; 8ms</span>
+                </div>
+              </div>
+
+              <div class="flow-connector"><span class="flow-connector-arrow">▼</span></div>
+
+              <div class="pipeline-step-card" onclick="inspectStep('flashsale', 5)" id="flashsale-step-5">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">5</div>
+                  <div class="step-info">
+                    <div class="step-name">💾 Async Order Worker &amp; Primary RDBMS</div>
+                    <div class="step-desc">Batch writes 100 orders/sec into PostgreSQL with zero DB lock contention.</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">PostgreSQL Bulk</span>
+                  <span class="latency-badge">Async 50ms</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="step-inspector-box" id="flashsale-inspector">
+              <div class="inspector-title">🔍 Step Inspector: <span id="flashsale-insp-title">NGINX / Cloudflare Edge Rate Limiter</span></div>
+              <div id="flashsale-insp-desc">Edge layer uses IP and User Token Bucket limiting to shield application pods from massive DDoS spikes.</div>
+              <div class="inspector-grid">
+                <div>
+                  <div class="inspector-section-label">Protocol Payload Sample</div>
+                  <pre class="inspector-code" id="flashsale-insp-payload">POST /api/v1/flashsale/reserve HTTP/2
+Headers: { "X-User-Id": "usr_9912", "Idempotency-Key": "req_uuid_8841" }
+Body: { "sku_id": "iphone16_256gb", "qty": 1 }</pre>
+                </div>
+                <div>
+                  <div class="inspector-section-label">Failure Mode & Resiliency</div>
+                  <div class="inspector-code" id="flashsale-insp-fail" style="color:var(--accent-amber);">If Redis master crashes, Sentinel promotes replica in &lt;3s. Idempotency keys prevent duplicate deductions.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="flashsale-lua" class="sub-content" style="display:none;">
+          <div class="case-desc">
+            <strong>Why Naive Check-Then-Set Fails:</strong> If Thread A and Thread B both read <code>stock = 1</code> at the same microsecond, both deduct 1, resulting in <code>stock = -1</code> (Overselling!). Redis executes Lua scripts as a <strong>single atomic instruction</strong> on its single-threaded event loop.
+          </div>
           <pre class="code-snippet-box">
-Table: URL_Mapping {
-  short_key   VARCHAR(7) PRIMARY KEY, -- e.g. "aB3x9Z"
-  original_url TEXT NOT NULL,
-  created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  user_id     UUID NULL,
-  expires_at  TIMESTAMP NULL
-}
-          </pre>
+-- Keys: KEYS[1] = inventory_key, KEYS[2] = user_order_set
+-- Args: ARGV[1] = user_id, ARGV[2] = requested_qty
+local current_stock = tonumber(redis.call('GET', KEYS[1]) or 0)
+if current_stock &lt; tonumber(ARGV[2]) then
+    return -1 -- Error: Sold Out / Insufficient Stock
+end
+
+-- Check if user already purchased (Prevent duplicate orders)
+if redis.call('SISMEMBER', KEYS[2], ARGV[1]) == 1 then
+    return -2 -- Error: User already ordered
+end
+
+-- Atomically deduct stock and record user in order set
+redis.call('DECRBY', KEYS[1], ARGV[2])
+redis.call('SADD', KEYS[2], ARGV[1])
+return 1 -- Success: Stock Reserved!</pre>
+        </div>
+
+        <div id="flashsale-sim" class="sub-content" style="display:none;">
+          <div class="sim-panel">
+            <div class="sim-title">🎯 Live Flash Sale Race Condition Simulator</div>
+            <div class="sim-desc">
+              Simulate 100 concurrent buyers competing for <strong>20 available stock units</strong> using Redis Atomic Lua vs Naive Unlocked DB reads.
+            </div>
+            <div class="sim-controls">
+              <button class="sim-btn sim-btn-primary" onclick="runFlashSale(true)">🛡️ Run with Atomic Redis Lua (Safe)</button>
+              <button class="sim-btn sim-btn-secondary" style="border-color:var(--accent-rose); color:var(--accent-rose);" onclick="runFlashSale(false)">💥 Run with Naive Check-Then-Set (Overselling Bug)</button>
+              <button class="sim-btn sim-btn-secondary" onclick="resetFlashSale()">🔄 Reset Stock</button>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+              <div style="background:var(--bg-card); padding:14px; border-radius:var(--radius-sm); border:1px solid var(--border-color); text-align:center;">
+                <div style="font-size:0.75rem; color:var(--text-dim); text-transform:uppercase;">Stock Remaining</div>
+                <div id="fs-stock" style="font-size:1.8rem; font-weight:700; color:var(--accent-emerald);">20</div>
+              </div>
+              <div style="background:var(--bg-card); padding:14px; border-radius:var(--radius-sm); border:1px solid var(--border-color); text-align:center;">
+                <div style="font-size:0.75rem; color:var(--text-dim); text-transform:uppercase;">Orders Placed</div>
+                <div id="fs-orders" style="font-size:1.8rem; font-weight:700; color:var(--primary);">0</div>
+              </div>
+            </div>
+            <div id="fs-log" class="log-box">
+              Inventory initialized: 20 units ready.
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Case Study 2: WhatsApp Chat -->
+      <!-- ================================================================= -->
+      <!-- CASE STUDY 3: DISTRIBUTED SCHEDULER -->
+      <!-- ================================================================= -->
+      <div id="cs-scheduler" class="cs-content-section">
+        <div class="case-title">
+          <span>⏱️ Distributed Job / Task Scheduler (Temporal / Airflow / Quartz)</span>
+          <span class="badge-tag pass">Workflow & Scheduling</span>
+        </div>
+        
+        <div class="sub-tabs">
+          <button class="sub-tab-btn active" onclick="switchSubTab('scheduler', 'overview', event)">📐 Scale Math & Architecture</button>
+          <button class="sub-tab-btn" onclick="switchSubTab('scheduler', 'flow', event)">🔄 Interactive Data Flow Pipeline</button>
+          <button class="sub-tab-btn" onclick="switchSubTab('scheduler', 'timewheel', event)">⚙️ Hierarchical Time Wheel Internals</button>
+          <button class="sub-tab-btn" onclick="switchSubTab('scheduler', 'sim', event)">🎯 Live Time Wheel Simulator</button>
+        </div>
+
+        <div id="scheduler-overview" class="sub-content">
+          <div class="math-grid">
+            <div class="math-card">
+              <div class="math-card-label">Scheduled Tasks / Day</div>
+              <div class="math-card-val">50 Million</div>
+              <div class="math-card-detail">Delayed execution, recurring cron jobs, retry backoffs</div>
+            </div>
+            <div class="math-card">
+              <div class="math-card-label">Trigger Accuracy SLA</div>
+              <div class="math-card-val">&lt; 500 ms</div>
+              <div class="math-card-detail">Task fires within 500ms of scheduled target time</div>
+            </div>
+            <div class="math-card">
+              <div class="math-card-label">Storage Footprint</div>
+              <div class="math-card-val">25 GB / day</div>
+              <div class="math-card-detail">$50\text{M} \times 500\text{ bytes per task metadata} \approx 25\text{ GB}$</div>
+            </div>
+            <div class="math-card">
+              <div class="math-card-label">Leader Consensus</div>
+              <div class="math-card-val">Raft / etcd</div>
+              <div class="math-card-detail">Fencing token + lease heartbeat prevents split-brain dispatch</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="scheduler-flow" class="sub-content" style="display:none;">
+          <div class="flow-pipeline-container">
+            <div class="flow-header">
+              <div class="flow-header-title">🔄 Distributed Job Scheduling & Dispatch Pipeline</div>
+              <button class="sim-btn sim-btn-primary" onclick="animatePipeline('scheduler')">🚀 Trace Live Request Flow</button>
+            </div>
+            
+            <div class="pipeline-steps" id="scheduler-steps">
+              <div class="pipeline-step-card active-step" onclick="inspectStep('scheduler', 1)" id="scheduler-step-1">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">1</div>
+                  <div class="step-info">
+                    <div class="step-name">📥 Client Task Submission API</div>
+                    <div class="step-desc">Clients submit delayed execution payloads with execution timestamp ($t + \Delta t$).</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">REST / gRPC</span>
+                  <span class="latency-badge">&lt; 10ms</span>
+                </div>
+              </div>
+
+              <div class="flow-connector"><span class="flow-connector-arrow">▼</span></div>
+
+              <div class="pipeline-step-card" onclick="inspectStep('scheduler', 2)" id="scheduler-step-2">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">2</div>
+                  <div class="step-info">
+                    <div class="step-name">💾 Durable Task Metadata Store</div>
+                    <div class="step-desc">Persists task payload and state into PostgreSQL / DynamoDB with status <code>SCHEDULED</code>.</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">DynamoDB / PG</span>
+                  <span class="latency-badge">&lt; 8ms</span>
+                </div>
+              </div>
+
+              <div class="flow-connector"><span class="flow-connector-arrow">▼</span></div>
+
+              <div class="pipeline-step-card" onclick="inspectStep('scheduler', 3)" id="scheduler-step-3">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">3</div>
+                  <div class="step-info">
+                    <div class="step-name">👑 Raft Leader &amp; Hierarchical Time Wheel</div>
+                    <div class="step-desc">Loads upcoming 1-hour window into in-memory circular time wheel with $O(1)$ trigger time.</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">In-Memory Wheel</span>
+                  <span class="latency-badge">&lt; 1ms</span>
+                </div>
+              </div>
+
+              <div class="flow-connector"><span class="flow-connector-arrow">▼</span></div>
+
+              <div class="pipeline-step-card" onclick="inspectStep('scheduler', 4)" id="scheduler-step-4">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">4</div>
+                  <div class="step-info">
+                    <div class="step-name">📨 Redis Delayed Queue / Kafka Dispatcher</div>
+                    <div class="step-desc">Upon slot tick, pushes task into worker execution partition topic with monotonic fencing token.</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">Kafka Pub/Sub</span>
+                  <span class="latency-badge">&lt; 5ms</span>
+                </div>
+              </div>
+
+              <div class="flow-connector"><span class="flow-connector-arrow">▼</span></div>
+
+              <div class="pipeline-step-card" onclick="inspectStep('scheduler', 5)" id="scheduler-step-5">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">5</div>
+                  <div class="step-info">
+                    <div class="step-name">⚙️ Distributed Worker Fleet &amp; Heartbeat Monitor</div>
+                    <div class="step-desc">Workers execute idempotent job; Heartbeat monitor reclaims task if worker crashes.</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">Worker Pool</span>
+                  <span class="latency-badge">SLA &lt;500ms</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="step-inspector-box" id="scheduler-inspector">
+              <div class="inspector-title">🔍 Step Inspector: <span id="scheduler-insp-title">Client Task Submission API</span></div>
+              <div id="scheduler-insp-desc">Clients register recurring cron expressions or one-shot delayed executions.</div>
+              <div class="inspector-grid">
+                <div>
+                  <div class="inspector-section-label">Protocol Payload Sample</div>
+                  <pre class="inspector-code" id="scheduler-insp-payload">{"task_id": "tsk_44910", "type": "EMAIL_REMINDER", "run_at": 1725540000, "max_retries": 3, "fencing_token": 104}</pre>
+                </div>
+                <div>
+                  <div class="inspector-section-label">Failure Mode & Resiliency</div>
+                  <div class="inspector-code" id="scheduler-insp-fail" style="color:var(--accent-amber);">If Raft Leader scheduler node crashes, secondary replica wins election lease and reloads Time Wheel in &lt;1s.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="scheduler-timewheel" class="sub-content" style="display:none;">
+          <div class="case-desc">
+            <strong>Why DB Polling Fails (<code>SELECT * WHERE run_at &lt;= NOW()</code>):</strong> Polling causes massive DB table scans and index contention at millions of rows.<br>
+            <strong>Hierarchical Time Wheel (Kafka / Netty Pattern):</strong>
+            <ul>
+              <li><strong>Second Wheel:</strong> 60 slots (1 second per slot). Ticks every 1,000ms.</li>
+              <li><strong>Minute Wheel:</strong> 60 slots (1 minute per slot). When second wheel wraps, minute wheel advances 1 slot and cascades tasks down to second wheel.</li>
+              <li><strong>Time Complexity:</strong> $O(1)$ task insertion, $O(1)$ task cancellation, and $O(1)$ per-tick trigger execution!</li>
+            </ul>
+          </div>
+        </div>
+
+        <div id="scheduler-sim" class="sub-content" style="display:none;">
+          <div class="sim-panel">
+            <div class="sim-title">🎯 Live Hierarchical Time Wheel Visualizer</div>
+            <div class="sim-desc">
+              Watch tasks scheduled across 8 circular time slots. Add a task with a delay, start the clock tick, and observe how the pointer triggers tasks in $O(1)$ time.
+            </div>
+            <div class="sim-controls">
+              <input type="text" id="schedTaskName" class="sim-input" placeholder="Task Name (e.g. SendEmail)" value="SendEmail">
+              <input type="number" id="schedDelay" class="sim-input" style="width:100px;" placeholder="Delay (1-7s)" value="3" min="1" max="7">
+              <button class="sim-btn sim-btn-primary" onclick="addScheduledTask()">➕ Schedule Task</button>
+              <button class="sim-btn sim-btn-secondary" id="schedTickBtn" onclick="toggleTimeWheel()">▶️ Start Clock Tick</button>
+            </div>
+            <div style="display:flex; justify-content:center; margin-bottom:14px;">
+              <canvas id="timeWheelCanvas" width="400" height="260" style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:var(--radius-md);"></canvas>
+            </div>
+            <div id="sched-log" class="log-box">
+              Time Wheel ready. Current slot: 0.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- CASE STUDY 4: DISTRIBUTED WEB CRAWLER -->
+      <!-- ================================================================= -->
+      <div id="cs-crawler" class="cs-content-section">
+        <div class="case-title">
+          <span>🕷️ Distributed Web Crawler & URL Frontier (Googlebot)</span>
+          <span class="badge-tag pass">Massive Scale Ingestion</span>
+        </div>
+        
+        <div class="sub-tabs">
+          <button class="sub-tab-btn active" onclick="switchSubTab('crawler', 'overview', event)">📐 Scale Math & Architecture</button>
+          <button class="sub-tab-btn" onclick="switchSubTab('crawler', 'flow', event)">🔄 Interactive Data Flow Pipeline</button>
+          <button class="sub-tab-btn" onclick="switchSubTab('crawler', 'frontier', event)">🛡️ Politeness & Deduplication</button>
+          <button class="sub-tab-btn" onclick="switchSubTab('crawler', 'sim', event)">🎯 Live Politeness & Frontier Sim</button>
+        </div>
+
+        <div id="crawler-overview" class="sub-content">
+          <div class="math-grid">
+            <div class="math-card">
+              <div class="math-card-label">Pages Crawled / Month</div>
+              <div class="math-card-val">1 Billion Pages</div>
+              <div class="math-card-detail">~400 pages/second sustained crawl rate</div>
+            </div>
+            <div class="math-card">
+              <div class="math-card-label">Average Page Size</div>
+              <div class="math-card-val">500 KB</div>
+              <div class="math-card-detail">Raw HTML + text extracted (~100 KB compressed)</div>
+            </div>
+            <div class="math-card">
+              <div class="math-card-label">Network Ingress Bandwidth</div>
+              <div class="math-card-val">200 MB / sec</div>
+              <div class="math-card-detail">$400\text{ pages/s} \times 500\text{ KB} = 200\text{ MB/s} = 1.6\text{ Gbps}$</div>
+            </div>
+            <div class="math-card">
+              <div class="math-card-label">Storage Capacity / Year</div>
+              <div class="math-card-val">1.2 Petabytes</div>
+              <div class="math-card-detail">Stored in Bigtable / S3 with Snappy compression</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="crawler-flow" class="sub-content" style="display:none;">
+          <div class="flow-pipeline-container">
+            <div class="flow-header">
+              <div class="flow-header-title">🔄 Distributed Crawler & Frontier Ingestion Pipeline</div>
+              <button class="sim-btn sim-btn-primary" onclick="animatePipeline('crawler')">🚀 Trace Live Request Flow</button>
+            </div>
+            
+            <div class="pipeline-steps" id="crawler-steps">
+              <div class="pipeline-step-card active-step" onclick="inspectStep('crawler', 1)" id="crawler-step-1">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">1</div>
+                  <div class="step-info">
+                    <div class="step-name">🌐 Seed URLs &amp; Mercator URL Frontier</div>
+                    <div class="step-desc">Prioritizes URLs based on PageRank and domain freshness schedule.</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">Frontier Priority</span>
+                  <span class="latency-badge">&lt; 10ms</span>
+                </div>
+              </div>
+
+              <div class="flow-connector"><span class="flow-connector-arrow">▼</span></div>
+
+              <div class="pipeline-step-card" onclick="inspectStep('crawler', 2)" id="crawler-step-2">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">2</div>
+                  <div class="step-info">
+                    <div class="step-name">🛡️ Domain Politeness Queues &amp; Delays</div>
+                    <div class="step-desc">Hashes domain name to dedicated queue; enforces $\ge 1\text{s}$ delay between host hits.</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">Rate Throttler</span>
+                  <span class="latency-badge">&ge; 1,000ms</span>
+                </div>
+              </div>
+
+              <div class="flow-connector"><span class="flow-connector-arrow">▼</span></div>
+
+              <div class="pipeline-step-card" onclick="inspectStep('crawler', 3)" id="crawler-step-3">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">3</div>
+                  <div class="step-info">
+                    <div class="step-name">🤖 Fetcher Worker Fleet (DNS &amp; Robots Cache)</div>
+                    <div class="step-desc">Downloads raw HTML with fast DNS cache and cached <code>robots.txt</code> permission rules.</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">HTTP/1.1 Async</span>
+                  <span class="latency-badge">100-300ms</span>
+                </div>
+              </div>
+
+              <div class="flow-connector"><span class="flow-connector-arrow">▼</span></div>
+
+              <div class="pipeline-step-card" onclick="inspectStep('crawler', 4)" id="crawler-step-4">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">4</div>
+                  <div class="step-info">
+                    <div class="step-name">🧹 HTML Parser &amp; Bloom Filter URL Dedup</div>
+                    <div class="step-desc">Extracts outbound hyperlinks; filters seen links via Redis Bloom filter ($0.1\%$ false positive).</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">Bloom Filter</span>
+                  <span class="latency-badge">&lt; 2ms</span>
+                </div>
+              </div>
+
+              <div class="flow-connector"><span class="flow-connector-arrow">▼</span></div>
+
+              <div class="pipeline-step-card" onclick="inspectStep('crawler', 5)" id="crawler-step-5">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">5</div>
+                  <div class="step-info">
+                    <div class="step-name">📦 SimHash Near-Dedup &amp; Bigtable Storage</div>
+                    <div class="step-desc">Calculates 64-bit SimHash fingerprint; stores compressed document into Bigtable/S3.</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">Bigtable Put</span>
+                  <span class="latency-badge">&lt; 25ms</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="step-inspector-box" id="crawler-inspector">
+              <div class="inspector-title">🔍 Step Inspector: <span id="crawler-insp-title">Seed URLs & Mercator URL Frontier</span></div>
+              <div id="crawler-insp-desc">URLs are sorted by importance before routing to politeness delay managers.</div>
+              <div class="inspector-grid">
+                <div>
+                  <div class="inspector-section-label">Protocol Payload Sample</div>
+                  <pre class="inspector-code" id="crawler-insp-payload">{"url": "https://wikipedia.org/wiki/System_design", "domain": "wikipedia.org", "depth": 2, "priority": 98}</pre>
+                </div>
+                <div>
+                  <div class="inspector-section-label">Failure Mode & Resiliency</div>
+                  <div class="inspector-code" id="crawler-insp-fail" style="color:var(--accent-amber);">Spider traps (infinite circular paths) are detected by maximum crawl depth limits and URL length filters.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="crawler-frontier" class="sub-content" style="display:none;">
+          <div class="case-desc">
+            <strong>Key Crawler Bottlenecks & Design Solutions:</strong>
+            <ul>
+              <li><strong>Politeness Guarantee:</strong> Mercator Frontier model uses two sets of queues: <em>Priority Queues</em> (PageRank/Freshness) and <em>Politeness Queues</em> (one per domain with delay timer, e.g., $\ge 1\text{s}$ between requests to same domain).</li>
+              <li><strong>URL Deduplication:</strong> Redis Bloom Filter with 10 Billion URL capacity ($\sim 12\text{ GB}$ RAM at $0.1\%$ false positive rate) avoids crawling previously seen URLs.</li>
+              <li><strong>Content Deduplication (SimHash):</strong> Computes 64-bit fingerprint of webpage text tokens. Pages with Hamming distance $\le 3$ are discarded as near-duplicates (mirrors, spam).</li>
+            </ul>
+          </div>
+        </div>
+
+        <div id="crawler-sim" class="sub-content" style="display:none;">
+          <div class="sim-panel">
+            <div class="sim-title">🎯 Live URL Frontier & Politeness Queue Simulator</div>
+            <div class="sim-desc">
+              Observe how URLs from different domains (e.g. `github.com`, `wikipedia.org`, `medium.com`) are routed into dedicated politeness queues with rate delays.
+            </div>
+            <div class="sim-controls">
+              <input type="text" id="crawlUrlInput" class="sim-input" style="width:280px;" placeholder="URL (e.g. https://wikipedia.org/wiki/System)" value="https://wikipedia.org/wiki/System">
+              <button class="sim-btn sim-btn-primary" onclick="enqueueCrawlUrl()">📥 Enqueue URL</button>
+              <button class="sim-btn sim-btn-secondary" onclick="stepCrawlWorker()">🤖 Worker Crawl Step</button>
+            </div>
+            <div id="crawler-queue-display" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin: 14px 0;">
+              <!-- Queues will be rendered dynamically -->
+            </div>
+            <div id="crawler-log" class="log-box">
+              URL Frontier initialized with seed domains.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- CASE STUDY 5: TINYURL SHORTENER -->
+      <!-- ================================================================= -->
+      <div id="cs-tinyurl" class="cs-content-section">
+        <div class="case-title">
+          <span>🔗 TinyURL URL Shortener & Key Generation Service (KGS)</span>
+          <span class="badge-tag pass">Read-Heavy System</span>
+        </div>
+        
+        <div class="sub-tabs">
+          <button class="sub-tab-btn active" onclick="switchSubTab('tinyurl', 'overview', event)">📐 Scale Math & Architecture</button>
+          <button class="sub-tab-btn" onclick="switchSubTab('tinyurl', 'flow', event)">🔄 Interactive Data Flow Pipeline</button>
+          <button class="sub-tab-btn" onclick="switchSubTab('tinyurl', 'base62', event)">🔢 Base62 Encoding & KGS</button>
+          <button class="sub-tab-btn" onclick="switchSubTab('tinyurl', 'sim', event)">🎯 Live KGS & Redirect Simulator</button>
+        </div>
+
+        <div id="tinyurl-overview" class="sub-content">
+          <div class="math-grid">
+            <div class="math-card">
+              <div class="math-card-label">Read:Write Ratio</div>
+              <div class="math-card-val">100 : 1</div>
+              <div class="math-card-detail">10M new URLs/month, 1B redirects/month</div>
+            </div>
+            <div class="math-card">
+              <div class="math-card-label">Read QPS / Write QPS</div>
+              <div class="math-card-val">400 Read / 4 Write</div>
+              <div class="math-card-detail">Peak Read QPS: ~2,000 QPS</div>
+            </div>
+            <div class="math-card">
+              <div class="math-card-label">Total Unique URLs (5 Yrs)</div>
+              <div class="math-card-val">600 Million</div>
+              <div class="math-card-detail">Base62 7-char supports 3.5 Trillion URLs</div>
+            </div>
+            <div class="math-card">
+              <div class="math-card-label">5-Year Storage Size</div>
+              <div class="math-card-val">300 GB</div>
+              <div class="math-card-detail">$600\text{M} \times 500\text{ bytes} \approx 300\text{ GB}$</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="tinyurl-flow" class="sub-content" style="display:none;">
+          <div class="flow-pipeline-container">
+            <div class="flow-header">
+              <div class="flow-header-title">🔄 TinyURL Shortening & Redirect Pipeline</div>
+              <button class="sim-btn sim-btn-primary" onclick="animatePipeline('tinyurl')">🚀 Trace Live Request Flow</button>
+            </div>
+            
+            <div class="pipeline-steps" id="tinyurl-steps">
+              <div class="pipeline-step-card active-step" onclick="inspectStep('tinyurl', 1)" id="tinyurl-step-1">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">1</div>
+                  <div class="step-info">
+                    <div class="step-name">🌐 Edge CloudFront &amp; Load Balancer</div>
+                    <div class="step-desc">Receives short URL redirect request (e.g. <code>https://tiny.url/14q2P9</code>).</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">HTTP/3 CDN</span>
+                  <span class="latency-badge">&lt; 15ms</span>
+                </div>
+              </div>
+
+              <div class="flow-connector"><span class="flow-connector-arrow">▼</span></div>
+
+              <div class="pipeline-step-card" onclick="inspectStep('tinyurl', 2)" id="tinyurl-step-2">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">2</div>
+                  <div class="step-info">
+                    <div class="step-name">⚡ Redis Distributed Cache Check</div>
+                    <div class="step-desc">Checks in-memory key cache. 90% of requests hit cache and return HTTP 301 immediately!</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">Redis GET</span>
+                  <span class="latency-badge">&lt; 1ms</span>
+                </div>
+              </div>
+
+              <div class="flow-connector"><span class="flow-connector-arrow">▼</span></div>
+
+              <div class="pipeline-step-card" onclick="inspectStep('tinyurl', 3)" id="tinyurl-step-3">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">3</div>
+                  <div class="step-info">
+                    <div class="step-name">💾 PostgreSQL Read Replica (On Cache Miss)</div>
+                    <div class="step-desc">On cache miss, queries indexed B+Tree table and lazily populates Redis cache.</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">SQL Indexed</span>
+                  <span class="latency-badge">&lt; 18ms</span>
+                </div>
+              </div>
+
+              <div class="flow-connector"><span class="flow-connector-arrow">▼</span></div>
+
+              <div class="pipeline-step-card" onclick="inspectStep('tinyurl', 4)" id="tinyurl-step-4">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">4</div>
+                  <div class="step-info">
+                    <div class="step-name">🔢 Key Generation Service (For URL Creation)</div>
+                    <div class="step-desc">Pre-generates Base62 unique 7-char keys from allocated sequential ranges. Zero collisions.</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">KGS In-Memory</span>
+                  <span class="latency-badge">&lt; 2ms</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="step-inspector-box" id="tinyurl-inspector">
+              <div class="inspector-title">🔍 Step Inspector: <span id="tinyurl-insp-title">Edge CloudFront & Load Balancer</span></div>
+              <div id="tinyurl-insp-desc">Edge layer checks cached 301 redirects to eliminate origin roundtrips for viral links.</div>
+              <div class="inspector-grid">
+                <div>
+                  <div class="inspector-section-label">Protocol Payload Sample</div>
+                  <pre class="inspector-code" id="tinyurl-insp-payload">GET /14q2P9 HTTP/2
+Host: tiny.url
+Response: HTTP 301 Moved Permanently
+Location: https://systemdesign.org/distributed/consensus</pre>
+                </div>
+                <div>
+                  <div class="inspector-section-label">Failure Mode & Resiliency</div>
+                  <div class="inspector-code" id="tinyurl-insp-fail" style="color:var(--accent-amber);">If primary database fails, read replicas continue serving redirects uninterrupted (Read-heavy resilience).</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="tinyurl-base62" class="sub-content" style="display:none;">
+          <div class="case-desc">
+            <strong>Why Not MD5/SHA256 Hash Truncation?</strong> Truncating a hash introduces hash collisions that require database lookup loops and retry penalties.<br>
+            <strong>Key Generation Service (KGS) Pattern:</strong>
+            <ul>
+              <li>KGS generates unique integer IDs via distributed range allocation (e.g. Server 1 gets <code>1-1,000,000</code>, Server 2 gets <code>1,000,001-2,000,000</code>).</li>
+              <li>Converts ID into <strong>Base62 string</strong> (<code>0-9, a-z, A-Z</code>). <code>ID 125</code> $\rightarrow$ <code>'21'</code>, <code>ID 987654321</code> $\rightarrow$ <code>'14q2P9'</code>.</li>
+              <li><strong>HTTP 301 vs 302:</strong> <code>301 Permanent Redirect</code> reduces server load (browser caches redirect), while <code>302 Temporary Redirect</code> enables click tracking and analytics.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div id="tinyurl-sim" class="sub-content" style="display:none;">
+          <div class="sim-panel">
+            <div class="sim-title">🎯 Live Base62 KGS & Cache Shortener Simulator</div>
+            <div class="sim-desc">
+              Shorten long URLs to see integer-to-Base62 conversion, followed by testing cache hit vs miss redirect lookups.
+            </div>
+            <div class="sim-controls">
+              <input type="text" id="tinyLongUrl" class="sim-input" style="width:280px;" placeholder="Long URL" value="https://systemdesign.org/distributed/consensus">
+              <button class="sim-btn sim-btn-primary" onclick="createTinyUrl()">✂️ Shorten URL</button>
+              <input type="text" id="tinyCodeInput" class="sim-input" style="width:120px;" placeholder="Tiny Code">
+              <button class="sim-btn sim-btn-secondary" onclick="lookupTinyUrl()">🔍 Lookup / Redirect</button>
+            </div>
+            <div id="tiny-log" class="log-box">
+              KGS Initialized. Next Global Sequence ID: 1000042.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================================================= -->
+      <!-- CASE STUDY 6: WHATSAPP REAL-TIME CHAT -->
+      <!-- ================================================================= -->
       <div id="cs-whatsapp" class="cs-content-section">
-        <h3 class="case-title">WhatsApp Real-Time Chat & Cassandra Persistence</h3>
-        <p class="case-desc">Uses WebSockets for bi-directional real-time messaging, Cassandra for write-heavy chat log storage, and Kafka for message queuing.</p>
-        <div class="arch-flow-diagram">
-CLIENT A (WebSocket) ──► CHAT GATEWAY (Gateway Node) ──► KAFKA TOPIC ("chat-messages")
-                                                              │
-                                     ┌────────────────────────┴────────────────────────┐
-                                     ▼                                                 ▼
-                          APNS / FCM PUSH SERVICE                           CASSANDRA DB SERVICE
-                           (Delivers to Client B)                            (Appends to Message Store)
+        <div class="case-title">
+          <span>💬 WhatsApp Real-Time Chat & Distributed Session Gateway</span>
+          <span class="badge-tag pass">Stateful Real-Time</span>
+        </div>
+        
+        <div class="sub-tabs">
+          <button class="sub-tab-btn active" onclick="switchSubTab('whatsapp', 'overview', event)">📐 Scale Math & Architecture</button>
+          <button class="sub-tab-btn" onclick="switchSubTab('whatsapp', 'flow', event)">🔄 Interactive Data Flow Pipeline</button>
+          <button class="sub-tab-btn" onclick="switchSubTab('whatsapp', 'protocol', event)">📡 WebSocket Session Registry</button>
+          <button class="sub-tab-btn" onclick="switchSubTab('whatsapp', 'sim', event)">🎯 Live Gateway Routing Sim</button>
+        </div>
+
+        <div id="whatsapp-overview" class="sub-content">
+          <div class="math-grid">
+            <div class="math-card">
+              <div class="math-card-label">Daily Active Users (DAU)</div>
+              <div class="math-card-val">500 Million</div>
+              <div class="math-card-detail">100 Billion messages sent per day</div>
+            </div>
+            <div class="math-card">
+              <div class="math-card-label">Peak Message QPS</div>
+              <div class="math-card-val">2.5 Million QPS</div>
+              <div class="math-card-detail">Avg: $1.15\text{M QPS}$, Peak burst: $2.5\text{M QPS}$</div>
+            </div>
+            <div class="math-card">
+              <div class="math-card-label">Concurrent WebSockets</div>
+              <div class="math-card-val">50 Million</div>
+              <div class="math-card-detail">500 Gateway nodes handling 100k conns each</div>
+            </div>
+            <div class="math-card">
+              <div class="math-card-label">Daily Storage (Text)</div>
+              <div class="math-card-val">10 TB / day</div>
+              <div class="math-card-detail">$100\text{B} \times 100\text{ bytes} = 10\text{ TB}$ (Cassandra LSM-Tree)</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="whatsapp-flow" class="sub-content" style="display:none;">
+          <div class="flow-pipeline-container">
+            <div class="flow-header">
+              <div class="flow-header-title">🔄 Real-Time Message Dispatch & Session Routing Pipeline</div>
+              <button class="sim-btn sim-btn-primary" onclick="animatePipeline('whatsapp')">🚀 Trace Live Request Flow</button>
+            </div>
+            
+            <div class="pipeline-steps" id="whatsapp-steps">
+              <div class="pipeline-step-card active-step" onclick="inspectStep('whatsapp', 1)" id="whatsapp-step-1">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">1</div>
+                  <div class="step-info">
+                    <div class="step-name">💬 Alice Client WebSocket Ingestion</div>
+                    <div class="step-desc">Alice sends message frame to sticky connection on Chat Gateway Node #1.</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">WebSocket Frame</span>
+                  <span class="latency-badge">&lt; 10ms</span>
+                </div>
+              </div>
+
+              <div class="flow-connector"><span class="flow-connector-arrow">▼</span></div>
+
+              <div class="pipeline-step-card" onclick="inspectStep('whatsapp', 2)" id="whatsapp-step-2">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">2</div>
+                  <div class="step-info">
+                    <div class="step-name">🗺️ Redis Global Session Registry Lookup</div>
+                    <div class="step-desc">Queries Redis map <code>Bob ➔ Gateway_Node_4</code> to determine recipient connection location.</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">Redis HGET</span>
+                  <span class="latency-badge">&lt; 1ms</span>
+                </div>
+              </div>
+
+              <div class="flow-connector"><span class="flow-connector-arrow">▼</span></div>
+
+              <div class="pipeline-step-card" onclick="inspectStep('whatsapp', 3)" id="whatsapp-step-3">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">3</div>
+                  <div class="step-info">
+                    <div class="step-name">📨 Kafka Chat Stream &amp; Cassandra Store</div>
+                    <div class="step-desc">Publishes message to Kafka; appends to Cassandra partitioned by <code>(chat_id, week)</code>.</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">Cassandra Append</span>
+                  <span class="latency-badge">&lt; 12ms</span>
+                </div>
+              </div>
+
+              <div class="flow-connector"><span class="flow-connector-arrow">▼</span></div>
+
+              <div class="pipeline-step-card" onclick="inspectStep('whatsapp', 4)" id="whatsapp-step-4">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">4</div>
+                  <div class="step-info">
+                    <div class="step-name">📲 Delivery Dispatch (Online Gateway #4 / Offline Push)</div>
+                    <div class="step-desc">If Bob is online, delivers via Gateway #4 socket. If offline, triggers Apple APNS/FCM.</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">Push / WS</span>
+                  <span class="latency-badge">&lt; 15ms</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="step-inspector-box" id="whatsapp-inspector">
+              <div class="inspector-title">🔍 Step Inspector: <span id="whatsapp-insp-title">Alice Client WebSocket Ingestion</span></div>
+              <div id="whatsapp-insp-desc">Lightweight WebSocket connections maintain persistent full-duplex TCP channels with client apps.</div>
+              <div class="inspector-grid">
+                <div>
+                  <div class="inspector-section-label">Protocol Payload Sample</div>
+                  <pre class="inspector-code" id="whatsapp-insp-payload">{"msg_id": "msg_901238", "sender": "usr_alice", "recipient": "usr_bob", "content": "Hey Bob, system is live!", "ts": 1725541200}</pre>
+                </div>
+                <div>
+                  <div class="inspector-section-label">Failure Mode & Resiliency</div>
+                  <div class="inspector-code" id="whatsapp-insp-fail" style="color:var(--accent-amber);">If gateway node crashes, client reconnects to any available gateway; Redis session table self-heals in &lt;500ms.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="whatsapp-protocol" class="sub-content" style="display:none;">
+          <div class="case-desc">
+            <strong>Key Real-Time Architectural Strategies:</strong>
+            <ul>
+              <li><strong>Connection Handling:</strong> Erlang / Go lightweight goroutines holding TCP/WebSocket connections. Memory per connection tuned to $\sim 10\text{ KB}$.</li>
+              <li><strong>Session Routing:</strong> Redis Cluster maintains a global map: <code>user_id ➔ gateway_node_ip</code>.</li>
+              <li><strong>Delivery Receipts:</strong> Double-tick acknowledgment pipeline: <code>Sent ➔ Delivered (Gateway ACK) ➔ Read (Client Render ACK)</code>.</li>
+              <li><strong>Storage Schema:</strong> Apache Cassandra partitioned by <code>(chat_id, bucket_week)</code> with clustering key <code>message_id DESC</code> for lightning-fast history scrolling.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div id="whatsapp-sim" class="sub-content" style="display:none;">
+          <div class="sim-panel">
+            <div class="sim-title">🎯 Live Real-Time WebSocket Gateway Router</div>
+            <div class="sim-desc">
+              Simulate sending a message from Alice to Bob across distributed gateway instances with Redis Session mapping and delivery status progression.
+            </div>
+            <div class="sim-controls">
+              <input type="text" id="chatMsgInput" class="sim-input" style="width:240px;" placeholder="Message text" value="Hey Bob, system is live!">
+              <button class="sim-btn sim-btn-primary" onclick="sendChatMessage()">📤 Send Message (Alice ➔ Bob)</button>
+              <button class="sim-btn sim-btn-secondary" onclick="toggleBobOnline()">🔄 Toggle Bob (Online/Offline)</button>
+            </div>
+            <div id="chat-status-banner" style="margin-bottom:12px; font-size:0.85rem; color:var(--text-muted);">
+              Bob Status: <span id="bob-status-badge" class="badge-tag pass">ONLINE (Gateway #4)</span>
+            </div>
+            <div id="chat-log" class="log-box">
+              Chat session router active. Ready to send messages.
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Case Study 3: Netflix Streaming -->
+      <!-- ================================================================= -->
+      <!-- CASE STUDY 7: NETFLIX VIDEO PIPELINE -->
+      <!-- ================================================================= -->
       <div id="cs-netflix" class="cs-content-section">
-        <h3 class="case-title">Netflix Video Processing & Adaptive Bitrate CDN</h3>
-        <p class="case-desc">Asynchronous video transcoding pipeline splitting uploaded MP4 files into chunks, encoding them into HLS/DASH formats, and distributing to CloudFront/Open Connect CDNs.</p>
-        <div class="arch-flow-diagram">
-VIDEO UPLOAD ──► AWS S3 (Raw MP4) ──► EVENTBRIDGE ──► TRANSCODING WORKER POOL (FFmpeg)
-                                                               │
-                                       ┌───────────────────────┴───────────────────────┐
-                                       ▼                                               ▼
-                           CDN EDGE CACHE (HLS/DASH)                      DYNAMODB METADATA STORE
-                           (Streaming to End User)                        (Chunk Indexing & Subtitles)
+        <div class="case-title">
+          <span>🎬 Netflix Video Transcoding Pipeline & Adaptive Bitrate CDN</span>
+          <span class="badge-tag pass">High-Throughput Streaming</span>
+        </div>
+        
+        <div class="sub-tabs">
+          <button class="sub-tab-btn active" onclick="switchSubTab('netflix', 'overview', event)">📐 Scale Math & Architecture</button>
+          <button class="sub-tab-btn" onclick="switchSubTab('netflix', 'flow', event)">🔄 Interactive Data Flow Pipeline</button>
+          <button class="sub-tab-btn" onclick="switchSubTab('netflix', 'abr', event)">📶 HLS / DASH Transcoding Ladder</button>
+          <button class="sub-tab-btn" onclick="switchSubTab('netflix', 'sim', event)">🎯 Live Video Chunking & CDN Sim</button>
+        </div>
+
+        <div id="netflix-overview" class="sub-content">
+          <div class="math-grid">
+            <div class="math-card">
+              <div class="math-card-label">Active Subscribers</div>
+              <div class="math-card-val">250 Million</div>
+              <div class="math-card-detail">Peak stream concurrency: 20 Million streams</div>
+            </div>
+            <div class="math-card">
+              <div class="math-card-label">Peak CDN Outbound Bandwidth</div>
+              <div class="math-card-val">100 Terabits / sec</div>
+              <div class="math-card-detail">$20\text{M streams} \times 5\text{ Mbps avg} = 100\text{ Tbps}$</div>
+            </div>
+            <div class="math-card">
+              <div class="math-card-label">Transcoding Profiles</div>
+              <div class="math-card-val">1,200 Files / Title</div>
+              <div class="math-card-detail">Bitrate ladders $\times$ Codecs (AV1, HEVC, H.264) $\times$ Audio</div>
+            </div>
+            <div class="math-card">
+              <div class="math-card-label">Edge Cache Hit Ratio</div>
+              <div class="math-card-val">&gt; 95%</div>
+              <div class="math-card-detail">Open Connect CDN appliances placed inside ISP networks</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="netflix-flow" class="sub-content" style="display:none;">
+          <div class="flow-pipeline-container">
+            <div class="flow-header">
+              <div class="flow-header-title">🔄 Video Ingestion, Transcoding & CDN Delivery Pipeline</div>
+              <button class="sim-btn sim-btn-primary" onclick="animatePipeline('netflix')">🚀 Trace Live Request Flow</button>
+            </div>
+            
+            <div class="pipeline-steps" id="netflix-steps">
+              <div class="pipeline-step-card active-step" onclick="inspectStep('netflix', 1)" id="netflix-step-1">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">1</div>
+                  <div class="step-info">
+                    <div class="step-name">📹 Raw Mezzanine Video Upload</div>
+                    <div class="step-desc">Studio master (ProRes 422, ~500 GB) uploaded to AWS S3 Mezzanine Bucket.</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">S3 Multipart</span>
+                  <span class="latency-badge">&lt; 100MB/s</span>
+                </div>
+              </div>
+
+              <div class="flow-connector"><span class="flow-connector-arrow">▼</span></div>
+
+              <div class="pipeline-step-card" onclick="inspectStep('netflix', 2)" id="netflix-step-2">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">2</div>
+                  <div class="step-info">
+                    <div class="step-name">⚡ EventBridge &amp; GOP Chunk Splitter</div>
+                    <div class="step-desc">S3 event triggers Archer service to split movie into uniform 5-second GOP chunks.</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">EventBridge SQS</span>
+                  <span class="latency-badge">&lt; 50ms</span>
+                </div>
+              </div>
+
+              <div class="flow-connector"><span class="flow-connector-arrow">▼</span></div>
+
+              <div class="pipeline-step-card" onclick="inspectStep('netflix', 3)" id="netflix-step-3">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">3</div>
+                  <div class="step-info">
+                    <div class="step-name">⚙️ Parallel FFmpeg Worker Pool (ECS / Spot Fleet)</div>
+                    <div class="step-desc">Thousands of spot instances encode chunks into bitrate ladder (4K, 1080p, 720p, 480p).</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">Parallel FFmpeg</span>
+                  <span class="latency-badge">Fast Spot Pool</span>
+                </div>
+              </div>
+
+              <div class="flow-connector"><span class="flow-connector-arrow">▼</span></div>
+
+              <div class="pipeline-step-card" onclick="inspectStep('netflix', 4)" id="netflix-step-4">
+                <div class="pipeline-step-left">
+                  <div class="step-num-badge">4</div>
+                  <div class="step-info">
+                    <div class="step-name">📄 Master Manifest Generator &amp; Open Connect CDN Sync</div>
+                    <div class="step-desc">Generates <code>manifest.m3u8</code> and pre-populates Open Connect CDN caches inside ISP networks.</div>
+                  </div>
+                </div>
+                <div class="pipeline-step-right">
+                  <span class="proto-badge">HLS / DASH Edge</span>
+                  <span class="latency-badge">&gt; 95% Cache Hit</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="step-inspector-box" id="netflix-inspector">
+              <div class="inspector-title">🔍 Step Inspector: <span id="netflix-insp-title">Raw Mezzanine Video Upload</span></div>
+              <div id="netflix-insp-desc">Studios ingest master ProRes high-bitrate video assets directly into cloud object storage.</div>
+              <div class="inspector-grid">
+                <div>
+                  <div class="inspector-section-label">Protocol Payload Sample</div>
+                  <pre class="inspector-code" id="netflix-insp-payload">{"asset_id": "mov_stranger_things_s5e1", "codec": "ProRes_422", "resolution": "3840x2160", "duration_sec": 3600}</pre>
+                </div>
+                <div>
+                  <div class="inspector-section-label">Failure Mode & Resiliency</div>
+                  <div class="inspector-code" id="netflix-insp-fail" style="color:var(--accent-amber);">If spot instance worker is reclaimed mid-encode, SQS visibility timeout automatically re-dispatches chunk.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="netflix-abr" class="sub-content" style="display:none;">
+          <div class="case-desc">
+            <strong>Adaptive Bitrate Streaming (ABR) Mechanics:</strong>
+            <ul>
+              <li><strong>Chunking:</strong> Raw source video split into uniform 2-second or 5-second GOP (Group of Pictures) chunks.</li>
+              <li><strong>Manifest Generation:</strong> Creates Master <code>.m3u8</code> (HLS) or <code>.mpd</code> (DASH) files linking bitrates: 4K (16 Mbps), 1080p (5 Mbps), 720p (2.5 Mbps), 480p (1 Mbps).</li>
+              <li><strong>Client-Side Adaptation:</strong> Video player measures buffer health and download latency; switches bitrates mid-stream seamlessly without stalling!</li>
+            </ul>
+          </div>
+        </div>
+
+        <div id="netflix-sim" class="sub-content" style="display:none;">
+          <div class="sim-panel">
+            <div class="sim-title">🎯 Live Video Chunk Splitter & ABR Transcoding Simulator</div>
+            <div class="sim-desc">
+              Watch a 30-second raw movie clip split into 5-second chunks and transcoded concurrently into HLS 4K, 1080p, and 720p bitrates.
+            </div>
+            <div class="sim-controls">
+              <button class="sim-btn sim-btn-primary" onclick="startTranscodePipeline()">🎬 Start Transcoding Pipeline</button>
+              <button class="sim-btn sim-btn-secondary" onclick="resetTranscodePipeline()">🔄 Reset</button>
+            </div>
+            <div id="transcode-grid" style="display:grid; grid-template-columns: repeat(6, 1fr); gap:8px; margin: 16px 0;">
+              <!-- Chunks will be dynamically rendered -->
+            </div>
+            <div id="netflix-log" class="log-box">
+              Video Transcoding Engine idle. Ready to process raw mezzanine source.
+            </div>
+          </div>
         </div>
       </div>
 
@@ -145,6 +1424,7 @@ VIDEO UPLOAD ──► AWS S3 (Raw MP4) ──► EVENTBRIDGE ──► TRANSCOD
   </div>
 
   <script>
+    // --- MAIN NAVIGATION HANDLERS ---
     function switchCaseStudy(csId, e) {
       document.querySelectorAll('.cs-tab-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.cs-content-section').forEach(sec => sec.classList.remove('active'));
@@ -152,6 +1432,11 @@ VIDEO UPLOAD ──► AWS S3 (Raw MP4) ──► EVENTBRIDGE ──► TRANSCOD
       if (e && e.currentTarget) e.currentTarget.classList.add('active');
       const targetSec = document.getElementById('cs-' + csId);
       if (targetSec) targetSec.classList.add('active');
+
+      if (csId === 'uber') initUberGrid();
+      if (csId === 'scheduler') initTimeWheel();
+      if (csId === 'crawler') renderCrawlerQueues();
+      if (csId === 'netflix') resetTranscodePipeline();
     }
 
     function switchSubTab(csId, subId, e) {
@@ -163,6 +1448,549 @@ VIDEO UPLOAD ──► AWS S3 (Raw MP4) ──► EVENTBRIDGE ──► TRANSCOD
       if (e && e.currentTarget) e.currentTarget.classList.add('active');
       const targetSub = document.getElementById(csId + '-' + subId);
       if (targetSub) targetSub.style.display = 'block';
+
+      if (csId === 'uber' && subId === 'sim') setTimeout(initUberGrid, 100);
+      if (csId === 'scheduler' && subId === 'sim') setTimeout(initTimeWheel, 100);
+      if (csId === 'crawler' && subId === 'sim') setTimeout(renderCrawlerQueues, 100);
+      if (csId === 'netflix' && subId === 'sim') setTimeout(resetTranscodePipeline, 100);
+    }
+
+    // =================================================================
+    // STEP INSPECTOR DATA & METHODS
+    // =================================================================
+    const stepData = {
+      uber: {
+        1: { title: "Driver GPS Telemetry Ingestion", desc: "Drivers transmit micro-payloads containing device ID, current coordinates, and timestamp over sticky WebSocket connections.", payload: '{"driver_id": "drv_8941", "lat": 37.7749, "lon": -122.4194, "bearing": 184.2, "speed_mph": 28.5, "ts": 1725538800}', fail: "If driver loses cell signal, Redis key auto-expires in 15 seconds. Matching engine gracefully excludes stale driver." },
+        2: { title: "Netty Gateway & Ingestion Service", desc: "Terminates stateful TCP sessions and computes Uber H3 Resolution 8 cell index in <3ms.", payload: '{"h3_cell": "8828308281fffff", "driver_id": "drv_8941", "status": "AVAILABLE"}', fail: "Load balancers distribute connections across 200 Netty nodes with round-robin TLS resumption." },
+        3: { title: "Redis In-Memory Geospatial H3 Index", desc: "Maintains H3 cell sets in memory for lightning fast O(1) concentric circle lookups.", payload: 'HSET h3:8828308281fffff drv_8941 "37.7749,-122.4194,1725538800"', fail: "Redis Cluster with 3-way replication across Availability Zones guarantees zero downtime." },
+        4: { title: "Kafka Stream & Apache Flink Surge Engine", desc: "Streams location pings to compute dynamic supply/demand density multipliers.", payload: '{"cell_id": "8828308281fffff", "demand_qps": 84, "supply_count": 12, "surge_multiplier": 1.85}', fail: "Flink checkpointing guarantees exactly-once state calculation during node failure." },
+        5: { title: "Ride Matching & Bipartite Dispatch Engine", desc: "Finds best driver within expanding concentric rings (r=0, 1, 2) and dispatches push notification.", payload: '{"match_id": "mtc_0029", "rider_id": "usr_77", "driver_id": "drv_8941", "eta_min": 2.1}', fail: "If driver rejects offer within 15s timeout, offer cascades to next nearest candidate in matching pool." }
+      },
+      flashsale: {
+        1: { title: "NGINX / Cloudflare Edge Rate Limiter", desc: "Token bucket filter drops 80% invalid/bot burst traffic before hitting origin.", payload: 'POST /api/v1/flashsale/reserve HTTP/2\nHeaders: { "X-User-Id": "usr_9912", "Idempotency-Key": "req_uuid_8841" }\nBody: { "sku_id": "iphone16_256gb", "qty": 1 }', fail: "Rate limiters shed excessive traffic gracefully with HTTP 429 without loading backend pods." },
+        2: { title: "Flash Sale Inventory Service (Go / .NET)", desc: "Stateless microservice that executes atomic Redis Lua scripts via connection pools.", payload: '{"sku": "iphone16_256gb", "user": "usr_9912", "requested": 1}', fail: "Circuit breakers trip if Redis latency exceeds 20ms, shedding traffic to prevent cascading failures." },
+        3: { title: "Redis In-Memory Atomic Lua Execution", desc: "Executes atomic inventory deduction and user deduplication in a single thread tick.", payload: 'EVALSHA <sha_hash> 2 flash_stock:iphone16 flash_users:iphone16 usr_9912 1', fail: "Sentinel automatically promotes replica to primary in <3s with zero inventory corruption." },
+        4: { title: "Kafka Queue (orders_to_create)", desc: "Buffers successful reservations for asynchronous persistence.", payload: '{"reservation_id": "res_881", "user_id": "usr_9912", "sku": "iphone16_256gb", "ts": 1725539000}', fail: "Kafka partition replication factor 3 guarantees no message loss on broker crash." },
+        5: { title: "Async Order Worker & Primary RDBMS", desc: "Batches orders into PostgreSQL in bulk without table locking.", payload: 'INSERT INTO orders (id, user_id, sku, status) VALUES ... ON CONFLICT DO NOTHING;', fail: "Worker retries failed DB writes with exponential backoff and dead-letter queuing." }
+      },
+      scheduler: {
+        1: { title: "Client Task Submission API", desc: "Accepts delayed execution payloads with execution timestamp (t + Delta t).", payload: '{"task_id": "tsk_44910", "type": "EMAIL_REMINDER", "run_at": 1725540000, "max_retries": 3, "fencing_token": 104}', fail: "Idempotency keys prevent duplicate task registrations." },
+        2: { title: "Durable Task Metadata Store", desc: "Persists task payload and state into PostgreSQL / DynamoDB with status SCHEDULED.", payload: 'INSERT INTO scheduled_tasks (id, payload, run_at, state) VALUES ("tsk_44910", ..., 1725540000, "SCHEDULED");', fail: "Multi-AZ database ensures task durability even during complete data center outage." },
+        3: { title: "Raft Leader & Hierarchical Time Wheel", desc: "Loads active 1-hour execution window into in-memory circular time wheel with O(1) tick lookup.", payload: 'TimeWheel.Insert(slot = (target_sec - current_sec) % 60, task_id = "tsk_44910")', fail: "If Leader node crashes, Raft elects new leader and reloads Time Wheel from DB in <1s." },
+        4: { title: "Redis Delayed Queue / Kafka Dispatcher", desc: "Pushes task into worker execution partition topic with monotonic fencing token.", payload: '{"task_id": "tsk_44910", "fencing_token": 105, "dispatched_at": 1725540000}', fail: "Fencing tokens reject delayed stale messages from zombie leader nodes." },
+        5: { title: "Distributed Worker Fleet & Heartbeat Monitor", desc: "Workers execute idempotent job; Heartbeat monitor reclaims task if worker crashes.", payload: '{"worker_id": "wrk_04", "status": "COMPLETED", "execution_time_ms": 142}', fail: "Heartbeat monitor detects dead workers in 10s and re-queues unfinished tasks." }
+      },
+      crawler: {
+        1: { title: "Seed URLs & Mercator URL Frontier", desc: "Prioritizes URLs based on PageRank and domain freshness schedule.", payload: '{"url": "https://wikipedia.org/wiki/System_design", "domain": "wikipedia.org", "depth": 2, "priority": 98}', fail: "Spider traps (infinite circular paths) are detected by maximum crawl depth limits and URL length filters." },
+        2: { title: "Domain Politeness Queues & Delays", desc: "Hashes domain name to dedicated queue; enforces >= 1s delay between host hits.", payload: 'DomainQueue["wikipedia.org"].Enqueue("/wiki/System_design"); LastRequestTime = NOW()', fail: "Domain rate limiter prevents getting IP-banned by target hosts." },
+        3: { title: "Fetcher Worker Fleet (DNS & Robots Cache)", desc: "Downloads raw HTML with fast DNS cache and cached robots.txt permission rules.", payload: 'GET /wiki/System_design HTTP/1.1\nHost: wikipedia.org\nUser-Agent: Googlebot/2.1', fail: "HTTP timeouts set to 3s to prevent slow-loris server hangs." },
+        4: { title: "HTML Parser & Bloom Filter URL Dedup", desc: "Extracts outbound hyperlinks; filters seen links via Redis Bloom filter (0.1% false positive).", payload: 'BloomFilter.Add("https://wikipedia.org/wiki/Distributed_computing") ➔ FALSE (New URL)', fail: "Bloom filter state backed by Redis cluster with Snappy compression." },
+        5: { title: "SimHash Near-Dedup & Bigtable Storage", desc: "Calculates 64-bit SimHash fingerprint; stores compressed document into Bigtable/S3.", payload: '{"simhash": "0x4A8F91B2", "hamming_dist": 5, "status": "UNIQUE_SAVED"}', fail: "Near-duplicates (Hamming dist <= 3) are automatically discarded to save petabytes of storage." }
+      },
+      tinyurl: {
+        1: { title: "Edge CloudFront & Load Balancer", desc: "Receives short URL redirect request (e.g. https://tiny.url/14q2P9).", payload: 'GET /14q2P9 HTTP/2\nHost: tiny.url\nResponse: HTTP 301 Moved Permanently\nLocation: https://systemdesign.org/distributed/consensus', fail: "Edge layer checks cached 301 redirects to eliminate origin roundtrips for viral links." },
+        2: { title: "Redis Distributed Cache Check", desc: "Checks in-memory key cache. 90% of requests hit cache and return HTTP 301 immediately!", payload: 'GET tiny_key:14q2P9 ➔ "https://systemdesign.org/distributed/consensus"', fail: "LRU eviction policy discards cold URLs when memory exceeds 80% capacity." },
+        3: { title: "PostgreSQL Read Replica (On Cache Miss)", desc: "On cache miss, queries indexed B+Tree table and lazily populates Redis cache.", payload: 'SELECT target_url FROM url_mappings WHERE short_code = "14q2P9" LIMIT 1;', fail: "If primary database fails, read replicas continue serving redirects uninterrupted." },
+        4: { title: "Key Generation Service (For URL Creation)", desc: "Pre-generates Base62 unique 7-char keys from allocated sequential ranges. Zero collisions.", payload: 'KGS.GetNextKey() ➔ 1000043 ➔ Base62: "14q2PA"', fail: "Each KGS node maintains 10,000 keys in memory buffer for zero-latency response." }
+      },
+      whatsapp: {
+        1: { title: "Alice Client WebSocket Ingestion", desc: "Alice sends message frame to sticky connection on Chat Gateway Node #1.", payload: '{"msg_id": "msg_901238", "sender": "usr_alice", "recipient": "usr_bob", "content": "Hey Bob, system is live!", "ts": 1725541200}', fail: "Lightweight WebSocket connections maintain persistent full-duplex TCP channels with client apps." },
+        2: { title: "Redis Global Session Registry Lookup", desc: "Queries Redis map Bob ➔ Gateway_Node_4 to determine recipient connection location.", payload: 'HGET active_sessions usr_bob ➔ "gateway_node_4:8080"', fail: "If gateway node crashes, client reconnects to any available gateway; Redis session table self-heals in <500ms." },
+        3: { title: "Kafka Chat Stream & Cassandra Store", desc: "Publishes message to Kafka; appends to Cassandra partitioned by (chat_id, week).", payload: 'INSERT INTO chat_messages (chat_id, bucket_week, message_id, content) VALUES ...', fail: "Cassandra LSM-Tree provides fast sequential write performance for billions of messages." },
+        4: { title: "Delivery Dispatch (Online Gateway #4 / Offline Push)", desc: "If Bob is online, delivers via Gateway #4 socket. If offline, triggers Apple APNS/FCM.", payload: '{"action": "PUSH_NOTIFICATION", "target": "device_token_bob_iphone", "badge": 1}', fail: "Offline sync queues deliver backlog automatically when Bob reconnects." }
+      },
+      netflix: {
+        1: { title: "Raw Mezzanine Video Upload", desc: "Studio master (ProRes 422, ~500 GB) uploaded to AWS S3 Mezzanine Bucket.", payload: '{"asset_id": "mov_stranger_things_s5e1", "codec": "ProRes_422", "resolution": "3840x2160", "duration_sec": 3600}', fail: "Studios ingest master ProRes high-bitrate video assets directly into cloud object storage." },
+        2: { title: "EventBridge & GOP Chunk Splitter", desc: "S3 event triggers Archer service to split movie into uniform 5-second GOP chunks.", payload: '{"event": "SPLIT_CHUNKS", "chunk_duration_sec": 5, "total_chunks": 720}', fail: "SQS dead-letter queues capture failed split events for automatic worker retries." },
+        3: { title: "Parallel FFmpeg Worker Pool (ECS / Spot Fleet)", desc: "Thousands of spot instances encode chunks into bitrate ladder (4K, 1080p, 720p, 480p).", payload: 'ffmpeg -i chunk_001.raw -c:v libx265 -b:v 16000k -s 3840x2160 chunk_001_4k.mp4', fail: "If spot instance worker is reclaimed mid-encode, SQS visibility timeout automatically re-dispatches chunk." },
+        4: { title: "Master Manifest Generator & Open Connect CDN Sync", desc: "Generates manifest.m3u8 and pre-populates Open Connect CDN caches inside ISP networks.", payload: 'Master HLS Manifest: #EXT-X-STREAM-INF:BANDWIDTH=16000000,RESOLUTION=3840x2160\n4k.m3u8', fail: "Open Connect CDN edge caches 95%+ of video traffic directly inside ISP exchanges." }
+      }
+    };
+
+    function inspectStep(csId, stepNum) {
+      const container = document.getElementById(csId + '-steps');
+      if (!container) return;
+      container.querySelectorAll('.pipeline-step-card').forEach(c => c.classList.remove('active-step'));
+      const targetCard = document.getElementById(`${csId}-step-${stepNum}`);
+      if (targetCard) targetCard.classList.add('active-step');
+
+      const data = stepData[csId]?.[stepNum];
+      if (!data) return;
+
+      const titleEl = document.getElementById(`${csId}-insp-title`);
+      const descEl = document.getElementById(`${csId}-insp-desc`);
+      const payloadEl = document.getElementById(`${csId}-insp-payload`);
+      const failEl = document.getElementById(`${csId}-insp-fail`);
+
+      if (titleEl) titleEl.textContent = data.title;
+      if (descEl) descEl.textContent = data.desc;
+      if (payloadEl) payloadEl.textContent = data.payload;
+      if (failEl) failEl.textContent = data.fail;
+    }
+
+    function animatePipeline(csId) {
+      const steps = [1, 2, 3, 4, 5];
+      let delay = 0;
+      steps.forEach((s, idx) => {
+        if (stepData[csId]?.[s]) {
+          setTimeout(() => {
+            inspectStep(csId, s);
+          }, delay);
+          delay += 800;
+        }
+      });
+    }
+
+    // =================================================================
+    // 1. UBER H3 CANVAS VISUALIZER
+    // =================================================================
+    const drivers = [
+      { x: 180, y: 110, id: 'D1' },
+      { x: 260, y: 100, id: 'D2' },
+      { x: 190, y: 180, id: 'D3' },
+      { x: 310, y: 160, id: 'D4' },
+      { x: 120, y: 150, id: 'D5' },
+      { x: 270, y: 220, id: 'D6' }
+    ];
+    let rider = { x: 230, y: 130 };
+
+    function drawHex(ctx, x, y, r, strokeColor, fillColor) {
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const angle = (Math.PI / 3) * i;
+        const hx = x + r * Math.cos(angle);
+        const hy = y + r * Math.sin(angle);
+        if (i === 0) ctx.moveTo(hx, hy);
+        else ctx.lineTo(hx, hy);
+      }
+      ctx.closePath();
+      if (fillColor) { ctx.fillStyle = fillColor; ctx.fill(); }
+      ctx.strokeStyle = strokeColor;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+
+    function initUberGrid() {
+      const canvas = document.getElementById('uberCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const hexR = 30;
+      const hDist = hexR * Math.sqrt(3);
+      for (let row = 0; row < 5; row++) {
+        for (let col = 0; col < 9; col++) {
+          const cx = col * hDist + ((row % 2) * hDist / 2);
+          const cy = row * hexR * 1.5 + 20;
+          drawHex(ctx, cx, cy, hexR, 'rgba(148, 163, 184, 0.2)', null);
+        }
+      }
+
+      drivers.forEach(d => {
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = '#10b981';
+        ctx.fill();
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '10px monospace';
+        ctx.fillText(d.id, d.x + 8, d.y + 4);
+      });
+
+      ctx.beginPath();
+      ctx.arc(rider.x, rider.y, 7, 0, Math.PI * 2);
+      ctx.fillStyle = '#6366f1';
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText('Rider', rider.x - 14, rider.y - 12);
+    }
+
+    function simulateUberMatch() {
+      const canvas = document.getElementById('uberCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      initUberGrid();
+
+      ctx.beginPath();
+      ctx.arc(rider.x, rider.y, 45, 0, Math.PI * 2);
+      ctx.strokeStyle = '#6366f1';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([4, 4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      let closest = null;
+      let minD = Infinity;
+      drivers.forEach(d => {
+        const dist = Math.hypot(d.x - rider.x, d.y - rider.y);
+        if (dist < minD) { minD = dist; closest = d; }
+      });
+
+      if (closest) {
+        ctx.beginPath();
+        ctx.moveTo(rider.x, rider.y);
+        ctx.lineTo(closest.x, closest.y);
+        ctx.strokeStyle = '#10b981';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        document.getElementById('uber-log').innerHTML = `🎉 <strong>Match Dispatched!</strong> Rider at (230, 130) matched to <strong>Driver ${closest.id}</strong> in adjacent Hex Cell (Distance: ${Math.round(minD * 10)}m, ETA: 2.1 mins).`;
+      }
+    }
+
+    // =================================================================
+    // 2. FLASH SALE SIMULATOR
+    // =================================================================
+    let fsStock = 20;
+    let fsOrders = 0;
+
+    function resetFlashSale() {
+      fsStock = 20;
+      fsOrders = 0;
+      document.getElementById('fs-stock').textContent = fsStock;
+      document.getElementById('fs-stock').style.color = 'var(--accent-emerald)';
+      document.getElementById('fs-orders').textContent = fsOrders;
+      document.getElementById('fs-log').textContent = 'Inventory reset to 20 units.';
+    }
+
+    function runFlashSale(isAtomicLua) {
+      resetFlashSale();
+      const log = document.getElementById('fs-log');
+      log.innerHTML = `🚀 Simulating 100 concurrent checkout requests...`;
+
+      if (isAtomicLua) {
+        let successful = 0;
+        let rejected = 0;
+        for (let i = 0; i < 100; i++) {
+          if (fsStock > 0) {
+            fsStock--;
+            successful++;
+          } else {
+            rejected++;
+          }
+        }
+        fsOrders = successful;
+        document.getElementById('fs-stock').textContent = fsStock;
+        document.getElementById('fs-orders').textContent = fsOrders;
+        log.innerHTML = `✅ <strong>Atomic Redis Lua Success:</strong> Exactly <strong>${successful}</strong> orders placed. <strong>${rejected}</strong> excess requests safely rejected with HTTP 410 (Sold Out). <strong>0 Overselling</strong>.`;
+      } else {
+        fsOrders = 38;
+        fsStock = -18;
+        document.getElementById('fs-stock').textContent = fsStock;
+        document.getElementById('fs-stock').style.color = 'var(--accent-rose)';
+        document.getElementById('fs-orders').textContent = fsOrders;
+        log.innerHTML = `❌ <strong>CRITICAL BUG (Race Condition):</strong> Unlocked DB reads caused <strong>${fsOrders} orders</strong> to be placed for only 20 units! Inventory dropped to <strong>-18 (Oversold)</strong>!`;
+      }
+    }
+
+    // =================================================================
+    // 3. TIME WHEEL SIMULATOR
+    // =================================================================
+    let timeWheelSlots = Array.from({ length: 8 }, () => []);
+    let currentSlot = 0;
+    let isTicking = false;
+    let tickTimer = null;
+
+    function initTimeWheel() {
+      const canvas = document.getElementById('timeWheelCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      const radius = 90;
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.strokeStyle = 'var(--border-color)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      for (let i = 0; i < 8; i++) {
+        const angle = (Math.PI / 4) * i - Math.PI / 2;
+        const sx = cx + radius * Math.cos(angle);
+        const sy = cy + radius * Math.sin(angle);
+
+        ctx.beginPath();
+        ctx.arc(sx, sy, 16, 0, Math.PI * 2);
+        ctx.fillStyle = (i === currentSlot) ? 'rgba(99, 102, 241, 0.35)' : 'var(--bg-card)';
+        ctx.fill();
+        ctx.strokeStyle = (i === currentSlot) ? '#6366f1' : 'var(--border-color)';
+        ctx.lineWidth = (i === currentSlot) ? 2.5 : 1;
+        ctx.stroke();
+
+        ctx.fillStyle = (i === currentSlot) ? '#6366f1' : 'var(--text-muted)';
+        ctx.font = 'bold 11px monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(`S${i}`, sx, sy);
+
+        if (timeWheelSlots[i].length > 0) {
+          ctx.beginPath();
+          ctx.arc(sx + 10, sy - 10, 8, 0, Math.PI * 2);
+          ctx.fillStyle = '#10b981';
+          ctx.fill();
+          ctx.fillStyle = '#fff';
+          ctx.font = 'bold 9px sans-serif';
+          ctx.fillText(timeWheelSlots[i].length, sx + 10, sy - 10);
+        }
+      }
+
+      const curAngle = (Math.PI / 4) * currentSlot - Math.PI / 2;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + (radius - 22) * Math.cos(curAngle), cy + (radius - 22) * Math.sin(curAngle));
+      ctx.strokeStyle = '#6366f1';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+      ctx.fillStyle = '#6366f1';
+      ctx.fill();
+    }
+
+    function addScheduledTask() {
+      const name = document.getElementById('schedTaskName').value || 'Task';
+      const delay = parseInt(document.getElementById('schedDelay').value) || 1;
+      const targetSlot = (currentSlot + delay) % 8;
+      timeWheelSlots[targetSlot].push(name);
+      initTimeWheel();
+      document.getElementById('sched-log').innerHTML = `📥 Task <strong>${name}</strong> scheduled with ${delay}s delay into <strong>Slot S${targetSlot}</strong>.`;
+    }
+
+    function toggleTimeWheel() {
+      const btn = document.getElementById('schedTickBtn');
+      if (isTicking) {
+        clearInterval(tickTimer);
+        isTicking = false;
+        btn.textContent = '▶️ Start Clock Tick';
+      } else {
+        isTicking = true;
+        btn.textContent = '⏸️ Pause Clock Tick';
+        tickTimer = setInterval(() => {
+          currentSlot = (currentSlot + 1) % 8;
+          const triggered = timeWheelSlots[currentSlot];
+          timeWheelSlots[currentSlot] = [];
+          initTimeWheel();
+
+          const log = document.getElementById('sched-log');
+          if (triggered.length > 0) {
+            log.innerHTML = `⚡ <strong>Tick Slot S${currentSlot}:</strong> Executed <strong>${triggered.join(', ')}</strong> in O(1) time! Dispatched to worker pool.`;
+          } else {
+            log.innerHTML = `⏰ Tick Slot S${currentSlot}: Slot empty. Clock advancing...`;
+          }
+        }, 1200);
+      }
+    }
+
+    // =================================================================
+    // 4. DISTRIBUTED CRAWLER POLITENESS QUEUES
+    // =================================================================
+    let crawlQueues = {
+      'wikipedia.org': ['/wiki/Distributed_computing', '/wiki/Raft_(algorithm)'],
+      'github.com': ['/torvalds/linux', '/dotnet/runtime'],
+      'medium.com': ['/tech/system-design-primer']
+    };
+
+    function renderCrawlerQueues() {
+      const container = document.getElementById('crawler-queue-display');
+      if (!container) return;
+      container.innerHTML = '';
+
+      Object.entries(crawlQueues).forEach(([domain, urls]) => {
+        const div = document.createElement('div');
+        div.style.background = 'var(--bg-card)';
+        div.style.border = '1px solid var(--border-color)';
+        div.style.borderRadius = 'var(--radius-sm)';
+        div.style.padding = '12px';
+        div.innerHTML = `
+          <div style="font-weight:700; font-size:0.85rem; color:var(--primary); margin-bottom:6px; display:flex; justify-content:space-between;">
+            <span>🌐 ${domain}</span>
+            <span class="badge-tag pass">${urls.length} Queued</span>
+          </div>
+          <div style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted); max-height:80px; overflow-y:auto;">
+            ${urls.map(u => `<div>• ${u}</div>`).join('') || '<div style="color:var(--text-dim); font-style:italic;">Empty Queue</div>'}
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function enqueueCrawlUrl() {
+      const input = document.getElementById('crawlUrlInput');
+      const val = input.value.trim();
+      if (!val) return;
+
+      try {
+        const urlObj = new URL(val);
+        const domain = urlObj.hostname.replace('www.', '');
+        if (!crawlQueues[domain]) crawlQueues[domain] = [];
+        crawlQueues[domain].push(urlObj.pathname || '/');
+        renderCrawlerQueues();
+        document.getElementById('crawler-log').innerHTML = `✅ Added <code>${urlObj.pathname}</code> to <strong>${domain}</strong> politeness queue.`;
+      } catch (err) {
+        document.getElementById('crawler-log').innerHTML = `⚠️ Invalid URL format. Example: https://wikipedia.org/wiki/System`;
+      }
+    }
+
+    function stepCrawlWorker() {
+      const domains = Object.keys(crawlQueues);
+      for (const d of domains) {
+        if (crawlQueues[d].length > 0) {
+          const path = crawlQueues[d].shift();
+          renderCrawlerQueues();
+          document.getElementById('crawler-log').innerHTML = `🤖 <strong>Worker Fetched:</strong> <code>https://${d}${path}</code> (HTTP 200, 142KB). Enqueued 3 discovered child links to Frontier.`;
+          return;
+        }
+      }
+      document.getElementById('crawler-log').innerHTML = `Frontier queues are currently empty.`;
+    }
+
+    // =================================================================
+    // 5. TINYURL KGS SIMULATOR
+    // =================================================================
+    let kgsSeq = 1000042;
+    const tinyDb = {
+      '14q2P9': 'https://systemdesign.org/distributed/consensus'
+    };
+    const tinyCache = new Set(['14q2P9']);
+
+    const BASE62 = "01256789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    function toBase62(num) {
+      let str = "";
+      while (num > 0) {
+        str = BASE62[num % 62] + str;
+        num = Math.floor(num / 62);
+      }
+      return str || "0";
+    }
+
+    function createTinyUrl() {
+      const longUrl = document.getElementById('tinyLongUrl').value.trim();
+      if (!longUrl) return;
+      kgsSeq++;
+      const code = toBase62(kgsSeq);
+      tinyDb[code] = longUrl;
+      tinyCache.add(code);
+      document.getElementById('tinyCodeInput').value = code;
+      document.getElementById('tiny-log').innerHTML = `🎉 <strong>Short URL Created:</strong> <code>https://tiny.url/${code}</code> (Generated from Global Sequence ID: ${kgsSeq}). Cached in Redis!`;
+    }
+
+    function lookupTinyUrl() {
+      const code = document.getElementById('tinyCodeInput').value.trim();
+      if (!code) return;
+      const log = document.getElementById('tiny-log');
+      if (tinyCache.has(code)) {
+        log.innerHTML = `⚡ <strong>REDIS CACHE HIT (0.8ms):</strong> <code>${code}</code> ➔ Redirecting to <strong>${tinyDb[code]}</strong> (HTTP 301 Permanent Redirect).`;
+      } else if (tinyDb[code]) {
+        tinyCache.add(code);
+        log.innerHTML = `💾 <strong>CACHE MISS ➔ DB LOOKUP (18ms):</strong> <code>${code}</code> retrieved from PostgreSQL replica & populated into Redis Cache. Target: <strong>${tinyDb[code]}</strong>`;
+      } else {
+        log.innerHTML = `❌ <strong>HTTP 404:</strong> Short code <code>${code}</code> does not exist in KGS registry.`;
+      }
+    }
+
+    // =================================================================
+    // 6. WHATSAPP REAL-TIME CHAT SIMULATOR
+    // =================================================================
+    let isBobOnline = true;
+    function toggleBobOnline() {
+      isBobOnline = !isBobOnline;
+      const badge = document.getElementById('bob-status-badge');
+      if (isBobOnline) {
+        badge.className = 'badge-tag pass';
+        badge.textContent = 'ONLINE (Gateway #4)';
+      } else {
+        badge.className = 'badge-tag warn';
+        badge.textContent = 'OFFLINE (Push APNS/FCM Trigger)';
+      }
+    }
+
+    function sendChatMessage() {
+      const msg = document.getElementById('chatMsgInput').value.trim() || 'Hello';
+      const log = document.getElementById('chat-log');
+      if (isBobOnline) {
+        log.innerHTML = `
+          1️⃣ Alice sends WebSocket frame to <strong>Gateway #1</strong>.<br>
+          2️⃣ Gateway #1 looks up Redis Session: <code>Bob ➔ Gateway #4</code>.<br>
+          3️⃣ Gateway #1 publishes to Kafka topic: <code>chat-events</code>.<br>
+          4️⃣ Gateway #4 receives event & forwards to Bob's live WebSocket.<br>
+          ✅ <strong style="color:var(--accent-emerald);">Double Blue Tick (Read Receipt):</strong> "${msg}" delivered in <strong>22ms</strong>!
+        `;
+      } else {
+        log.innerHTML = `
+          1️⃣ Alice sends WebSocket frame to <strong>Gateway #1</strong>.<br>
+          2️⃣ Redis Session lookup returns <code>Bob = OFFLINE</code>.<br>
+          3️⃣ Message appended to <strong>Cassandra Store</strong> (Status: <code>SENT ✓</code>).<br>
+          4️⃣ Dispatched notification payload to <strong>Apple APNS / Google FCM Push Service</strong>.<br>
+          ⚠️ Bob will receive offline sync backlog on next WebSocket reconnect.
+        `;
+      }
+    }
+
+    // =================================================================
+    // 7. NETFLIX VIDEO CHUNKING SIMULATOR
+    // =================================================================
+    function resetTranscodePipeline() {
+      const container = document.getElementById('transcode-grid');
+      if (!container) return;
+      container.innerHTML = '';
+      for (let i = 1; i <= 6; i++) {
+        const div = document.createElement('div');
+        div.id = `chunk-${i}`;
+        div.style.background = 'var(--bg-card)';
+        div.style.border = '1px solid var(--border-color)';
+        div.style.borderRadius = 'var(--radius-sm)';
+        div.style.padding = '10px';
+        div.style.textAlign = 'center';
+        div.innerHTML = `
+          <div style="font-size:0.75rem; color:var(--text-dim);">Chunk #${i} (5s)</div>
+          <div style="font-size:0.82rem; font-weight:700; color:var(--text-muted); margin:4px 0;">IDLE</div>
+          <div style="font-size:0.7rem; color:var(--text-dim);">-</div>
+        `;
+        container.appendChild(div);
+      }
+      document.getElementById('netflix-log').innerHTML = `Pipeline reset. 6 chunks (30s mezzanine video) ready for parallel transcoding.`;
+    }
+
+    function startTranscodePipeline() {
+      resetTranscodePipeline();
+      const log = document.getElementById('netflix-log');
+      log.innerHTML = `🚀 <strong>EventBridge Triggered:</strong> Dispatching 6 parallel FFmpeg transcoding workers across EC2/ECS spot fleet...`;
+
+      for (let i = 1; i <= 6; i++) {
+        setTimeout(() => {
+          const chunk = document.getElementById(`chunk-${i}`);
+          if (chunk) {
+            chunk.style.borderColor = 'var(--primary)';
+            chunk.innerHTML = `
+              <div style="font-size:0.75rem; color:var(--primary);">Chunk #${i} (5s)</div>
+              <div style="font-size:0.82rem; font-weight:700; color:var(--primary); margin:4px 0;">ENCODING</div>
+              <div style="font-size:0.7rem; color:var(--accent-emerald);">4K / 1080p / 720p</div>
+            `;
+          }
+        }, i * 400);
+
+        setTimeout(() => {
+          const chunk = document.getElementById(`chunk-${i}`);
+          if (chunk) {
+            chunk.style.borderColor = 'var(--accent-emerald)';
+            chunk.innerHTML = `
+              <div style="font-size:0.75rem; color:var(--accent-emerald);">Chunk #${i} (5s)</div>
+              <div style="font-size:0.82rem; font-weight:700; color:var(--accent-emerald); margin:4px 0;">READY ✓</div>
+              <div style="font-size:0.7rem; color:var(--text-muted);">CDN Edge Sync</div>
+            `;
+          }
+          if (i === 6) {
+            log.innerHTML = `🎉 <strong>Transcoding Complete:</strong> All 6 chunks encoded into HLS/DASH bitrate ladder and synced to <strong>Open Connect CDN Edges</strong>. Master <code>manifest.m3u8</code> published in <strong>2.4 seconds</strong>!`;
+          }
+        }, i * 400 + 800);
+      }
     }
   </script>
 </body>

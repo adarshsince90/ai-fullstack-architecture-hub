@@ -1456,6 +1456,8 @@ class MasterPrepApp {
 
     let tabId = 'sd-tab-fundamentals';
     if (moduleName === 'hld_framework') tabId = 'sd-tab-hld';
+    if (moduleName === 'storage_and_caching') tabId = 'sd-tab-storage';
+    if (moduleName === 'consensus_and_transactions') tabId = 'sd-tab-consensus';
     if (moduleName === 'architectural_primitives') tabId = 'sd-tab-primitives';
     if (moduleName === 'case_studies') tabId = 'sd-tab-casestudies';
     if (moduleName === 'observability_request_flow') tabId = 'sd-tab-observability';

@@ -601,18 +601,30 @@
   },
   {
     "path": "docs/system_design/architectural_primitives.html",
-    "title": "Architectural Primitives & Interactive Simulators",
+    "title": "Architectural Primitives & Edge Routing Deep Dive",
+    "domainDir": "system_design",
+    "headers": [
+      "1. Rate Limiting Algorithm Comparison Matrix",
+      "2. L4 vs L7 Load Balancers & Edge Gateway Routing",
+      "3. Interactive Token Bucket Rate Limiter",
+      "4. Interactive Consistent Hashing Ring with Virtual Nodes"
+    ]
+  },
+  {
+    "path": "docs/system_design/case_studies.html",
+    "title": "Tier-1 Real-World System Design Case Studies",
     "domainDir": "system_design",
     "headers": []
   },
   {
-    "path": "docs/system_design/case_studies.html",
-    "title": "Real-World System Design Case Studies",
+    "path": "docs/system_design/consensus_and_transactions.html",
+    "title": "Distributed Consensus, Consistency & Transactions",
     "domainDir": "system_design",
     "headers": [
-      "TinyURL Architecture & Base62 Encoding",
-      "WhatsApp Real-Time Chat & Cassandra Persistence",
-      "Netflix Video Processing & Adaptive Bitrate CDN"
+      "1. Consensus Protocols & Tunable Quorum Consistency",
+      "2. Distributed Locks, Fencing Tokens & Dual-Write Mitigation",
+      "3. Interactive Quorum ($N, R, W$) Consistency Simulator",
+      "4. Interactive Orchestrated Saga State Machine & Compensation Rollback"
     ]
   },
   {
@@ -649,6 +661,17 @@
       "13. Synthetics & Real User Monitoring (RUM)",
       "14. Continuous Production Profiling",
       "Architecture Diagram Zoom View"
+    ]
+  },
+  {
+    "path": "docs/system_design/storage_and_caching.html",
+    "title": "Distributed Storage Engines & Advanced Caching Deep Dive",
+    "domainDir": "system_design",
+    "headers": [
+      "1. Storage Engine Fundamentals & Mechanical Sympathy",
+      "2. Distributed Cache Anomalies & Production Mitigations",
+      "3. Interactive Bloom Filter Simulator",
+      "4. Interactive LSM-Tree Step-by-Step Write & Compaction Flow"
     ]
   }
 ]

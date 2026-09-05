@@ -4,7 +4,7 @@
   "description": "Senior & Lead Full-Stack Engineering Master Prep Hub",
   "main": "app.js",
   "scripts": {
-    "test": "node tests/smoke.test.js",
+    "test": "node tests/smoke.test.js && node tests/validate_interactions.js",
     "build:graph": "node scripts/build_graph_topology.js"
   },
   "keywords": [
