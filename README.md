@@ -24,11 +24,15 @@ npx serve .
 ```
 
 Navigate to `http://localhost:3000` to interact with:
+- 🎨 **5-Theme Design Studio**: Zero-overhead CSS custom property themes (`Obsidian Cyber`, `Slate Studio`, `Alpine Nord`, `Warm Paper`, `Tokyo Midnight`) with live switcher dropdown & `Alt+T` cycling shortcut.
+- ⚡ **Universal Command Palette**: Press `⌘K` / `Ctrl+K` or `/` to instantly search and jump across 24 guides, 6 system design cases, 9 simulators, and navigation views.
 - 🗺️ **Master Mind Map**: Dynamic architectural tree spanning all 6 engineering domains.
-- ⚡ **Quick Recap Checklist**: Interactive 292-term knowledge base with state persistence in `localStorage`.
-- 📖 **Embedded Guide Viewer**: Read markdown guides inside the app with dynamic breadcrumb navigation.
+- 🏛️ **Staff System Design Hub**: 5 interactive modules with live capacity calculators, token bucket simulators, case studies, and NOC observability console.
+- 🎯 **Header Mastery Readiness Gauge**: Real-time interview readiness progress pill syncing live with the 292-term recap checklist.
+- 📖 **Enhanced Guide Reader**: Live reading progress scroll tracker, dynamic read-time badges (`⏱️ X min read`), and 1-click code copying (`📋 Copy` → `✅ Copied!`).
+- 🌐 **Interactive Graph Dashboard**: Dynamic physics-driven knowledge graph with multi-axis taxonomy clustering and camera zoom/pan controls.
 - 🎨 **9 Visual Simulators**: Interactive step-by-step visualizers for event loop, fibers, sagas, OAuth2 PKCE, and RAG vector search.
-- 🤖 **BYOK AI Study Assistant**: Bring Your Own Key client-side AI tutor (OpenAI / Gemini direct browser REST API calls).
+- 🤖 **BYOK AI Study Assistant**: Client-side AI tutor with context-aware mentoring (Gemini / OpenAI / Groq / OpenRouter REST API).
 
 ---
 
