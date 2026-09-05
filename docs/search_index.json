@@ -598,5 +598,57 @@
       "Q1: How do you establish enterprise engineering policies for AI coding tools (Copilot, Cursor) to protect IP and prevent security regressions?",
       "Q2: What is the difference between RAG and Model Fine-Tuning, and when do you use each?"
     ]
+  },
+  {
+    "path": "docs/system_design/architectural_primitives.html",
+    "title": "Architectural Primitives & Interactive Simulators",
+    "domainDir": "system_design",
+    "headers": []
+  },
+  {
+    "path": "docs/system_design/case_studies.html",
+    "title": "Real-World System Design Case Studies",
+    "domainDir": "system_design",
+    "headers": [
+      "TinyURL Architecture & Base62 Encoding",
+      "WhatsApp Real-Time Chat & Cassandra Persistence",
+      "Netflix Video Processing & Adaptive Bitrate CDN"
+    ]
+  },
+  {
+    "path": "docs/system_design/fundamentals.html",
+    "title": "System Design Fundamentals & First Principles",
+    "domainDir": "system_design",
+    "headers": []
+  },
+  {
+    "path": "docs/system_design/hld_framework.html",
+    "title": "HLD & LLD Framework Mastery & Back-of-Envelope Calculator",
+    "domainDir": "system_design",
+    "headers": []
+  },
+  {
+    "path": "docs/system_design/observability_request_flow.html",
+    "title": "Enterprise Observability & Request Flow Architecture Guide",
+    "domainDir": "system_design",
+    "headers": [
+      "1. Pillars & Request Layers Overview",
+      "2. High-Level Architecture (HLD)",
+      "3. Unified Lifecycle: How They Work Together",
+      "4. LLD: OS Kernel & Packet Lifecycle",
+      "5. LLD: Edge Processing & Ingress Gateway",
+      "Edge HTTP Header Injection",
+      "6. LLD: Service Mesh & Context Propagation",
+      "7. LLD: App Middleware & OpenTelemetry",
+      "Exposition Endpoint Format (`/metrics`)",
+      "8. LLD: Prometheus Metrics Engine",
+      "9. LLD: Grafana & Alerting",
+      "10. LLD: Logging & ELK Stack",
+      "11. SLO, SLI & SLA Formulations",
+      "12. Database & Cache Observability",
+      "13. Synthetics & Real User Monitoring (RUM)",
+      "14. Continuous Production Profiling",
+      "Architecture Diagram Zoom View"
+    ]
   }
 ]

@@ -1,6 +1,6 @@
 # 🚀 Master Knowledge Base & Content Roadmap
 
-> **System Overview**: 24 Technical Guides • 292 Knowledge Terms • 9 Interactive Visual Simulators • 24 Architectural Code Templates across 6 Core Pillars.
+> **System Overview**: 24 Technical Guides • 292 Knowledge Terms • 9 Visual Simulators • 5 Staff System Design Modules • 24 Architectural Code Templates across 6 Core Pillars.
 
 ---
 
@@ -13,6 +13,10 @@
 ✅ Interactive Progress Tracking Checklist (Saved to localStorage with Real-time Progress Bar)
 ✅ Left Architecture Tree Navigation (with '▸ Headlines' & '▾ Expand' one-glance view)
 ✅ 9 Interactive Engineering Simulators (RAG, Signals, OAuth2 PKCE, .NET DI, Saga, Event Loop, Fiber, Redux, esbuild)
+✅ Staff System Design Hub Complete: 5 Interactive Modules, Visualizers & Math Calculators
+✅ Interactive Graph Topology Dashboard Complete: Physics Engine, Multi-Axis Taxonomies & Responsive Camera
+✅ Multi-Device & Mobile Responsiveness Complete: Off-Canvas Drawer, Snap Rails, Single-Column Stack, Touch Gestures
+✅ Context-Aware BYOK AI Interview Coach Complete: Groq, Gemini, OpenAI, OpenRouter Integration
 ✅ Pillar 1 Complete: 5 In-Depth Guides across Backend & .NET Core
 ✅ Pillar 2 Complete: 4 In-Depth Guides across Distributed Systems & System Design
 ✅ Pillar 3 Complete: 4 In-Depth Guides across Cloud Platforms (AWS/Azure) & DevOps (K8s/Terraform)
@@ -23,7 +27,16 @@
 
 ---
 
-## 🗺️ Detailed Guide Roadmap (6 Core Pillars)
+## 🗺️ Detailed Guide Roadmap (6 Core Pillars & System Design Hub)
+
+### 🏛️ Staff System Design Hub (`docs/system_design/`)
+- [x] `hld_framework.html` - 4-Step HLD Interview Framework, Live Back-of-the-Envelope Capacity Estimator (QPS, Storage, Bandwidth, Memory/Cache), SLA Availability Matrix
+- [x] `fundamentals.html` - System Design Fundamentals: CAP Theorem, PACELC, Latency Numbers Every Programmer Should Know, Consistency Models, ACID vs BASE
+- [x] `architectural_primitives.html` - Architectural Primitives & Interactive Simulators: Token Bucket Rate Limiting, Consistent Hashing Ring with Virtual Nodes, Load Balancers, Caching Patterns
+- [x] `case_studies.html` - Production Case Studies: URL Shortener (TinyURL), Real-Time Chat (WhatsApp), Global Video Streaming (Netflix), Flash Sale / Hot Item Reservation
+- [x] `observability_request_flow.html` - Interactive End-to-End Request Lifecycle & Distributed Tracing Simulator (DNS ➔ CDN ➔ ALB ➔ API Gateway ➔ Service Mesh ➔ Microservices ➔ DB/Cache with OTel, Prometheus, ELK)
+
+---
 
 ### 🧠 Pillar 1: Backend & .NET Core (`guides/01_dotnet_backend/`)
 - [x] `01_csharp_internals.md` - C# 12/13 Internals, CLR Memory, GC Generations, `Span<T>`, RyuJIT
@@ -84,4 +97,5 @@
 | In-Depth Guides (`.md`) | 24 | ✅ All Complete |
 | Code Templates (runnable files) | 24 | ✅ All Complete |
 | Interactive Simulators (`.html`) | 9 | ✅ All Complete |
+| Staff System Design Modules (`.html`) | 5 | ✅ All Complete |
 | Knowledge Base Terms | 292 | ✅ All Complete |

@@ -72,6 +72,18 @@ Navigate to `http://localhost:3000` to interact with:
 - **Azure OpenAI & Semantic Kernel**: Enterprise LLM integration, Microsoft Semantic Kernel SDK native plugins in .NET.
 - **AI-Assisted Engineering**: GitHub Copilot prompt engineering, automated unit test generation, security vulnerability triage workflows.
 
+## 🏛️ Staff System Design Hub & Interactive Architecture Tools
+
+The repository features a dedicated **Staff System Design & Architecture Hub** (`docs/system_design/`) with 5 interactive deep-dive modules and live visualizers:
+
+| Module | Focus Area | Key Visualizations & Tools |
+|---|---|---|
+| 📐 **[4-Step HLD Framework](./docs/system_design/hld_framework.html)** | Interview Methodology | Live Back-of-the-Envelope Math Calculator (QPS, Bandwidth, Storage, RAM, Cache sizing) & SLA Availability Matrix |
+| ⚖️ **[System Design Fundamentals](./docs/system_design/fundamentals.html)** | First Principles | CAP & PACELC Tradeoff Explorer, Latency Numbers comparison, Consistency Models & ACID vs BASE |
+| 🧱 **[Architectural Primitives](./docs/system_design/architectural_primitives.html)** | Scalability Building Blocks | Interactive Token Bucket Rate Limiter, Consistent Hashing Ring with Virtual Nodes, L4/L7 Load Balancers & Caching Patterns |
+| 🏢 **[Real-World Case Studies](./docs/system_design/case_studies.html)** | Enterprise Systems | High-scale blueprints: TinyURL URL Shortener, WhatsApp Real-Time Chat, Netflix Video Streaming & Flash Sale Reservations |
+| 🔍 **[Request Flow & Observability](./docs/system_design/observability_request_flow.html)** | Distributed Tracing | Step-by-step Request Lifecycle simulator (DNS ➔ CDN ➔ ALB ➔ API Gateway ➔ Service Mesh ➔ Microservices ➔ DB) with OpenTelemetry spans, Prometheus metrics & ELK logs |
+
 ---
 
 ## ⚡ Interactive Engineering Simulators
@@ -103,8 +115,16 @@ The repository features 9 standalone client-side visual tools designed to build 
 │
 ├── docs/
 │   ├── mindmap_schema.json                  # Dynamic JSON schema for Mind Map nodes
+│   ├── graph_topology.json                  # Multi-taxonomy physics graph topology
 │   ├── search_index.json                    # Full-text topic search index
-│   └── definitions_schema.json              # 292-term Knowledge Base schema
+│   ├── definitions_schema.json              # 292-term Knowledge Base schema
+│   ├── Definitions.md                       # Comprehensive 292-term recap handbook
+│   └── system_design/                       # 5 Staff System Design Modules
+│       ├── hld_framework.html               # 4-Step HLD framework & Capacity Calculator
+│       ├── fundamentals.html                # CAP/PACELC, Latency & Consistency models
+│       ├── architectural_primitives.html    # Token Bucket & Consistent Hashing Simulators
+│       ├── case_studies.html                # TinyURL, WhatsApp, Netflix, Flash Sale
+│       └── observability_request_flow.html  # End-to-End Request Flow & Distributed Tracing
 │
 ├── guides/                                  # 24 Structured Study Guides by Domain
 │   ├── 01_dotnet_backend/

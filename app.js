@@ -894,8 +894,13 @@ class MasterPrepApp {
     treeContainer.innerHTML = domainHtml;
   }
 
-  // Toggle Global App Navigation Left Sidebar
+  // Toggle Global App Navigation Left Sidebar (Desktop collapse & Mobile off-canvas drawer)
   toggleGlobalSidebar(forceState) {
+    if (window.innerWidth <= 768) {
+      this.toggleMobileSidebar(forceState);
+      return;
+    }
+
     const bodyLayout = document.getElementById('app-layout-body');
     const collapseBtn = document.getElementById('global-sidebar-collapse-btn');
     if (!bodyLayout) return;
@@ -915,7 +920,53 @@ class MasterPrepApp {
     }
   }
 
+  // Mobile Off-Canvas Navigation Drawer Controller
+  toggleMobileSidebar(forceState) {
+    const bodyLayout = document.getElementById('app-layout-body');
+    const backdrop = document.getElementById('sidebar-backdrop');
+    if (!bodyLayout) return;
+
+    const isOpen = bodyLayout.classList.contains('mobile-drawer-open');
+    const shouldOpen = forceState !== undefined ? forceState : !isOpen;
+
+    if (shouldOpen) {
+      bodyLayout.classList.add('mobile-drawer-open');
+      if (backdrop) backdrop.classList.add('active');
+      document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    } else {
+      bodyLayout.classList.remove('mobile-drawer-open');
+      if (backdrop) backdrop.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  }
+
+  closeMobileSidebar() {
+    this.toggleMobileSidebar(false);
+  }
+
+  openMobileSidebar() {
+    this.toggleMobileSidebar(true);
+  }
+
+  // Mobile Toggle for Architecture Tree in Quick Recap View
+  toggleRecapMobileTree() {
+    const treeSidebar = document.getElementById('recap-tree-sidebar');
+    const toggleBtn = document.getElementById('recap-tree-mobile-toggle');
+    if (!treeSidebar) return;
+
+    const isExpanded = treeSidebar.classList.toggle('mobile-expanded');
+    if (toggleBtn) {
+      toggleBtn.classList.toggle('active', isExpanded);
+      const arrow = toggleBtn.querySelector('.recap-tree-toggle-arrow');
+      if (arrow) arrow.textContent = isExpanded ? '▴' : '▾';
+    }
+  }
+
   initGlobalSidebarState() {
+    if (window.innerWidth <= 768) {
+      this.closeMobileSidebar();
+      return;
+    }
     const savedState = localStorage.getItem('global_sidebar_collapsed');
     // Default to open (false) if not explicitly set to 'true'
     const shouldCollapse = savedState === 'true';
@@ -931,6 +982,11 @@ class MasterPrepApp {
   }
 
   updateGlobalNavActive(viewId) {
+    // Auto close mobile drawer on view switch
+    if (window.innerWidth <= 768) {
+      this.closeMobileSidebar();
+    }
+
     const gnavMap = {
       'recap-view': 'gnav-recap',
       'system-design-hub-view': 'gnav-system-design',
@@ -1316,14 +1372,23 @@ class MasterPrepApp {
       this.graphEngine.startAnimation();
     }
 
-    // Restore scroll position when returning from guide; center canvas only on initial load or non-back navigation
+    // Restore scroll position when returning from guide; position view appropriately on initial navigation
     setTimeout(() => {
       if (isBackNavigation && this.guideOrigin === 'graph' && this.guideOriginScrollY) {
         window.scrollTo({ top: this.guideOriginScrollY, behavior: 'smooth' });
       } else {
-        const graphCanvasContainer = document.getElementById('graph-canvas-container');
-        if (graphCanvasContainer) {
-          graphCanvasContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (window.innerWidth <= 768) {
+          const graphView = document.getElementById('graph-dashboard-view');
+          if (graphView) {
+            graphView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        } else {
+          const graphCanvasContainer = document.getElementById('graph-canvas-container');
+          if (graphCanvasContainer) {
+            graphCanvasContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
         }
       }
       if (this.graphEngine) {

@@ -47,6 +47,10 @@ class MindMapGraphEngine {
     this.boundResizeHandler = () => this.resizeCanvas();
     this.boundMouseUpHandler = (e) => this.onMouseUp(e);
 
+    this.hasInitializedCamera = false;
+    this.initialPinchDistance = null;
+    this.initialPinchZoom = null;
+
     this.resizeCanvas();
     window.addEventListener('resize', this.boundResizeHandler);
 
@@ -58,16 +62,30 @@ class MindMapGraphEngine {
   resizeCanvas() {
     const rect = this.container.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
-    this.width = rect.width || window.innerWidth;
-    this.height = Math.max(1400, rect.height || 1400);
+    this.width = this.container.clientWidth || rect.width || window.innerWidth;
+    
+    // Use actual container height on both mobile and desktop
+    const isMobile = this.width <= 768;
+    this.height = this.container.clientHeight || rect.height || (isMobile ? 550 : 1400);
 
     this.canvas.width = this.width * dpr;
     this.canvas.height = this.height * dpr;
     this.canvas.style.width = `${this.width}px`;
     this.canvas.style.height = `${this.height}px`;
 
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform matrix before scaling
     this.ctx.scale(dpr, dpr);
-    if (this.camera.x === 0 && this.camera.y === 0) {
+
+    // Responsive default zoom: On mobile, calculate zoom so all central clusters fit perfectly!
+    const defaultZoom = isMobile ? Math.min(0.38, Math.max(0.25, this.width / 950)) : 0.70;
+
+    if (!this.hasInitializedCamera || (this.camera.x === 0 && this.camera.y === 0)) {
+      this.camera.x = this.width / 2;
+      this.camera.y = this.height / 2;
+      this.camera.zoom = defaultZoom;
+      this.hasInitializedCamera = true;
+    } else if (!this.focusedNode && !this.targetCamera) {
+      // Re-center camera when screen is resized or rotated without active node focus
       this.camera.x = this.width / 2;
       this.camera.y = this.height / 2;
     }
@@ -257,7 +275,9 @@ class MindMapGraphEngine {
   // Smooth Camera Focus Interpolation
   focusOnNode(node) {
     this.focusedNode = node;
-    const targetZoom = Math.max(this.camera.zoom, 1.35);
+    const isMobile = this.width <= 768;
+    const minFocusZoom = isMobile ? 0.90 : 1.35;
+    const targetZoom = Math.max(this.camera.zoom, minFocusZoom);
     this.targetCamera = {
       x: this.width / 2 - node.x * targetZoom,
       y: this.height / 2 - node.y * targetZoom,
@@ -282,10 +302,13 @@ class MindMapGraphEngine {
     const spanX = Math.max(320, maxX - minX);
     const spanY = Math.max(320, maxY - minY);
 
+    const isMobile = this.width <= 768;
     // Calculate ideal zoom so all texts and connections in cluster are 100% clearly visible
-    const idealZoomX = (this.width * 0.72) / spanX;
-    const idealZoomY = (this.height * 0.72) / spanY;
-    const targetZoom = Math.min(1.50, Math.max(1.18, Math.min(idealZoomX, idealZoomY)));
+    const idealZoomX = (this.width * (isMobile ? 0.85 : 0.72)) / spanX;
+    const idealZoomY = (this.height * (isMobile ? 0.85 : 0.72)) / spanY;
+    const maxZoom = isMobile ? 1.05 : 1.50;
+    const minZoom = isMobile ? 0.50 : 1.18;
+    const targetZoom = Math.min(maxZoom, Math.max(minZoom, Math.min(idealZoomX, idealZoomY)));
 
     const dummyNode = { x: avgX, y: avgY };
     this.focusedNode = dummyNode;
@@ -558,7 +581,9 @@ class MindMapGraphEngine {
   resetCamera() {
     this.focusedNode = null;
     this.targetCamera = null;
-    this.camera = { x: this.width / 2, y: this.height / 2, zoom: 0.70 };
+    const isMobile = this.width <= 768;
+    const defaultZoom = isMobile ? Math.min(0.38, Math.max(0.25, this.width / 950)) : 0.70;
+    this.camera = { x: this.width / 2, y: this.height / 2, zoom: defaultZoom };
   }
 
   // Pointer & Camera Interaction
@@ -567,6 +592,87 @@ class MindMapGraphEngine {
     this.canvas.addEventListener('mousemove', (e) => this.onMouseMove(e));
     window.addEventListener('mouseup', this.boundMouseUpHandler);
     this.canvas.addEventListener('wheel', (e) => this.onWheel(e));
+
+    // Touch Gestures for Mobile & Tablets
+    this.canvas.addEventListener('touchstart', (e) => this.onTouchStart(e), { passive: false });
+    this.canvas.addEventListener('touchmove', (e) => this.onTouchMove(e), { passive: false });
+    this.canvas.addEventListener('touchend', (e) => this.onTouchEnd(e), { passive: false });
+    this.canvas.addEventListener('touchcancel', (e) => this.onTouchEnd(e), { passive: false });
+  }
+
+  onTouchStart(e) {
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      const world = this.screenToWorld(touch.clientX, touch.clientY);
+      const hitNode = this.findNodeAt(world.x, world.y);
+
+      this.mouseDownPos = { x: touch.clientX, y: touch.clientY };
+      this.isDraggingNode = false;
+
+      if (hitNode) {
+        this.draggedNode = hitNode;
+      } else {
+        this.isPanning = true;
+        this.panStart = { x: touch.clientX - this.camera.x, y: touch.clientY - this.camera.y };
+      }
+    } else if (e.touches.length === 2) {
+      // Pinch to Zoom
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      this.initialPinchDistance = Math.sqrt(dx * dx + dy * dy);
+      this.initialPinchZoom = this.camera.zoom;
+      this.isPanning = false;
+      this.draggedNode = null;
+    }
+    if (e.cancelable) e.preventDefault();
+  }
+
+  onTouchMove(e) {
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      const world = this.screenToWorld(touch.clientX, touch.clientY);
+
+      if (this.draggedNode) {
+        const dx = touch.clientX - (this.mouseDownPos?.x || 0);
+        const dy = touch.clientY - (this.mouseDownPos?.y || 0);
+        if (Math.sqrt(dx * dx + dy * dy) > 6) {
+          this.isDraggingNode = true;
+          this.draggedNode.x = world.x;
+          this.draggedNode.y = world.y;
+          this.draggedNode.vx = 0;
+          this.draggedNode.vy = 0;
+        }
+      } else if (this.isPanning) {
+        this.camera.x = touch.clientX - this.panStart.x;
+        this.camera.y = touch.clientY - this.panStart.y;
+      }
+    } else if (e.touches.length === 2 && this.initialPinchDistance) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const currentDistance = Math.sqrt(dx * dx + dy * dy);
+      const scaleFactor = currentDistance / this.initialPinchDistance;
+      const newZoom = Math.max(0.20, Math.min(3.0, this.initialPinchZoom * scaleFactor));
+      this.camera.zoom = newZoom;
+    }
+    if (e.cancelable) e.preventDefault();
+  }
+
+  onTouchEnd(e) {
+    if (this.draggedNode) {
+      if (!this.isDraggingNode) {
+        const isAlreadyFocused = (this.focusedNode === this.draggedNode);
+        if (!isAlreadyFocused) {
+          this.focusOnNode(this.draggedNode);
+        } else if (this.options.onNodeClick) {
+          this.options.onNodeClick(this.draggedNode);
+        }
+      }
+    }
+    this.draggedNode = null;
+    this.isDraggingNode = false;
+    this.isPanning = false;
+    this.initialPinchDistance = null;
+    this.initialPinchZoom = null;
   }
 
   screenToWorld(screenX, screenY) {
