@@ -218,11 +218,13 @@
           <p class="section-desc">First-principles basics, interactive capacity calculators, architectural primitives, real-world case studies, and enterprise request flow & observability stack.</p>
           
           <div class="sd-hub-tabs" style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
-            <button class="btn btn-outline sd-module-btn" id="sd-tab-fundamentals" onclick="app.loadSystemDesignModule('fundamentals')">📖 1. Fundamentals</button>
-            <button class="btn btn-primary sd-module-btn" id="sd-tab-hld" onclick="app.loadSystemDesignModule('hld_framework')">📐 2. HLD Framework & Math</button>
-            <button class="btn btn-outline sd-module-btn" id="sd-tab-primitives" onclick="app.loadSystemDesignModule('architectural_primitives')">⚡ 3. Primitives & Simulators</button>
-            <button class="btn btn-outline sd-module-btn" id="sd-tab-casestudies" onclick="app.loadSystemDesignModule('case_studies')">🏛️ 4. Real-World Case Studies</button>
-            <button class="btn btn-outline sd-module-btn" id="sd-tab-observability" onclick="app.loadSystemDesignModule('observability_request_flow')">🔍 5. Request Flow & Observability</button>
+            <button class="btn btn-primary sd-module-btn" id="sd-tab-fundamentals" onclick="app.loadSystemDesignModule('fundamentals')">📖 1. Fundamentals</button>
+            <button class="btn btn-outline sd-module-btn" id="sd-tab-hld" onclick="app.loadSystemDesignModule('hld_framework')">📐 2. HLD Framework & Math</button>
+            <button class="btn btn-outline sd-module-btn" id="sd-tab-storage" onclick="app.loadSystemDesignModule('storage_and_caching')">💾 3. Storage & Caching</button>
+            <button class="btn btn-outline sd-module-btn" id="sd-tab-consensus" onclick="app.loadSystemDesignModule('consensus_and_transactions')">⚖️ 4. Consensus & Transactions</button>
+            <button class="btn btn-outline sd-module-btn" id="sd-tab-primitives" onclick="app.loadSystemDesignModule('architectural_primitives')">⚡ 5. Primitives & Edge</button>
+            <button class="btn btn-outline sd-module-btn" id="sd-tab-casestudies" onclick="app.loadSystemDesignModule('case_studies')">🏛️ 6. Tier-1 Case Studies</button>
+            <button class="btn btn-outline sd-module-btn" id="sd-tab-observability" onclick="app.loadSystemDesignModule('observability_request_flow')">🔍 7. Request Flow & Observability</button>
           </div>
         </div>
 
@@ -709,6 +711,23 @@
         </div>
       </div>
     </div>
+
+    <!-- Simulator Glassmorphic Modal Dialog -->
+    <div id="sim-modal" class="simulator-frame-modal" style="display: none;" onclick="if(event.target===this) app.closeSimulator()">
+      <div class="sim-modal-content">
+        <div class="sim-modal-header">
+          <div class="sim-modal-title-wrap">
+            <button id="sim-modal-return-btn" class="btn btn-sm btn-outline" style="display: none;" onclick="app.closeSimulator()">← Return to Topic</button>
+            <h3 id="sim-modal-title" class="sim-modal-title">Interactive Simulator</h3>
+          </div>
+          <button class="sim-close-btn" onclick="app.closeSimulator()" title="Close Simulator (Esc)">✕</button>
+        </div>
+        <div class="sim-modal-body">
+          <iframe id="sim-iframe" src="" style="width: 100%; height: 100%; border: none;"></iframe>
+        </div>
+      </div>
+    </div>
+
   <!-- Phase 2: Global Universal Command Palette (⌘K / Ctrl+K) -->
   <div class="command-palette-overlay" id="command-palette-modal" onclick="app.closeCommandPaletteOnBackdrop(event)">
     <div class="command-palette-dialog" role="dialog" aria-modal="true" aria-label="Universal Command Palette">

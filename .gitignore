@@ -10,6 +10,8 @@ node_modules/
 # Personal & Confidential Candidate Profile Data
 docs/profile/
 docs/strategy/
+docs/system_design/.scratch/
+docs/system_design/.tmp/
 AGENTS.md
 
 # OS & System Files

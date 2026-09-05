@@ -1,6 +1,6 @@
 # 🚀 Master Knowledge Base & Content Roadmap
 
-> **System Overview**: 24 Technical Guides • 292 Knowledge Terms • 9 Visual Simulators • 5 Staff System Design Modules • 24 Architectural Code Templates across 6 Core Pillars.
+> **System Overview**: 24 Technical Guides • 292 Knowledge Terms • 9 Visual Simulators • 7 Staff System Design Modules • 24 Architectural Code Templates across 6 Core Pillars.
 
 ---
 
@@ -13,7 +13,7 @@
 ✅ Interactive Progress Tracking Checklist (Saved to localStorage with Real-time Progress Bar)
 ✅ Left Architecture Tree Navigation (with '▸ Headlines' & '▾ Expand' one-glance view)
 ✅ 9 Interactive Engineering Simulators (RAG, Signals, OAuth2 PKCE, .NET DI, Saga, Event Loop, Fiber, Redux, esbuild)
-✅ Staff System Design Hub Complete: 5 Interactive Modules, Visualizers & Math Calculators
+✅ Staff System Design Hub Complete: 7 Interactive Deep-Dive Modules, Visualizers & Math Calculators
 ✅ Interactive Graph Topology Dashboard Complete: Physics Engine, Multi-Axis Taxonomies & Responsive Camera
 ✅ Multi-Device & Mobile Responsiveness Complete: Off-Canvas Drawer, Snap Rails, Single-Column Stack, Touch Gestures
 ✅ Context-Aware BYOK AI Interview Coach Complete: Groq, Gemini, OpenAI, OpenRouter Integration
@@ -30,10 +30,12 @@
 ## 🗺️ Detailed Guide Roadmap (6 Core Pillars & System Design Hub)
 
 ### 🏛️ Staff System Design Hub (`docs/system_design/`)
-- [x] `hld_framework.html` - 4-Step HLD Interview Framework, Live Back-of-the-Envelope Capacity Estimator (QPS, Storage, Bandwidth, Memory/Cache), SLA Availability Matrix
 - [x] `fundamentals.html` - System Design Fundamentals: CAP Theorem, PACELC, Latency Numbers Every Programmer Should Know, Consistency Models, ACID vs BASE
-- [x] `architectural_primitives.html` - Architectural Primitives & Interactive Simulators: Token Bucket Rate Limiting, Consistent Hashing Ring with Virtual Nodes, Load Balancers, Caching Patterns
-- [x] `case_studies.html` - Production Case Studies: URL Shortener (TinyURL), Real-Time Chat (WhatsApp), Global Video Streaming (Netflix), Flash Sale / Hot Item Reservation
+- [x] `hld_framework.html` - 4-Step HLD Interview Framework, Live Back-of-the-Envelope Capacity Estimator (QPS, Storage, Bandwidth, Memory/Cache), SLA Availability Matrix
+- [x] `storage_and_caching.html` - Storage Engines (LSM-Trees vs B+Trees), SSTables, Compaction, Bloom Filter Simulator & Distributed Cache Anomaly Mitigation (Thundering Herd, Penetration, Avalanche)
+- [x] `consensus_and_transactions.html` - Distributed Consensus (Raft vs Paxos), Tunable Quorum ($N, R, W$) Simulator, Fencing Tokens & Orchestrated Saga State Machine
+- [x] `architectural_primitives.html` - Architectural Primitives: Rate Limiting Algorithms (Token Bucket, Sliding Window), Consistent Hashing with Virtual Nodes & L4/L7 Load Balancers
+- [x] `case_studies.html` - Tier-1 Production Case Studies: Uber/Lyft Geospatial (H3 Hexagonal Grid Visualizer), Flash Sale Inventory Reservation (Atomic Redis Lua Simulator), Distributed Task Scheduler, Web Crawler, TinyURL, WhatsApp & Netflix
 - [x] `observability_request_flow.html` - Interactive End-to-End Request Lifecycle & Distributed Tracing Simulator (DNS ➔ CDN ➔ ALB ➔ API Gateway ➔ Service Mesh ➔ Microservices ➔ DB/Cache with OTel, Prometheus, ELK)
 
 ---
@@ -97,7 +99,8 @@
 | In-Depth Guides (`.md`) | 24 | ✅ All Complete |
 | Code Templates (runnable files) | 24 | ✅ All Complete |
 | Interactive Simulators (`.html`) | 9 | ✅ All Complete |
-| Staff System Design Modules (`.html`) | 5 | ✅ All Complete |
+| Staff System Design Modules (`.html`) | 7 | ✅ All Complete |
+| Case Study Visual Pipelines | 7 | ✅ All Complete |
 | Knowledge Base Terms | 292 | ✅ All Complete |
 | Curated Modern UI Themes | 5 | ✅ All Complete |
 
@@ -109,5 +112,10 @@
 - [x] **Header & Mobile Theme Switchers** (Dropdown Studio + Alt+T Shortcut + Mobile Drawer Grid)
 - [x] **Zero-Overhead Color Tokenization** Across all Cards, Sticky Headers, Rails, and Modals
 - [x] **Phase 1: Reader & Visual Polish**: Mouse Spotlight Glow FX (`--mouse-x/y`), Editorial Typography, 1-Click Code Copy Buttons, Dynamic Read-Time Badges (`⏱️ X min read`), and Sticky Reading Progress Scroll Tracker
-- [x] **Phase 2: Universal Command Palette**: `⌘K` / `Ctrl+K` and `/` Keyboard Jump Dialog with Live Instant Search across 24 Guides, 6 System Design Cases, 9 Simulators, Navigation, and Theme Switching
+- [x] **Phase 2: Universal Command Palette**: `⌘K` / `Ctrl+K` and `/` Keyboard Jump Dialog with Live Instant Search across 24 Guides, 7 System Design Modules, 9 Simulators, Navigation, and Theme Switching
 - [x] **Phase 3: Header Interview Readiness Mastery Gauge**: Real-Time Header Mastery Bar & Percentage with Domain Breakdown Popover, Synchronized with Quick Recap Checklists
+- [x] **Phase 4: Staff System Design Deep Dive & Interactive Pipelines**:
+  - Storage & Caching: LSM-Tree vs B+Tree, SSTables, Bloom Filter Simulator, Thundering Herd singleflight.
+  - Consensus & Transactions: Raft vs Paxos, Tunable Quorum ($N, R, W$) Simulator, Fencing Tokens, Orchestrated Saga State Machine.
+  - Tier-1 Case Studies: 7 End-to-End Interactive Data Flow Pipelines with Step Inspectors, Live Request Flow Tracing, and 7 embedded simulators.
+  - Automated Interactivity Validation: Comprehensive click & DOM integrity testing suite in `tests/validate_interactions.js`.

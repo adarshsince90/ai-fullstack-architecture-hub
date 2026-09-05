@@ -364,6 +364,8 @@ test('Staff System Design Hub modules exist with valid HTML and architectural co
   const modules = [
     'docs/system_design/hld_framework.html',
     'docs/system_design/fundamentals.html',
+    'docs/system_design/storage_and_caching.html',
+    'docs/system_design/consensus_and_transactions.html',
     'docs/system_design/architectural_primitives.html',
     'docs/system_design/case_studies.html',
     'docs/system_design/observability_request_flow.html'
@@ -381,6 +383,14 @@ test('Staff System Design Hub modules exist with valid HTML and architectural co
   const hldContent = fs.readFileSync(path.join(rootDir, 'docs/system_design/hld_framework.html'), 'utf8');
   assert.ok(hldContent.includes('calc-dau') || hldContent.includes('calculateCapacity') || hldContent.includes('Back-of-the-Envelope'), 'HLD framework must contain capacity calculations');
 
+  // Verify Storage & Caching module contains Bloom filter & LSM content
+  const storageContent = fs.readFileSync(path.join(rootDir, 'docs/system_design/storage_and_caching.html'), 'utf8');
+  assert.ok(storageContent.includes('LSM-Tree') && storageContent.includes('Bloom Filter'), 'Storage module must contain LSM and Bloom Filter content');
+
+  // Verify Consensus module contains Quorum & Saga content
+  const consensusContent = fs.readFileSync(path.join(rootDir, 'docs/system_design/consensus_and_transactions.html'), 'utf8');
+  assert.ok(consensusContent.includes('Quorum') && consensusContent.includes('Saga'), 'Consensus module must contain Quorum and Saga content');
+
   // Verify Observability module contains request flow tracing content
   const obsContent = fs.readFileSync(path.join(rootDir, 'docs/system_design/observability_request_flow.html'), 'utf8');
   assert.ok(obsContent.includes('Request Flow') || obsContent.includes('Observability') || obsContent.includes('OpenTelemetry'), 'Observability module must contain request flow architecture content');
@@ -391,7 +401,7 @@ test('System Design Hub is mapped in mindmap_schema.json and graph_topology.json
   const schema = JSON.parse(fs.readFileSync(path.join(rootDir, 'docs/mindmap_schema.json'), 'utf8'));
   const domain = schema.domains.find(d => d.id === 'system-design-mastery');
   assert.ok(domain, 'mindmap_schema.json must contain system-design-mastery domain');
-  assert.ok(Array.isArray(domain.subtopics) && domain.subtopics.length >= 4, 'system-design-mastery domain must have subtopics');
+  assert.ok(Array.isArray(domain.subtopics) && domain.subtopics.length >= 7, 'system-design-mastery domain must have at least 7 subtopics');
 
   const topology = JSON.parse(fs.readFileSync(path.join(rootDir, 'docs/graph_topology.json'), 'utf8'));
   const sdNode = topology.nodes.find(n => n.id === 'domain-system-design-mastery');

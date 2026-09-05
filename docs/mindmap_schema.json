@@ -98,15 +98,29 @@
           "guide": "docs/system_design/hld_framework.html"
         },
         {
+          "id": "sd-storage-caching",
+          "name": "Storage Engines (LSM/B-Tree), Bloom Filters & Advanced Caching",
+          "level": "Staff",
+          "status": "Ready",
+          "guide": "docs/system_design/storage_and_caching.html"
+        },
+        {
+          "id": "sd-consensus-transactions",
+          "name": "Distributed Consensus (Raft), Quorum Math, Locks & Saga Outbox",
+          "level": "Staff",
+          "status": "Ready",
+          "guide": "docs/system_design/consensus_and_transactions.html"
+        },
+        {
           "id": "sd-primitives-simulators",
-          "name": "Architectural Primitives (Token Bucket & Consistent Hashing)",
+          "name": "Architectural Primitives (Token Bucket, Sliding Window & Consistent Hashing)",
           "level": "Staff",
           "status": "Ready",
           "guide": "docs/system_design/architectural_primitives.html"
         },
         {
           "id": "sd-case-studies",
-          "name": "Real-World Case Studies (TinyURL, WhatsApp, Netflix)",
+          "name": "Tier-1 Real-World Case Studies (Uber H3, Flash Sale Lua, Scheduler, TinyURL)",
           "level": "Staff",
           "status": "Ready",
           "guide": "docs/system_design/case_studies.html"
