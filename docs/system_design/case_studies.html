@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Real-World System Design Case Studies</title>
+  <link rel="stylesheet" href="../../styles.css">
+  <style>
+    .sd-container { padding: 24px; max-width: 1200px; margin: 0 auto; font-family: 'Inter', sans-serif; color: #e2e8f0; }
+    .sd-card { background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 24px; margin-bottom: 24px; backdrop-filter: blur(12px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37); }
+    .sd-title { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 700; color: #38bdf8; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
+    .sd-badge { font-size: 0.75rem; padding: 4px 10px; background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; border-radius: 20px; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* Case Study Selector Tabs */
+    .cs-nav-tabs { display: flex; gap: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 12px; margin-bottom: 20px; }
+    .cs-tab-btn { padding: 10px 18px; background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; color: #94a3b8; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+    .cs-tab-btn.active { background: #38bdf8; color: #0f172a; border-color: #38bdf8; box-shadow: 0 0 12px rgba(56, 189, 248, 0.4); }
+
+    /* Sub-tabs inside case study */
+    .sub-tabs { display: flex; gap: 8px; margin: 16px 0; }
+    .sub-tab-btn { padding: 6px 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; color: #cbd5e1; font-size: 0.85rem; cursor: pointer; }
+    .sub-tab-btn.active { background: rgba(56, 189, 248, 0.2); border-color: #38bdf8; color: #38bdf8; }
+
+    .cs-content-section { display: none; }
+    .cs-content-section.active { display: block; }
+
+    .arch-flow-diagram { background: #0f172a; border: 1px solid #334155; border-radius: 12px; padding: 20px; font-family: 'Fira Code', monospace; font-size: 0.85rem; color: #38bdf8; line-height: 1.5; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <div class="sd-container">
+    <div class="sd-card">
+      <div class="sd-title">
+        <span>🏛️ Real-World System Design Case Studies</span>
+        <span class="sd-badge">Interactive Problem Deep Dives</span>
+      </div>
+      <p style="color: #94a3b8; font-size: 0.95rem;">
+        Select a real-world system architecture below to explore its functional specs, data flow, API design, database strategy, and bottleneck solutions.
+      </p>
+
+      <!-- Main Case Study Tabs -->
+      <div class="cs-nav-tabs">
+        <button class="cs-tab-btn active" onclick="switchCaseStudy('tinyurl')">🔗 1. TinyURL Shortener</button>
+        <button class="cs-tab-btn" onclick="switchCaseStudy('whatsapp')">💬 2. WhatsApp Real-Time Chat</button>
+        <button class="cs-tab-btn" onclick="switchCaseStudy('netflix')">🎬 3. Netflix Video Streaming</button>
+      </div>
+
+      <!-- Case Study 1: TinyURL Shortener -->
+      <div id="cs-tinyurl" class="cs-content-section active">
+        <h3 style="color:#f8fafc; margin-top:0;">TinyURL Architecture & Base62 Encoding</h3>
+        
+        <div class="sub-tabs">
+          <button class="sub-tab-btn active" onclick="switchSubTab('tinyurl', 'overview')">Overview & Math</button>
+          <button class="sub-tab-btn" onclick="switchSubTab('tinyurl', 'flow')">Data Flow Diagram</button>
+          <button class="sub-tab-btn" onclick="switchSubTab('tinyurl', 'db')">DB Schema & API</button>
+        </div>
+
+        <div id="tinyurl-overview" class="sub-content">
+          <p style="color:#cbd5e1; line-height:1.6;">
+            <strong>Core Requirements:</strong> Given a long URL (e.g., <code>https://example.com/long/path</code>), generate a unique 7-character alias (e.g., <code>tiny.url/aB3x9Z</code>). 
+            When accessed, issue an HTTP 301/302 redirect.
+          </p>
+          <ul>
+            <li><strong>Base62 Encoding:</strong> Uses <code>[a-z, A-Z, 0-9]</code> ($62$ characters). A 7-character string yields $62^7 \approx 3.5 \text{ Trillion}$ unique URLs.</li>
+            <li><strong>Key Generation Service (KGS):</strong> Pre-generates random 7-character keys in memory to avoid key collisions during high-concurrent writes.</li>
+          </ul>
+        </div>
+
+        <div id="tinyurl-flow" class="sub-content" style="display:none;">
+          <div class="arch-flow-diagram">
+CLIENT REQUEST ──► LOAD BALANCER (Nginx) ──► API GATEWAY (Rate Limiter)
+                                                    │
+                 ┌──────────────────────────────────┴──────────────────────────────────┐
+                 ▼ (Read: Redirect)                                                    ▼ (Write: Shorten URL)
+       REDIS DISTRIBUTED CACHE ──(Cache Miss)──► RDBMS READ REPLICAS               KEY GENERATION SVC (KGS)
+                 │                                                                     │
+          (Return HTTP 301)                                                     Fetch Pre-generated Key &
+                                                                                Write to Primary DB
+          </div>
+        </div>
+
+        <div id="tinyurl-db" class="sub-content" style="display:none;">
+          <h4 style="color:#38bdf8;">Database Schema (NoSQL / SQL)</h4>
+          <pre style="background:#1e293b; padding:12px; border-radius:8px; color:#4ade80;">
+Table: URL_Mapping {
+  short_key   VARCHAR(7) PRIMARY KEY, -- e.g. "aB3x9Z"
+  original_url TEXT NOT NULL,
+  created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  user_id     UUID NULL,
+  expires_at  TIMESTAMP NULL
+}
+          </pre>
+        </div>
+      </div>
+
+      <!-- Case Study 2: WhatsApp Chat -->
+      <div id="cs-whatsapp" class="cs-content-section">
+        <h3 style="color:#f8fafc; margin-top:0;">WhatsApp Real-Time Chat & Cassandra Persistence</h3>
+        <p style="color:#94a3b8;">Uses WebSockets for bi-directional real-time messaging, Cassandra for write-heavy chat log storage, and Kafka for message queuing.</p>
+        <div class="arch-flow-diagram">
+CLIENT A (WebSocket) ──► CHAT GATEWAY (Gateway Node) ──► KAFKA TOPIC ("chat-messages")
+                                                              │
+                                     ┌────────────────────────┴────────────────────────┐
+                                     ▼                                                 ▼
+                          APNS / FCM PUSH SERVICE                           CASSANDRA DB SERVICE
+                           (Delivers to Client B)                            (Appends to Message Store)
+        </div>
+      </div>
+
+      <!-- Case Study 3: Netflix Streaming -->
+      <div id="cs-netflix" class="cs-content-section">
+        <h3 style="color:#f8fafc; margin-top:0;">Netflix Video Processing & Adaptive Bitrate CDN</h3>
+        <p style="color:#94a3b8;">Asynchronous video transcoding pipeline splitting uploaded MP4 files into chunks, encoding them into HLS/DASH formats, and distributing to CloudFront/Open Connect CDNs.</p>
+        <div class="arch-flow-diagram">
+VIDEO UPLOAD ──► AWS S3 (Raw MP4) ──► EVENTBRIDGE ──► TRANSCODING WORKER POOL (FFmpeg)
+                                                               │
+                                       ┌───────────────────────┴───────────────────────┐
+                                       ▼                                               ▼
+                           CDN EDGE CACHE (HLS/DASH)                      DYNAMODB METADATA STORE
+                           (Streaming to End User)                        (Chunk Indexing & Subtitles)
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function switchCaseStudy(csId) {
+      document.querySelectorAll('.cs-tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.cs-content-section').forEach(sec => sec.classList.remove('active'));
+
+      event.target.classList.add('active');
+      document.getElementById('cs-' + csId).classList.add('active');
+    }
+
+    function switchSubTab(csId, subId) {
+      const parent = document.getElementById('cs-' + csId);
+      parent.querySelectorAll('.sub-tab-btn').forEach(btn => btn.classList.remove('active'));
+      parent.querySelectorAll('.sub-content').forEach(c => c.style.display = 'none');
+
+      event.target.classList.add('active');
+      document.getElementById(csId + '-' + subId).style.display = 'block';
+    }
+  </script>
+</body>
+</html>

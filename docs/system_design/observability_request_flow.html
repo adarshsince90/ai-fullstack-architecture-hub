@@ -1,0 +1,2194 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Observability & Request Flow Architecture Guide</title>
+    <meta name="description" content="Technical High-Level (HLD) & Low-Level Design (LLD) reference guide for networks, request flows, and Prometheus, OpenTelemetry, Grafana, and ELK observability stacks.">
+    <meta name="keywords" content="observability, request flow, networking, DNS, CDN, ingress, gateway, service mesh, mTLS, prometheus, opentelemetry, grafana, elk, microservices, logging, tracing, metrics, hld, lld, devops, slo, sli, database observability, profiling">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        space: {
+                            950: '#04060b',
+                            900: '#070a13',
+                            800: '#0e1424',
+                            700: '#172037',
+                            600: '#1f2b4c',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Mermaid.js for Diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true, 
+            theme: 'dark',
+            securityLevel: 'loose',
+            themeVariables: {
+                background: '#0e1424',
+                primaryColor: '#172037',
+                primaryTextColor: '#f8fafc',
+                lineColor: '#38bdf8',
+                secondaryColor: '#1f2b4c',
+                tertiaryColor: '#070a13'
+            }
+        });
+    </script>
+    
+    <style>
+        body {
+            background-color: #070a13;
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+        }
+        .nav-active {
+            border-left: 4px solid #38bdf8;
+            background-color: #172037;
+            color: #38bdf8;
+            font-weight: 600;
+        }
+        .glass-panel {
+            background: rgba(14, 20, 36, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #070a13;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f2b4c;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #38bdf8;
+        }
+        /* Mermaid responsive sizing safeguard */
+        .mermaid {
+            width: 100%;
+            overflow-x: auto;
+        }
+        .mermaid svg {
+            max-width: 100% !important;
+            height: auto !important;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body class="flex flex-col md:flex-row h-screen overflow-hidden">
+
+    <!-- Mobile Header -->
+    <header class="flex md:hidden items-center justify-between px-6 py-4 bg-space-800/90 backdrop-blur-md border-b border-slate-800/80 w-full shrink-0 z-50">
+        <div class="flex flex-col">
+            <h1 class="text-base font-bold font-display text-sky-400">Observability & Request</h1>
+            <span class="text-[10px] text-slate-400">Integrated Control Panel</span>
+        </div>
+        <button id="mobile-menu-toggle" class="p-2 text-slate-400 hover:text-white focus:outline-none transition-colors rounded-lg bg-space-700/50">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path id="hamburger-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
+    </header>
+
+    <!-- Mobile Sidebar Backdrop Overlay -->
+    <div id="sidebar-backdrop" class="fixed inset-0 z-40 bg-slate-950/70 backdrop-blur-sm hidden transition-opacity duration-300 md:hidden"></div>
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="fixed md:relative inset-y-0 left-0 z-40 w-72 bg-space-800 border-r border-slate-800/80 flex flex-col shrink-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out h-full">
+        <!-- Logo Header -->
+        <div class="p-5 border-b border-slate-800/80">
+            <h1 class="text-lg font-bold font-display text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-indigo-400">Observability & Request</h1>
+            <p class="text-xs text-slate-400 mt-1">Unified Systems Architecture Guide</p>
+        </div>
+
+        <!-- Interactive Search Bar -->
+        <div class="px-4 py-3 border-b border-slate-800/80 bg-space-900/40">
+            <div class="relative">
+                <input type="text" id="search-input" placeholder="Search systems, queries, configs..." 
+                    class="w-full bg-space-900 text-slate-200 pl-9 pr-3 py-2 rounded-lg border border-slate-800 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 text-xs transition-all" />
+                <svg class="absolute left-3 top-2.5 h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Dynamic Navigation Menu Links (Toggled by active Tab) -->
+        <nav id="nav-container" class="flex-1 overflow-y-auto p-4 space-y-6 text-sm text-slate-300">
+            <!-- Group 1: Overview & Architecture -->
+            <div class="space-y-1">
+                <span class="text-[10px] font-bold font-mono text-sky-400 uppercase tracking-wider block mb-2 px-3">1. Architecture Overview</span>
+                <a href="#summary" class="nav-item nav-active flex items-center px-3 py-2 rounded-lg text-xs transition-all hover:bg-space-700/50 hover:text-white">
+                    <span class="mr-2 text-sky-400 font-mono">1.</span> Pillars & Layers
+                </a>
+                <a href="#hld" class="nav-item flex items-center px-3 py-2 rounded-lg text-xs transition-all hover:bg-space-700/50 hover:text-white">
+                    <span class="mr-2 text-sky-400 font-mono">2.</span> System HLDs
+                </a>
+                <a href="#unified-lifecycle" class="nav-item flex items-center px-3 py-2 rounded-lg text-xs transition-all hover:bg-space-700/50 hover:text-white">
+                    <span class="mr-2 text-sky-400 font-mono">3.</span> Unified Request Trace
+                </a>
+            </div>
+
+            <!-- Group 2: Network & Transit Flow -->
+            <div class="space-y-1">
+                <span class="text-[10px] font-bold font-mono text-sky-400 uppercase tracking-wider block mb-2 px-3">2. Request Transit Pipeline</span>
+                <a href="#lld-kernel" class="nav-item flex items-center px-3 py-2 rounded-lg text-xs transition-all hover:bg-space-700/50 hover:text-white">
+                    <span class="mr-2 text-sky-400 font-mono">4.</span> OS Kernel Packets
+                </a>
+                <a href="#lld-network" class="nav-item flex items-center px-3 py-2 rounded-lg text-xs transition-all hover:bg-space-700/50 hover:text-white">
+                    <span class="mr-2 text-sky-400 font-mono">5.</span> Edge CDN & Ingress
+                </a>
+                <a href="#lld-mesh" class="nav-item flex items-center px-3 py-2 rounded-lg text-xs transition-all hover:bg-space-700/50 hover:text-white">
+                    <span class="mr-2 text-sky-400 font-mono">6.</span> Service Mesh & Context
+                </a>
+            </div>
+
+            <!-- Group 3: Telemetry Engine -->
+            <div class="space-y-1">
+                <span class="text-[10px] font-bold font-mono text-sky-400 uppercase tracking-wider block mb-2 px-3">3. Telemetry Stack (LLD)</span>
+                <a href="#lld-app" class="nav-item flex items-center px-3 py-2 rounded-lg text-xs transition-all hover:bg-space-700/50 hover:text-white">
+                    <span class="mr-2 text-sky-400 font-mono">7.</span> App & OpenTelemetry
+                </a>
+                <a href="#lld-prometheus" class="nav-item flex items-center px-3 py-2 rounded-lg text-xs transition-all hover:bg-space-700/50 hover:text-white">
+                    <span class="mr-2 text-sky-400 font-mono">8.</span> Prometheus & Metrics
+                </a>
+                <a href="#lld-grafana" class="nav-item flex items-center px-3 py-2 rounded-lg text-xs transition-all hover:bg-space-700/50 hover:text-white">
+                    <span class="mr-2 text-sky-400 font-mono">9.</span> Grafana & Alerting
+                </a>
+                <a href="#lld-elk" class="nav-item flex items-center px-3 py-2 rounded-lg text-xs transition-all hover:bg-space-700/50 hover:text-white">
+                    <span class="mr-2 text-sky-400 font-mono">10.</span> Logging & ELK Stack
+                </a>
+            </div>
+
+            <!-- Group 4: Advanced Operations -->
+            <div class="space-y-1">
+                <span class="text-[10px] font-bold font-mono text-sky-400 uppercase tracking-wider block mb-2 px-3">4. Advanced Operations</span>
+                <a href="#roadmap-slo" class="nav-item flex items-center px-3 py-2 rounded-lg text-xs transition-all hover:bg-space-700/50 hover:text-white">
+                    <span class="mr-2 text-sky-400 font-mono">11.</span> SLO/SLI Calculations
+                </a>
+                <a href="#roadmap-db" class="nav-item flex items-center px-3 py-2 rounded-lg text-xs transition-all hover:bg-space-700/50 hover:text-white">
+                    <span class="mr-2 text-sky-400 font-mono">12.</span> Database Observability
+                </a>
+                <a href="#roadmap-rum" class="nav-item flex items-center px-3 py-2 rounded-lg text-xs transition-all hover:bg-space-700/50 hover:text-white">
+                    <span class="mr-2 text-sky-400 font-mono">13.</span> Synthetics & RUM
+                </a>
+                <a href="#roadmap-profiling" class="nav-item flex items-center px-3 py-2 rounded-lg text-xs transition-all hover:bg-space-700/50 hover:text-white">
+                    <span class="mr-2 text-sky-400 font-mono">14.</span> Continuous Profiling
+                </a>
+            </div>
+        </nav>
+
+        <!-- Footer -->
+        <div class="p-4 border-t border-slate-800/80 bg-space-900/20 text-[10px] text-slate-500 text-center font-mono">
+            V1.5.0 • DNS • CDN • Mesh • OTel • ELK
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main id="main-content" class="flex-1 overflow-y-auto p-6 md:p-10">
+
+
+
+        <!-- Tab 1 Container: Overview & Unified Architecture -->
+        <!-- Section Group: Overview -->
+            
+            <!-- Section 1: Overview & Pillars -->
+            <section id="summary" class="scroll-mt-24 md:scroll-mt-10 space-y-8">
+                <div class="border-b border-slate-800/80 pb-4">
+                    <div class="flex items-center space-x-2 text-xs font-bold text-sky-400 uppercase tracking-widest font-mono">
+                        <span>Overview</span>
+                        <span>•</span>
+                        <span>Observability & Request Layers</span>
+                    </div>
+                    <h2 class="text-3xl font-extrabold font-display text-slate-100 mt-1">1. Pillars & Request Layers Overview</h2>
+                    <p class="text-slate-400 mt-2 text-sm max-w-4xl font-sans leading-relaxed">
+                        To build highly resilient software, modern engineers must bridge the gap between network transit architectures and telemetry monitoring systems. Below, we compare the three core pillars of observability with the five network layers that process external client traffic. 
+                        As requests move from the public internet through internal microservices, they generate logs, metrics, and traces that document performance boundaries.
+                    </p>
+                </div>
+
+                <!-- Visual Topic Navigator (Interactive HTML/CSS Architecture Map) -->
+                <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl shadow-xl">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                        <div>
+                            <h3 class="text-base font-semibold font-display text-sky-400 flex items-center gap-2">
+                                <span class="relative flex h-2.5 w-2.5">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-sky-500"></span>
+                                </span>
+                                Visual Topic Navigator
+                            </h3>
+                            <p class="text-slate-400 text-xs mt-1 font-sans">
+                                Click any architectural component below to jump directly to its technical deep-dive and code implementation.
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span class="text-xs font-mono bg-space-900 border border-slate-700/60 text-sky-400 px-2.5 py-1 rounded-md">
+                                14 Deep-Dive Modules
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- 3-Column Interactive Roadmap Grid -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
+                        
+                        <!-- Column 1: Request Transit Pipeline -->
+                        <div class="bg-space-900/80 border border-sky-500/20 rounded-xl p-4 flex flex-col justify-between hover:border-sky-500/40 transition-all">
+                            <div>
+                                <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-base">🌐</span>
+                                        <h4 class="text-xs font-bold font-mono text-sky-400 uppercase tracking-wider">1. Request Transit Pipeline</h4>
+                                    </div>
+                                    <span class="text-[10px] font-mono text-slate-500 bg-space-950 px-2 py-0.5 rounded">L4 - L7</span>
+                                </div>
+                                <div class="mt-3 space-y-2">
+                                    <a href="#lld-kernel" class="group flex items-center justify-between p-2.5 rounded-lg bg-space-800/60 hover:bg-space-700/80 border border-slate-800 hover:border-sky-400/50 transition-all">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-sky-400 font-mono text-xs group-hover:translate-x-0.5 transition-transform">01.</span>
+                                            <div>
+                                                <div class="text-xs font-semibold text-slate-200 group-hover:text-sky-300">OS Kernel & TCP Stack</div>
+                                                <div class="text-[10px] text-slate-400 font-mono">sk_buff, Zero-Copy, NAPI softIRQs</div>
+                                            </div>
+                                        </div>
+                                        <span class="text-xs text-slate-500 group-hover:text-sky-400 font-mono">→</span>
+                                    </a>
+
+                                    <a href="#lld-network" class="group flex items-center justify-between p-2.5 rounded-lg bg-space-800/60 hover:bg-space-700/80 border border-slate-800 hover:border-sky-400/50 transition-all">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-sky-400 font-mono text-xs group-hover:translate-x-0.5 transition-transform">02.</span>
+                                            <div>
+                                                <div class="text-xs font-semibold text-slate-200 group-hover:text-sky-300">Edge CDN & Anycast DNS</div>
+                                                <div class="text-[10px] text-slate-400 font-mono">Cloudflare WAF, TLS 1.3 Termination</div>
+                                            </div>
+                                        </div>
+                                        <span class="text-xs text-slate-500 group-hover:text-sky-400 font-mono">→</span>
+                                    </a>
+
+                                    <a href="#lld-network" class="group flex items-center justify-between p-2.5 rounded-lg bg-space-800/60 hover:bg-space-700/80 border border-slate-800 hover:border-sky-400/50 transition-all">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-sky-400 font-mono text-xs group-hover:translate-x-0.5 transition-transform">03.</span>
+                                            <div>
+                                                <div class="text-xs font-semibold text-slate-200 group-hover:text-sky-300">Ingress Gateway & Routing</div>
+                                                <div class="text-[10px] text-slate-400 font-mono">Kong / NGINX, JWT & Rate Limits</div>
+                                            </div>
+                                        </div>
+                                        <span class="text-xs text-slate-500 group-hover:text-sky-400 font-mono">→</span>
+                                    </a>
+
+                                    <a href="#lld-mesh" class="group flex items-center justify-between p-2.5 rounded-lg bg-space-800/60 hover:bg-space-700/80 border border-slate-800 hover:border-sky-400/50 transition-all">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-sky-400 font-mono text-xs group-hover:translate-x-0.5 transition-transform">04.</span>
+                                            <div>
+                                                <div class="text-xs font-semibold text-slate-200 group-hover:text-sky-300">Service Mesh & mTLS</div>
+                                                <div class="text-[10px] text-slate-400 font-mono">Envoy Sidecar, SPIFFE / SPIRE</div>
+                                            </div>
+                                        </div>
+                                        <span class="text-xs text-slate-500 group-hover:text-sky-400 font-mono">→</span>
+                                    </a>
+
+                                    <a href="#unified-lifecycle" class="group flex items-center justify-between p-2 rounded-lg bg-sky-950/30 border border-sky-500/30 hover:bg-sky-900/40 transition-all">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-sky-400 text-xs">⚡</span>
+                                            <span class="text-xs font-medium text-sky-200">Unified 10-Step Trace Flow</span>
+                                        </div>
+                                        <span class="text-xs text-sky-400 font-mono">View →</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Column 2: Telemetry Stack -->
+                        <div class="bg-space-900/80 border border-indigo-500/20 rounded-xl p-4 flex flex-col justify-between hover:border-indigo-500/40 transition-all">
+                            <div>
+                                <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-base">📊</span>
+                                        <h4 class="text-xs font-bold font-mono text-indigo-400 uppercase tracking-wider">2. Telemetry Stack (LLD)</h4>
+                                    </div>
+                                    <span class="text-[10px] font-mono text-slate-500 bg-space-950 px-2 py-0.5 rounded">Observability</span>
+                                </div>
+                                <div class="mt-3 space-y-2">
+                                    <a href="#lld-app" class="group flex items-center justify-between p-2.5 rounded-lg bg-space-800/60 hover:bg-space-700/80 border border-slate-800 hover:border-indigo-400/50 transition-all">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-indigo-400 font-mono text-xs group-hover:translate-x-0.5 transition-transform">01.</span>
+                                            <div>
+                                                <div class="text-xs font-semibold text-slate-200 group-hover:text-indigo-300">App & OpenTelemetry</div>
+                                                <div class="text-[10px] text-slate-400 font-mono">W3C TraceContext, Baggage, OTLP</div>
+                                            </div>
+                                        </div>
+                                        <span class="text-xs text-slate-500 group-hover:text-indigo-400 font-mono">→</span>
+                                    </a>
+
+                                    <a href="#lld-prometheus" class="group flex items-center justify-between p-2.5 rounded-lg bg-space-800/60 hover:bg-space-700/80 border border-slate-800 hover:border-indigo-400/50 transition-all">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-indigo-400 font-mono text-xs group-hover:translate-x-0.5 transition-transform">02.</span>
+                                            <div>
+                                                <div class="text-xs font-semibold text-slate-200 group-hover:text-indigo-300">Prometheus & Metrics Engine</div>
+                                                <div class="text-[10px] text-slate-400 font-mono">Pull Scraping, PromQL, TSDB</div>
+                                            </div>
+                                        </div>
+                                        <span class="text-xs text-slate-500 group-hover:text-indigo-400 font-mono">→</span>
+                                    </a>
+
+                                    <a href="#lld-grafana" class="group flex items-center justify-between p-2.5 rounded-lg bg-space-800/60 hover:bg-space-700/80 border border-slate-800 hover:border-indigo-400/50 transition-all">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-indigo-400 font-mono text-xs group-hover:translate-x-0.5 transition-transform">03.</span>
+                                            <div>
+                                                <div class="text-xs font-semibold text-slate-200 group-hover:text-indigo-300">Grafana & Alertmanager</div>
+                                                <div class="text-[10px] text-slate-400 font-mono">Threshold Alerts, PagerDuty, Webhooks</div>
+                                            </div>
+                                        </div>
+                                        <span class="text-xs text-slate-500 group-hover:text-indigo-400 font-mono">→</span>
+                                    </a>
+
+                                    <a href="#lld-elk" class="group flex items-center justify-between p-2.5 rounded-lg bg-space-800/60 hover:bg-space-700/80 border border-slate-800 hover:border-indigo-400/50 transition-all">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-indigo-400 font-mono text-xs group-hover:translate-x-0.5 transition-transform">04.</span>
+                                            <div>
+                                                <div class="text-xs font-semibold text-slate-200 group-hover:text-indigo-300">Structured Logging & ELK</div>
+                                                <div class="text-[10px] text-slate-400 font-mono">Serilog, Fluentbit, Elasticsearch</div>
+                                            </div>
+                                        </div>
+                                        <span class="text-xs text-slate-500 group-hover:text-indigo-400 font-mono">→</span>
+                                    </a>
+
+                                    <a href="#hld" class="group flex items-center justify-between p-2 rounded-lg bg-indigo-950/30 border border-indigo-500/30 hover:bg-indigo-900/40 transition-all">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-indigo-400 text-xs">📐</span>
+                                            <span class="text-xs font-medium text-indigo-200">High-Level Pipeline (HLD)</span>
+                                        </div>
+                                        <span class="text-xs text-indigo-400 font-mono">View →</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Column 3: Advanced Operations -->
+                        <div class="bg-space-900/80 border border-emerald-500/20 rounded-xl p-4 flex flex-col justify-between hover:border-emerald-500/40 transition-all">
+                            <div>
+                                <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-base">⚙️</span>
+                                        <h4 class="text-xs font-bold font-mono text-emerald-400 uppercase tracking-wider">3. Production Operations</h4>
+                                    </div>
+                                    <span class="text-[10px] font-mono text-slate-500 bg-space-950 px-2 py-0.5 rounded">SRE Ready</span>
+                                </div>
+                                <div class="mt-3 space-y-2">
+                                    <a href="#roadmap-slo" class="group flex items-center justify-between p-2.5 rounded-lg bg-space-800/60 hover:bg-space-700/80 border border-slate-800 hover:border-emerald-400/50 transition-all">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-emerald-400 font-mono text-xs group-hover:translate-x-0.5 transition-transform">01.</span>
+                                            <div>
+                                                <div class="text-xs font-semibold text-slate-200 group-hover:text-emerald-300">SLO, SLI & Error Budgets</div>
+                                                <div class="text-[10px] text-slate-400 font-mono">Four Golden Signals, 99.99% Math</div>
+                                            </div>
+                                        </div>
+                                        <span class="text-xs text-slate-500 group-hover:text-emerald-400 font-mono">→</span>
+                                    </a>
+
+                                    <a href="#roadmap-db" class="group flex items-center justify-between p-2.5 rounded-lg bg-space-800/60 hover:bg-space-700/80 border border-slate-800 hover:border-emerald-400/50 transition-all">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-emerald-400 font-mono text-xs group-hover:translate-x-0.5 transition-transform">02.</span>
+                                            <div>
+                                                <div class="text-xs font-semibold text-slate-200 group-hover:text-emerald-300">Database & Cache Metrics</div>
+                                                <div class="text-[10px] text-slate-400 font-mono">Slow Query Logs, Redis Hit Ratios</div>
+                                            </div>
+                                        </div>
+                                        <span class="text-xs text-slate-500 group-hover:text-emerald-400 font-mono">→</span>
+                                    </a>
+
+                                    <a href="#roadmap-rum" class="group flex items-center justify-between p-2.5 rounded-lg bg-space-800/60 hover:bg-space-700/80 border border-slate-800 hover:border-emerald-400/50 transition-all">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-emerald-400 font-mono text-xs group-hover:translate-x-0.5 transition-transform">03.</span>
+                                            <div>
+                                                <div class="text-xs font-semibold text-slate-200 group-hover:text-emerald-300">Synthetics & RUM</div>
+                                                <div class="text-[10px] text-slate-400 font-mono">Core Web Vitals (LCP, INP, CLS)</div>
+                                            </div>
+                                        </div>
+                                        <span class="text-xs text-slate-500 group-hover:text-emerald-400 font-mono">→</span>
+                                    </a>
+
+                                    <a href="#roadmap-profiling" class="group flex items-center justify-between p-2.5 rounded-lg bg-space-800/60 hover:bg-space-700/80 border border-slate-800 hover:border-emerald-400/50 transition-all">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-emerald-400 font-mono text-xs group-hover:translate-x-0.5 transition-transform">04.</span>
+                                            <div>
+                                                <div class="text-xs font-semibold text-slate-200 group-hover:text-emerald-300">Continuous Profiling & eBPF</div>
+                                                <div class="text-[10px] text-slate-400 font-mono">Flamegraphs, CPU/Memory Tracing</div>
+                                            </div>
+                                        </div>
+                                        <span class="text-xs text-slate-500 group-hover:text-emerald-400 font-mono">→</span>
+                                    </a>
+
+                                    <a href="#summary" class="group flex items-center justify-between p-2 rounded-lg bg-emerald-950/30 border border-emerald-500/30 hover:bg-emerald-900/40 transition-all">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-emerald-400 text-xs">📋</span>
+                                            <span class="text-xs font-medium text-emerald-200">Data Pillars & Layers Table</span>
+                                        </div>
+                                        <span class="text-xs text-emerald-400 font-mono">View →</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- End-to-End Sequence Mini Breadcrumb -->
+                    <div class="mt-4 p-3 bg-space-950/60 rounded-lg border border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+                        <span class="text-slate-400 flex items-center gap-1.5">
+                            <span class="text-sky-400">⚡</span>
+                            <span>E2E Flow Sequence:</span>
+                        </span>
+                        <div class="flex flex-wrap items-center gap-1.5 text-[11px] text-slate-300">
+                            <span class="bg-space-800 px-2 py-0.5 rounded border border-slate-700/50 text-slate-300">Client / DNS</span>
+                            <span class="text-sky-400">→</span>
+                            <span class="bg-space-800 px-2 py-0.5 rounded border border-slate-700/50 text-slate-300">Edge CDN</span>
+                            <span class="text-sky-400">→</span>
+                            <span class="bg-space-800 px-2 py-0.5 rounded border border-slate-700/50 text-slate-300">Ingress Gateway</span>
+                            <span class="text-sky-400">→</span>
+                            <span class="bg-space-800 px-2 py-0.5 rounded border border-slate-700/50 text-slate-300">Envoy Mesh</span>
+                            <span class="text-sky-400">→</span>
+                            <span class="bg-space-800 px-2 py-0.5 rounded border border-slate-700/50 text-sky-400 font-semibold">OTel Middleware</span>
+                            <span class="text-sky-400">→</span>
+                            <span class="bg-space-800 px-2 py-0.5 rounded border border-slate-700/50 text-indigo-300 font-semibold">TSDB / Elastic</span>
+                            <span class="text-sky-400">→</span>
+                            <span class="bg-space-800 px-2 py-0.5 rounded border border-slate-700/50 text-emerald-400 font-semibold">Grafana Alerting</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table 1: Observability Pillars -->
+                <div class="space-y-3">
+                    <h3 class="text-base font-semibold font-display text-sky-400 flex items-center gap-2">
+                        <span class="w-1.5 h-3 bg-sky-400 rounded-sm"></span>
+                        Observability Data Pillars
+                    </h3>
+                    <div class="overflow-x-auto bg-space-800 border border-slate-800/80 rounded-xl shadow-xl">
+                        <table class="w-full text-left text-sm min-w-[700px]">
+                            <thead class="bg-space-700/60 text-slate-300 uppercase text-xs font-mono border-b border-slate-800/80">
+                                <tr>
+                                    <th class="p-4 pl-6">Pillar</th>
+                                    <th class="p-4">Primary Data Format</th>
+                                    <th class="p-4">Primary Purpose</th>
+                                    <th class="p-4">Collection Model</th>
+                                    <th class="p-4 pr-6">Primary Toolstack</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/60 text-slate-300">
+                                <tr class="hover:bg-space-700/20 transition-colors">
+                                    <td class="p-4 pl-6 font-bold text-sky-400 font-display">Metrics</td>
+                                    <td class="p-4 text-xs font-mono">Numeric time-series (Key-Value counters, gauges, histograms)</td>
+                                    <td class="p-4 text-slate-400 text-xs font-sans">Health tracking, aggregate performance metrics, threshold alerting</td>
+                                    <td class="p-4 font-mono text-xs text-slate-400">Pull / Scrape (exposes `/metrics`)</td>
+                                    <td class="p-4 pr-6 text-xs text-slate-300 font-semibold">Prometheus + Grafana</td>
+                                </tr>
+                                <tr class="hover:bg-space-700/20 transition-colors">
+                                    <td class="p-4 pl-6 font-bold text-emerald-400 font-display">Logs</td>
+                                    <td class="p-4 text-xs font-mono">Timestamped structured text/JSON events</td>
+                                    <td class="p-4 text-slate-400 text-xs font-sans">Deep debugging, error auditing, contextual stack traces</td>
+                                    <td class="p-4 font-mono text-xs text-slate-400">Push (Log shippers / Collectors)</td>
+                                    <td class="p-4 pr-6 text-xs text-slate-300 font-semibold">Elasticsearch + Kibana (ELK)</td>
+                                </tr>
+                                <tr class="hover:bg-space-700/20 transition-colors">
+                                    <td class="p-4 pl-6 font-bold text-purple-400 font-display">Traces</td>
+                                    <td class="p-4 text-xs font-mono">Spans with Context Propagation (`TraceID`, `SpanID`)</td>
+                                    <td class="p-4 text-slate-400 text-xs font-sans font-sans">Distributed request lifecycle tracking across microservices</td>
+                                    <td class="p-4 font-mono text-xs text-slate-400">Push (OTLP Exporter)</td>
+                                    <td class="p-4 pr-6 text-xs text-slate-300 font-semibold">OpenTelemetry + Jaeger / Tempo</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Table 2: Request Flow Layers -->
+                <div class="space-y-3 pt-4">
+                    <h3 class="text-lg font-semibold font-display text-indigo-400 flex items-center gap-2">
+                        <span class="w-1.5 h-3 bg-indigo-400 rounded-sm"></span>
+                        End-to-End Request Layer Architecture
+                    </h3>
+                    <div class="overflow-x-auto bg-space-800 border border-slate-800/80 rounded-xl shadow-xl">
+                        <table class="w-full text-left text-sm min-w-[700px]">
+                            <thead class="bg-space-700/60 text-slate-300 uppercase text-xs font-mono border-b border-slate-800/80">
+                                <tr>
+                                    <th class="p-4 pl-6">Layer</th>
+                                    <th class="p-4">Key Component</th>
+                                    <th class="p-4">Primary Responsibility</th>
+                                    <th class="p-4">OSI / Tech Level</th>
+                                    <th class="p-4 pr-6">Observability Artifact</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/60 text-slate-300">
+                                <tr class="hover:bg-space-700/20 transition-colors">
+                                    <td class="p-4 pl-6 font-bold text-sky-400 font-display">1. Client / DNS</td>
+                                    <td class="p-4 text-xs font-sans">Browser / Mobile App / Anycast DNS</td>
+                                    <td class="p-4 text-slate-400 text-xs font-sans font-sans">DNS Resolution (A/AAAA records), TLS Handshake setup</td>
+                                    <td class="p-4 font-mono text-xs text-slate-400">Layer 7 / Layer 3 (IP)</td>
+                                    <td class="p-4 pr-6 text-xs text-slate-300">Client RUM / Web Vitals</td>
+                                </tr>
+                                <tr class="hover:bg-space-700/20 transition-colors">
+                                    <td class="p-4 pl-6 font-bold text-amber-400 font-display">2. Edge & CDN</td>
+                                    <td class="p-4 text-xs font-sans">Cloudflare / AWS CloudFront / WAF</td>
+                                    <td class="p-4 text-slate-400 text-xs font-sans">DDoS protection, Edge Caching, TLS Termination, WAF inspection</td>
+                                    <td class="p-4 font-mono text-xs text-slate-400">Layer 7 (HTTP/S)</td>
+                                    <td class="p-4 pr-6 text-xs text-slate-300 font-sans">Edge Logs & Cache Ratios</td>
+                                </tr>
+                                <tr class="hover:bg-space-700/20 transition-colors">
+                                    <td class="p-4 pl-6 font-bold text-emerald-400 font-display">3. Ingress & Gateway</td>
+                                    <td class="p-4 text-xs font-sans">Kong / NGINX / Cloud ALB</td>
+                                    <td class="p-4 text-slate-400 text-xs font-sans">URL Routing, OAuth/JWT validation, Global Rate Limiting</td>
+                                    <td class="p-4 font-mono text-xs text-slate-400">Layer 7 Reverse Proxy</td>
+                                    <td class="p-4 pr-6 text-xs text-slate-300 font-sans">Gateway Latency & Status Codes</td>
+                                </tr>
+                                <tr class="hover:bg-space-700/20 transition-colors">
+                                    <td class="p-4 pl-6 font-bold text-purple-400 font-display">4. Service Mesh</td>
+                                    <td class="p-4 text-xs font-sans">Istio Envoy Sidecar</td>
+                                    <td class="p-4 text-slate-400 text-xs font-sans">mTLS Encryption, Pod-to-Pod Traffic routing, Circuit Breaking</td>
+                                    <td class="p-4 font-mono text-xs text-slate-400">Layer 4 / Layer 7 Sidecar</td>
+                                    <td class="p-4 pr-6 text-xs text-slate-300 font-sans">Envoy Access Logs & Mesh Metrics</td>
+                                </tr>
+                                <tr class="hover:bg-space-700/20 transition-colors">
+                                    <td class="p-4 pl-6 font-bold text-rose-400 font-display">5. Application Runtime</td>
+                                    <td class="p-4 text-xs font-sans">ASP.NET Core / OTel Middleware</td>
+                                    <td class="p-4 text-slate-400 text-xs font-sans font-sans font-sans">Business logic execution, Database access, Metric exposition</td>
+                                    <td class="p-4 font-mono text-xs text-slate-400">Application Layer</td>
+                                    <td class="p-4 pr-6 text-xs text-slate-300 font-sans">OTel Spans, Prometheus `/metrics`</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: HLD Pipeline Diagrams -->
+            <section id="hld" class="scroll-mt-24 md:scroll-mt-10 space-y-10">
+                <div class="border-b border-slate-800/80 pb-4">
+                    <div class="flex items-center space-x-2 text-xs font-bold text-indigo-400 uppercase tracking-widest font-mono">
+                        <span>High-Level Design</span>
+                        <span>•</span>
+                        <span>Telemetry Collection Pipeline</span>
+                    </div>
+                    <h2 class="text-3xl font-extrabold font-display text-slate-100 mt-1">2. High-Level Architecture (HLD)</h2>
+                    <p class="text-slate-400 mt-2 text-sm max-w-4xl font-sans leading-relaxed">
+                        This High-Level Design (HLD) mappings document illustrates how diagnostic data is gathered out-of-band without degrading host request latencies. 
+                        Metrics are gathered using pull-based models, logs are collected from standard output streams, and trace spans are exported asynchronously to storage backends.
+                    </p>
+                </div>
+
+                <!-- Diagram A: Telemetry flow -->
+                <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl shadow-xl">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-base font-semibold font-display text-sky-400 flex items-center gap-2">
+                            <span class="w-1.5 h-3 bg-sky-400 rounded-sm"></span>
+                            Telemetry Collection Pipeline Flowchart
+                        </h3>
+                        <span class="text-xs font-mono bg-space-900 px-2 py-0.5 rounded text-slate-500">Flow Map</span>
+                    </div>
+                    <div class="overflow-x-auto py-2">
+                        <div class="mermaid flex justify-center min-w-[650px]">
+flowchart TD
+    subgraph AppHost ["Application Infrastructure Pod"]
+        App[".NET Microservice Application"]
+        OTel["OpenTelemetry SDK Middleware"]
+        NodeExp["Node Exporter System Metrics"]
+        
+        App -->|"SDK Instrumentation"| OTel
+        App -->|"Writes Stdout"| Logs["Application Logs"]
+    end
+
+    subgraph Ingestion ["Collector and Storage Subsystem"]
+        Prometheus["Prometheus Server TSDB"]
+        ES["Elasticsearch Engine"]
+        Jaeger["Jaeger Tempo Backend"]
+    end
+
+    subgraph Visualization ["Visualization and Action"]
+        Grafana["Grafana Dashboards"]
+        Kibana["Kibana Console"]
+        AlertManager["Alertmanager Notifications"]
+    end
+
+    OTel -->|"Exposes metrics endpoint"| Prometheus
+    NodeExp -->|"Exposes metrics endpoint"| Prometheus
+    OTel -->|"Pushes OTLP Traces"| Jaeger
+    Logs -->|"Shipped via Fluentbit"| ES
+
+    Prometheus -->|"PromQL Queries"| Grafana
+    Prometheus -->|"Triggers Threshold Alerts"| AlertManager
+    ES -->|"KQL Log Search"| Kibana
+    Jaeger -->|"Trace Lookup UI"| Grafana
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Unified Lifecycle (How They Work Together) -->
+            <section id="unified-lifecycle" class="scroll-mt-24 md:scroll-mt-10 space-y-8">
+                <div class="border-b border-slate-800/80 pb-4">
+                    <div class="flex items-center space-x-2 text-xs font-bold text-emerald-400 uppercase tracking-widest font-mono">
+                        <span>Unified Pipeline</span>
+                        <span>•</span>
+                        <span>Correlation Mapping</span>
+                    </div>
+                    <h2 class="text-3xl font-extrabold font-display text-slate-100 mt-1">3. Unified Lifecycle: How They Work Together</h2>
+                    <p class="text-slate-400 mt-2 text-sm max-w-4xl font-sans leading-relaxed">
+                        To truly grasp observability, you must understand that telemetry collection is not a passive, standalone process. Instead, it is triggered by request execution events. A single client request travels down the OS kernel stack 
+                        (see LLD details in <a href="#lld-kernel" onclick="switchTabAndScroll('request', 'lld-kernel'); return false;" class="text-sky-400 hover:underline">Section 4: OS Kernel</a>) 
+                        and hits edge gateways where TLS is terminated 
+                        (see LLD details in <a href="#lld-network" onclick="switchTabAndScroll('request', 'lld-network'); return false;" class="text-sky-400 hover:underline">Section 5: Edge & Gateway Ingress</a>). 
+                        As it enters the service mesh pod boundary, sidecars inject a trace parent ID 
+                        (see LLD details in <a href="#lld-mesh" onclick="switchTabAndScroll('request', 'lld-mesh'); return false;" class="text-sky-400 hover:underline">Section 6: Mesh & Context Propagation</a>).
+                    </p>
+                    <p class="text-slate-400 text-sm max-w-4xl font-sans leading-relaxed">
+                        Inside the application container, OpenTelemetry middleware extracts this metadata 
+                        (see LLD details in <a href="#lld-app" onclick="switchTabAndScroll('telemetry', 'lld-app'); return false;" class="text-sky-400 hover:underline">Section 7: App Middleware & OTel</a>) 
+                        to link logs and database query traces. As transactions finish, counters are incremented on metrics endpoints to be scraped by Prometheus 
+                        (see LLD details in <a href="#lld-prometheus" onclick="switchTabAndScroll('telemetry', 'lld-prometheus'); return false;" class="text-sky-400 hover:underline">Section 8: Prometheus Engine</a>) 
+                        and indexed inside Elasticsearch 
+                        (see LLD details in <a href="#lld-elk" onclick="switchTabAndScroll('telemetry', 'lld-elk'); return false;" class="text-sky-400 hover:underline">Section 10: Centralized Logging</a>).
+                    </p>
+                </div>
+
+                <!-- Request Observability Sequence -->
+                <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl shadow-xl">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-base font-semibold font-display text-sky-400 flex items-center gap-2">
+                            <span class="w-1.5 h-3 bg-sky-400 rounded-sm"></span>
+                            Correlation Lifecycle of a Single Request
+                        </h3>
+                        <span class="text-xs font-mono bg-space-900 px-2 py-0.5 rounded text-slate-500">Correlation Sequence</span>
+                    </div>
+                    <div class="overflow-x-auto py-2">
+                        <div class="mermaid flex justify-center min-w-[700px]">
+sequenceDiagram
+    autonumber
+    actor Client as "Client Browser"
+    participant Edge as "Edge CDN WAF Cloudflare"
+    participant Ingress as "Gateway Kong ALB"
+    participant Envoy as "Istio Envoy Sidecar"
+    participant App as "App Runtime DOTNET OTel"
+    participant DB as "PostgreSQL Database"
+    participant Storage as "Storage Engines ES TSDB"
+    participant Alert as "Alerts Grafana Alertmanager"
+
+    Client->>Edge: 1. Public HTTPS Request
+    Note over Edge: CDNs generate Access Log and Inject TraceID
+    
+    Edge->>Ingress: 2. Routed Traffic
+    Note over Ingress: Gateway checks JWT and Appends Route labels
+    
+    Ingress->>Envoy: 3. Pod Boundary Entry
+    Note over Envoy: Sidecar verifies mTLS and Starts Trace Span
+    
+    Envoy->>App: 4. Local loopback handover
+    Note over App: App Middleware starts Root Span and Writes Log
+    
+    App->>DB: 5. Execute DB call
+    Note over DB: Database driver spans parent TraceID
+    DB-->>App: Return records
+    
+    App-->>Envoy: 6. Response 200 OK
+    Note over App: Increment http_requests_total Counter
+    
+    Envoy-->>Client: 7. Client receives payload
+
+    Note over Storage: Out-of-band collection triggers
+    App->>Storage: Fluentbit reads Serilog to Elasticsearch
+    App->>Storage: OTel SDK pushes traces to Jaeger Tempo
+    Storage->>Storage: Prometheus pulls App metrics into TSDB
+    
+    Storage->>Alert: Alertmanager evaluates metrics rule
+    Note over Alert: Slack and PagerDuty notification triggered
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Tab 2 Container: Request Flow & Transit Architecture -->
+        <!-- Section Group: Request Flow -->
+            
+            <!-- Section 4: LLD: OS Kernel & Packet Lifecycle -->
+            <section id="lld-kernel" class="scroll-mt-24 md:scroll-mt-10 space-y-8">
+                <div class="border-b border-slate-800/80 pb-4">
+                    <div class="flex items-center space-x-2 text-xs font-bold text-sky-400 uppercase tracking-widest font-mono">
+                        <span>Low-Level Design</span>
+                        <span>•</span>
+                        <span>OS Kernel & Packets</span>
+                    </div>
+                    <h2 class="text-3xl font-extrabold font-display text-slate-100 mt-1">4. LLD: OS Kernel & Packet Lifecycle</h2>
+                    <p class="text-slate-400 mt-2 text-sm max-w-4xl font-sans leading-relaxed">
+                        To trace a request, we must first look at the OS kernel level. When user data travels over physical hardware lines as electrical signals, the operating system kernel utilizes socket buffers to parse protocol frames. 
+                        Understanding this layer helps clarify the performance boundaries of network drivers and CPUs.
+                    </p>
+                </div>
+
+                <!-- Metaphor Callout -->
+                <div class="bg-space-800/40 p-5 border border-sky-500/20 rounded-xl space-y-2 text-xs font-sans">
+                    <span class="font-bold text-sky-400 font-display block uppercase tracking-wider text-[10px]">💡 Core Metaphor: The Post Office Parcel</span>
+                    <p class="text-slate-300 leading-relaxed">
+                        Imagine the kernel's core socket buffer structure, <code class="bg-space-950 p-1 rounded font-mono text-[10px] text-sky-300">struct sk_buff</code>, as a <strong>Post Office Parcel</strong>. 
+                        Instead of opening, unpacking, and re-packing the parcel contents at every sorting office (Layer 2, Layer 3, Layer 4), workers simply stick a new shipping label on the outside of the box. 
+                        Similarly, the Linux kernel uses **Zero-Copy Pointer Manipulation**: it never copy-allocates memory when moving data across networking layers. Instead, it adjusts boundary offset pointers (<code class="font-mono text-slate-300">head</code>, <code class="font-mono text-slate-300">data</code>, <code class="font-mono text-slate-300">tail</code>, <code class="font-mono text-slate-300">end</code>) inside the struct allocated buffer to strip or append headers in place.
+                    </p>
+                </div>
+
+                <!-- OSI vs. Linux Kernel Table -->
+                <div class="space-y-3">
+                    <h3 class="text-lg font-semibold font-display text-sky-400 flex items-center gap-2">
+                        <span class="w-1.5 h-3 bg-sky-400 rounded-sm"></span>
+                        OSI Model vs. Linux Kernel Subsystems Mapping
+                    </h3>
+                    <div class="overflow-x-auto bg-space-800 border border-slate-800/80 rounded-xl shadow-xl">
+                        <table class="w-full text-left text-xs min-w-[850px] font-sans">
+                            <thead class="bg-space-700/60 text-slate-300 uppercase font-mono border-b border-slate-800/80">
+                                <tr>
+                                    <th class="p-4 pl-6">OSI Layer</th>
+                                    <th class="p-4">TCP/IP Layer</th>
+                                    <th class="p-4">OS / Hardware Boundary</th>
+                                    <th class="p-4">Core Kernel Subsystem & Memory Structure</th>
+                                    <th class="p-4 pr-6">Data Unit</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/60 text-slate-300">
+                                <tr class="hover:bg-space-700/20 transition-colors">
+                                    <td class="p-4 pl-6 font-bold text-sky-400">7. Application</td>
+                                    <td class="p-4">Application Layer</td>
+                                    <td class="p-4 font-semibold text-sky-300">User Space</td>
+                                    <td class="p-4 font-sans">Application Processes (Kestrel, Nginx, Envoy), HTTP Request Objects in heap</td>
+                                    <td class="p-4 pr-6 font-mono text-slate-400">Payload / Data</td>
+                                </tr>
+                                <tr class="hover:bg-space-700/20 transition-colors">
+                                    <td class="p-4 pl-6 font-bold text-sky-400">6. Presentation</td>
+                                    <td class="p-4">Application Layer</td>
+                                    <td class="p-4 font-semibold text-sky-300">User Space</td>
+                                    <td class="p-4 font-sans font-sans">TLS Engine (OpenSSL / BoringSSL), Data Serialization engines</td>
+                                    <td class="p-4 pr-6 font-mono text-slate-400">Encrypted Data</td>
+                                </tr>
+                                <tr class="hover:bg-space-700/20 transition-colors">
+                                    <td class="p-4 pl-6 font-bold text-sky-400">5. Session</td>
+                                    <td class="p-4">Application Layer</td>
+                                    <td class="p-4 font-semibold text-sky-300">User / Socket API</td>
+                                    <td class="p-4 font-sans">POSIX Sockets API bindings (<code class="text-2xs font-mono text-sky-300">socket()</code>, <code class="text-2xs font-mono text-sky-300">connect()</code>, <code class="text-2xs font-mono text-sky-300">read()</code>, <code class="text-2xs font-mono text-sky-300">write()</code>)</td>
+                                    <td class="p-4 pr-6 font-mono text-slate-400">Socket Stream</td>
+                                </tr>
+                                <tr class="hover:bg-space-700/20 transition-colors">
+                                    <td class="p-4 pl-6 font-bold text-indigo-400">4. Transport</td>
+                                    <td class="p-4">Transport Layer</td>
+                                    <td class="p-4 font-semibold text-indigo-300">Kernel Space</td>
+                                    <td class="p-4 font-sans">TCP Protocol Stack (<code class="text-2xs font-mono text-indigo-300">tcp_v4_rcv</code>, <code class="text-2xs font-mono text-indigo-300">struct sock</code> descriptor, TCP Ring Buffers, Sliding Window)</td>
+                                    <td class="p-4 pr-6 font-mono text-slate-400">Segment (TCP Header + Data)</td>
+                                </tr>
+                                <tr class="hover:bg-space-700/20 transition-colors">
+                                    <td class="p-4 pl-6 font-bold text-indigo-400">3. Network</td>
+                                    <td class="p-4">Internet Layer</td>
+                                    <td class="p-4 font-semibold text-indigo-300">Kernel Space</td>
+                                    <td class="p-4 font-sans">IP Protocol Subsystem (<code class="text-2xs font-mono text-indigo-300">ip_rcv</code>, OS Routing Table Lookup, Netfilter / IPtables routing, eBPF filters)</td>
+                                    <td class="p-4 pr-6 font-mono text-slate-400">Packet (IP Header + Segment)</td>
+                                </tr>
+                                <tr class="hover:bg-space-700/20 transition-colors">
+                                    <td class="p-4 pl-6 font-bold text-amber-400">2. Data Link</td>
+                                    <td class="p-4">Network Interface</td>
+                                    <td class="p-4 font-semibold text-amber-300">Kernel / Driver</td>
+                                    <td class="p-4 font-sans">NIC Device Driver, Ring Buffers (<code class="text-2xs font-mono text-amber-300">RX/TX Ring</code> structures), ARP Table mapping, Ethernet Framing</td>
+                                    <td class="p-4 pr-6 font-mono text-slate-400">Frame (MAC Header + Packet)</td>
+                                </tr>
+                                <tr class="hover:bg-space-700/20 transition-colors">
+                                    <td class="p-4 pl-6 font-bold text-amber-400">1. Physical</td>
+                                    <td class="p-4">Network Interface</td>
+                                    <td class="p-4 font-semibold text-amber-300">Hardware (NIC)</td>
+                                    <td class="p-4 font-sans font-sans">Physical Network Interface Card (NIC), PHY Chipset, Optical/Copper physical signals</td>
+                                    <td class="p-4 pr-6 font-mono text-slate-400">Bits / Signals</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Egress & Ingress Packet Lifecycles -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-2">
+                    <!-- Egress Section -->
+                    <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl shadow-xl flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold font-display text-sky-400 mb-4 flex items-center gap-2">
+                                <svg class="h-5 w-5 rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+                                Egress (Source Host Transmission)
+                            </h3>
+                            <ol class="space-y-4 text-xs text-slate-300 font-sans list-decimal list-inside leading-relaxed">
+                                <li>
+                                    <strong class="text-slate-200">Application Syscall:</strong> 
+                                    Application constructs request bytes in user memory and triggers a <code class="text-sky-400 font-mono">write(fd, buffer, length)</code> system call.
+                                </li>
+                                <li>
+                                    <strong class="text-slate-200">Kernel Context Switch:</strong> 
+                                    The CPU switches context from user-space mode into privilege kernel mode.
+                                </li>
+                                <li>
+                                    <strong class="text-slate-200">Socket Buffer Allocation:</strong> 
+                                    The kernel allocates a unified socket buffer structure (<code class="text-sky-400 font-mono">struct sk_buff</code>) in kernel memory space.
+                                </li>
+                                <li>
+                                    <strong class="text-slate-200">Transport & Network Layer:</strong> 
+                                    TCP layer adds ports and sequence hashes. IP layer resolves the routing table, prepends IP headers, and executes Netfilter/IPtables filters.
+                                </li>
+                                <li>
+                                    <strong class="text-slate-200">NIC Driver & DMA:</strong> 
+                                    The network driver copies the packet pointer into the NIC's Transmit (<code class="text-sky-400 font-mono">TX Ring</code>) buffer utilizing Direct Memory Access (DMA).
+                                </li>
+                                <li>
+                                    <strong class="text-slate-200">Hardware Framing:</strong> 
+                                    The physical NIC cards wrap the packet in an Ethernet frame with MAC headers and FCS checksums, emitting signals onto wires.
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <!-- Ingress Section -->
+                    <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl shadow-xl flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold font-display text-indigo-400 mb-4 flex items-center gap-2">
+                                <svg class="h-5 w-5 -rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+                                Ingress (Destination Host Reception)
+                            </h3>
+                            <ol class="space-y-4 text-xs text-slate-300 font-sans list-decimal list-inside leading-relaxed">
+                                <li>
+                                    <strong class="text-slate-200">Hardware Packet Receive:</strong> 
+                                    Target NIC accepts signals, validates FCS checksums, and copies frames to Receive (<code class="text-indigo-400 font-mono">RX Ring</code>) queue via DMA.
+                                </li>
+                                <li>
+                                    <strong class="text-slate-200">Interrupt and NAPI Polling:</strong> 
+                                    The NIC triggers a hardware IRQ. To prevent interrupt storms under load, NAPI disables IRQs and issues a SoftIRQ (<code class="text-indigo-400 font-mono">NET_RX_SOFTIRQ</code>) to poll the ring buffer in batches via <code class="text-indigo-400 font-mono">ksoftirqd</code>.
+                                </li>
+                                <li>
+                                    <strong class="text-slate-200">Network Layer (ip_rcv):</strong> 
+                                    The driver strips MAC headers and calls <code class="text-indigo-400 font-mono">ip_rcv()</code>. Netfilter rules are verified.
+                                </li>
+                                <li>
+                                    <strong class="text-slate-200">Transport Layer (tcp_v4_rcv):</strong> 
+                                    TCP verifies socket 4-tuples, removes segment headers, and stores payloads in the TCP read buffer socket queue.
+                                </li>
+                                <li>
+                                    <strong class="text-slate-200">POSIX Socket Read Syscall:</strong> 
+                                    The waiting worker wakes up via <code class="text-indigo-400 font-mono">epoll()</code>, invoking a socket <code class="text-indigo-400 font-mono">read()</code> context switch, dragging data bytes into user-space heap for HTTP parsing.
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NAPI Detailed Callout -->
+                <div class="bg-space-800/40 p-5 border border-indigo-500/20 rounded-xl space-y-2 text-xs font-sans">
+                    <span class="font-bold text-indigo-400 font-display block uppercase tracking-wider text-[10px]">💡 NAPI Mechanism: Doorbell vs. Mailbox Polling</span>
+                    <p class="text-slate-300 leading-relaxed">
+                        If a host receives 100,000 packets per second, and each packet triggers a CPU Hardware Interrupt (IRQ) to stop running threads, the CPU spends all its cycles handling context switches. This is known as <strong>Interrupt Livelock</strong>.
+                        To prevent this, Linux uses **NAPI (New API)**:
+                        Upon receiving a packet, the NIC triggers an initial IRQ. The driver immediately **disables** NIC hardware interrupts, registers the device in a poll list, and triggers a SoftIRQ (<code class="font-mono text-indigo-300">NET_RX_SOFTIRQ</code>). 
+                        A background thread (<code class="font-mono text-indigo-300">ksoftirqd</code>) then **polls** the RX Ring Buffer in batches. Hardware interrupts are only re-enabled once the buffer is entirely empty.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 5: LLD Edge & Ingress Gateway -->
+            <section id="lld-network" class="scroll-mt-24 md:scroll-mt-10 space-y-8">
+                <div class="border-b border-slate-800/80 pb-4">
+                    <div class="flex items-center space-x-2 text-xs font-bold text-amber-400 uppercase tracking-widest font-mono">
+                        <span>Low-Level Design</span>
+                        <span>•</span>
+                        <span>Edge & Ingress Routing</span>
+                    </div>
+                    <h2 class="text-3xl font-extrabold font-display text-slate-100 mt-1">5. LLD: Edge Processing & Ingress Gateway</h2>
+                    <p class="text-slate-400 mt-2 text-sm max-w-4xl font-sans leading-relaxed">
+                        Once packets leave the host kernel, they cross the public internet and hit edge network routing rules. This section traces how public edge routers terminate encryption layers and how ingress load balancers translate HTTP requests into cluster services.
+                    </p>
+                </div>
+
+                <!-- Pure Network Request Sequence -->
+                <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl shadow-xl">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-base font-semibold font-display text-amber-400 flex items-center gap-2">
+                            <span class="w-1.5 h-3 bg-amber-400 rounded-sm"></span>
+                            Client-to-Application Network Transit Flow
+                        </h3>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-mono bg-space-900 px-2 py-0.5 rounded text-slate-500 hidden sm:inline-block">Transit Diagram</span>
+                            <button class="expand-diagram-btn text-xs font-mono bg-space-900 hover:bg-space-700 text-sky-400 hover:text-white px-2.5 py-1 rounded-lg border border-slate-700/60 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                                </svg>
+                                Expand Diagram
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto py-2">
+                        <div class="mermaid flex justify-center min-w-[700px]">
+sequenceDiagram
+    autonumber
+    actor Client as "Client Mobile App"
+    participant DNS as "Route53 DNS"
+    participant CDN as "Cloudflare Edge WAF CDN"
+    participant ALB as "Cloud Load Balancer"
+    participant Ingress as "Kubernetes Ingress Gateway"
+    participant Envoy as "Envoy Sidecar Istio"
+    participant App as "DOTNET Application"
+
+    Client->>DNS: Resolve api.example.com
+    DNS-->>Client: IP Address CDN Edge Anycast IP
+    
+    Client->>CDN: HTTPS GET order service TLS 1.3
+    Note over CDN: WAF Inspection DDoS Check Rate Limit
+    
+    CDN->>ALB: Forward Authorized Request
+    ALB->>Ingress: Forward to Cluster Ingress Node
+    
+    Note over Ingress: Routing Rule Match JWT Verification
+    Ingress->>Envoy: Route to Target Service Pod
+    
+    Note over Envoy: mTLS Handshake Inject W3C Trace Context
+    Envoy->>App: Localhost HTTP Forward
+    App-->>Envoy: 200 OK Payload
+    Envoy-->>Ingress: 200 OK
+    Ingress-->>ALB: 200 OK
+    ALB-->>CDN: 200 OK
+    CDN-->>Client: 200 OK Response
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hop-by-Hop Mutation Timeline -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-semibold font-display text-amber-400 flex items-center gap-2">
+                        <span class="w-1.5 h-3 bg-amber-400 rounded-sm"></span>
+                        Request Object Mutation Across Network Hops
+                    </h3>
+                    <p class="text-xs text-slate-400 max-w-3xl leading-relaxed">
+                        A request does not remain static. As it crosses reverse proxies, gateways, and sidecars, its object state, headers, and L4 socket connections update dynamically to preserve metadata and link telemetry.
+                    </p>
+                    
+                    <div class="space-y-4 relative before:absolute before:inset-y-0 before:left-4 md:before:left-1/2 before:w-0.5 before:bg-slate-800/80">
+                        
+                        <!-- Hop 1 -->
+                        <div class="relative flex flex-col md:flex-row md:justify-between items-start md:items-center">
+                            <div class="absolute left-4 md:left-1/2 transform -translate-x-1/2 flex items-center justify-center w-5 h-5 rounded-full bg-sky-500 border border-space-900 z-10">
+                                <span class="text-[9px] font-bold text-white">1</span>
+                            </div>
+                            <div class="pl-8 md:pl-0 md:w-[46%] w-full">
+                                <div class="bg-space-800 p-4 border border-slate-800 rounded-lg shadow space-y-2">
+                                    <div class="flex justify-between items-center">
+                                        <h4 class="font-bold text-sky-400 text-xs font-display">Hop 1: Client Browser / App</h4>
+                                        <span class="text-3xs font-mono text-slate-500">Origin Request</span>
+                                    </div>
+                                    <div class="space-y-1 font-mono text-3xs text-slate-300 bg-space-900 p-2.5 rounded border border-slate-850">
+                                        <p class="text-slate-500 font-bold">HTTP Payload:</p>
+                                        <code class="block text-sky-300">GET /api/orders</code>
+                                        <p class="text-slate-500 font-bold mt-1">Headers:</p>
+                                        <code class="block text-slate-300">Host: api.example.com<br/>Auth: Bearer &lt;token&gt;</code>
+                                        <p class="text-slate-500 font-bold mt-1">L4 Socket:</p>
+                                        <code class="block text-purple-300">SrcIP: 203.0.113.5:52100 &rarr; DstIP: 104.16.1.1:443 (CDN Edge)</code>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="hidden md:block md:w-[46%]"></div>
+                        </div>
+
+                        <!-- Hop 2 -->
+                        <div class="relative flex flex-col md:flex-row md:justify-between items-start md:items-center">
+                            <div class="absolute left-4 md:left-1/2 transform -translate-x-1/2 flex items-center justify-center w-5 h-5 rounded-full bg-amber-500 border border-space-900 z-10">
+                                <span class="text-[9px] font-bold text-white">2</span>
+                            </div>
+                            <div class="hidden md:block md:w-[46%]"></div>
+                            <div class="pl-8 md:pl-0 md:w-[46%] w-full">
+                                <div class="bg-space-800 p-4 border border-slate-800 rounded-lg shadow space-y-2">
+                                    <div class="flex justify-between items-center">
+                                        <h4 class="font-bold text-amber-400 text-xs font-display">Hop 2: CDN Edge / WAF</h4>
+                                        <span class="text-3xs font-mono text-slate-500">TLS Termination & Headers Injected</span>
+                                    </div>
+                                    <div class="space-y-1 font-mono text-3xs text-slate-300 bg-space-900 p-2.5 rounded border border-slate-850 font-sans">
+                                        <p class="text-slate-500 font-bold">HTTP Payload:</p>
+                                        <code class="block text-sky-300">GET /api/orders</code>
+                                        <p class="text-slate-400 text-2xs mb-1 font-sans">CDN decrypts payload, verifies WAF rules, and appends original client metadata headers:</p>
+                                        <p class="text-slate-500 font-bold mt-1">Added Headers:</p>
+                                        <code class="block text-amber-300">X-Forwarded-For: 203.0.113.5<br/>X-Forwarded-Proto: https<br/>CF-Ray: 7a8b9c0d1e2f3a4b</code>
+                                        <p class="text-slate-500 font-bold mt-1">L4 Socket:</p>
+                                        <code class="block text-purple-300">SrcIP: 104.16.1.1:44300 &rarr; DstIP: 1.2.3.4 (Cloud ALB)</code>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hop 3 -->
+                        <div class="relative flex flex-col md:flex-row md:justify-between items-start md:items-center">
+                            <div class="absolute left-4 md:left-1/2 transform -translate-x-1/2 flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500 border border-space-900 z-10">
+                                <span class="text-[9px] font-bold text-white">3</span>
+                            </div>
+                            <div class="pl-8 md:pl-0 md:w-[46%] w-full">
+                                <div class="bg-space-800 p-4 border border-slate-800 rounded-lg shadow space-y-2">
+                                    <div class="flex justify-between items-center">
+                                        <h4 class="font-bold text-emerald-400 text-xs font-display">Hop 3: API Gateway / Ingress</h4>
+                                        <span class="text-3xs font-mono text-slate-500">JWT Context & W3C Trace Init</span>
+                                    </div>
+                                    <div class="space-y-1 font-mono text-3xs text-slate-300 bg-space-900 p-2.5 rounded border border-slate-850 font-sans">
+                                        <p class="text-slate-500 font-bold">HTTP Payload:</p>
+                                        <code class="block text-sky-300">GET /api/orders</code>
+                                        <p class="text-slate-400 text-2xs mb-1 font-sans">Decodes JWT, maps internal DNS names, and starts tracing correlation:</p>
+                                        <p class="text-slate-500 font-bold mt-1">Mutated Headers:</p>
+                                        <code class="block text-emerald-300">Host: order-service.internal<br/>X-Forwarded-For: 203.0.113.5, 10.0.1.10<br/>traceparent: 00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01<br/>X-User-Id: usr_994821</code>
+                                        <p class="text-slate-500 font-bold mt-1">L4 Socket:</p>
+                                        <code class="block text-purple-300">SrcIP: 10.0.1.10:38210 &rarr; DstIP: 10.244.1.15:8080 (Pod Target)</code>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="hidden md:block md:w-[46%]"></div>
+                        </div>
+
+                        <!-- Hop 4 -->
+                        <div class="relative flex flex-col md:flex-row md:justify-between items-start md:items-center">
+                            <div class="absolute left-4 md:left-1/2 transform -translate-x-1/2 flex items-center justify-center w-5 h-5 rounded-full bg-purple-500 border border-space-900 z-10">
+                                <span class="text-[9px] font-bold text-white">4</span>
+                            </div>
+                            <div class="hidden md:block md:w-[46%]"></div>
+                            <div class="pl-8 md:pl-0 md:w-[46%] w-full">
+                                <div class="bg-space-800 p-4 border border-slate-800 rounded-lg shadow space-y-2">
+                                    <div class="flex justify-between items-center">
+                                        <h4 class="font-bold text-purple-400 text-xs font-display">Hop 4: Service Mesh Sidecar (Envoy)</h4>
+                                        <span class="text-3xs font-mono text-slate-500">mTLS Decrypt & Local Span ID</span>
+                                    </div>
+                                    <div class="space-y-1 font-mono text-3xs text-slate-300 bg-space-900 p-2.5 rounded border border-slate-850 font-sans">
+                                        <p class="text-slate-500 font-bold">HTTP Payload:</p>
+                                        <code class="block text-sky-300">GET /api/orders</code>
+                                        <p class="text-slate-400 text-2xs mb-1 font-sans">Decrypts container mTLS, updates parent-child span, and forwards to application localhost loopback:</p>
+                                        <p class="text-slate-500 font-bold mt-1">Mutated Headers:</p>
+                                        <code class="block text-purple-300">Host: localhost:8080<br/>traceparent: 00-4bf92f3577b34da6a3ce929d0e0e4736-3a7b1c82e0229a1b-01<br/>x-request-id: c9a4f210-9831-481b-a24b</code>
+                                        <p class="text-slate-500 font-bold mt-1">L4 Socket:</p>
+                                        <code class="block text-purple-300">SrcIP: 127.0.0.1:41200 &rarr; DstIP: 127.0.0.1:8080 (Loopback to App)</code>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
+                    <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl flex flex-col justify-between shadow-xl">
+                        <div>
+                            <h3 class="text-lg font-semibold font-display text-amber-400 mb-4 flex items-center gap-2">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.933 12.8a1 1 0 000-1.6L6.6 7.2A1 1 0 005 8v8a1 1 0 001.6.8l5.333-4zM19.933 12.8a1 1 0 000-1.6l-5.333-4A1 1 0 0013 8v8a1 1 0 001.6.8l5.333-4z" /></svg>
+                                Edge Processing Lifecycle
+                            </h3>
+                            <ul class="space-y-4 text-sm text-slate-300 font-sans">
+                                <li class="flex items-start gap-3">
+                                    <span class="flex-shrink-0 flex items-center justify-center h-5 w-5 rounded-full bg-amber-500/10 text-amber-400 font-bold text-xs mt-0.5">1</span>
+                                    <div>
+                                        <strong class="text-slate-200">Anycast DNS Routing</strong>
+                                        <p class="text-xs text-slate-400 mt-0.5 leading-relaxed">BGP routes client request packages to the closest Point of Presence (PoP) edge server, reducing initial network latency.</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <span class="flex-shrink-0 flex items-center justify-center h-5 w-5 rounded-full bg-amber-500/10 text-amber-400 font-bold text-xs mt-0.5">2</span>
+                                    <div>
+                                        <strong class="text-slate-200">Edge TLS & WAF Filters</strong>
+                                        <p class="text-xs text-slate-400 mt-0.5 leading-relaxed">Terminates public TLS (v1.3) at the edge, checks for DDoS signatures, and filters out OWASP vulnerabilities early.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl flex flex-col justify-between shadow-xl">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold font-display text-sky-400">Edge HTTP Header Injection</h3>
+                                <span class="text-xs font-mono px-2 py-1 bg-slate-900 border border-slate-800 rounded text-slate-400">HTTP Sample</span>
+                            </div>
+                            <div class="relative group">
+                                <pre class="bg-space-900 p-4 rounded-lg text-xs text-slate-300 overflow-x-auto border border-slate-800/50"><code class="language-http">X-Forwarded-For: 203.0.113.195
+X-Forwarded-Proto: https
+CF-Ray: 7a8b9c0d1e2f3a4b-BLR
+CF-IPCountry: IN
+X-Request-Start: t=1786082885.123</code></pre>
+                                <button class="absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-2.5 py-1.5 rounded-md text-xs font-mono flex items-center gap-1.5 shadow" onclick="copySnippet(this)">
+                                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                                    </svg>
+                                    <span>Copy</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ingress Gateway Sequence -->
+                <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl shadow-xl">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-base font-semibold font-display text-emerald-400 flex items-center gap-2">
+                            <span class="w-1.5 h-3 bg-emerald-400 rounded-sm"></span>
+                            Ingress Gateway Pipeline Process
+                        </h3>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-mono bg-space-900 px-2 py-0.5 rounded text-slate-500 hidden sm:inline-block">Flow Diagram</span>
+                            <button class="expand-diagram-btn text-xs font-mono bg-space-900 hover:bg-space-700 text-sky-400 hover:text-white px-2.5 py-1 rounded-lg border border-slate-700/60 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                                </svg>
+                                Expand Diagram
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto py-2">
+                        <div class="mermaid flex justify-center min-w-[650px]">
+flowchart LR
+    ALB["Cloud Load Balancer"] -->|"HTTP2"| Gateway["Kubernetes Ingress Gateway"]
+    
+    subgraph GatewayPipeline ["Gateway Ingress Pipeline"]
+        Rules["1. Host and Path Routing"] --> Auth["2. JWT Auth Validation"]
+        Auth --> RateLimit["3. Distributed Rate Limiter"]
+        RateLimit --> HeaderInject["4. Inject Correlation Headers"]
+    end
+    
+    Gateway --> Rules
+    HeaderInject -->|"Cluster IP Routing"| PodMesh["Kubernetes Pod or Envoy Sidecar"]
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ingress YAML -->
+                <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl shadow-xl">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-base font-semibold font-display text-sky-400 flex items-center gap-2">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                            Kubernetes Ingress Configuration Example
+                        </h3>
+                        <span class="text-xs font-mono px-2 py-1 bg-slate-900 border border-slate-800 rounded text-slate-400">YAML</span>
+                    </div>
+                    <div class="relative group">
+                        <pre class="bg-space-900 p-4 rounded-lg text-xs text-slate-300 overflow-x-auto border border-slate-800/50"><code class="language-yaml">apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "5"
+spec:
+  rules:
+  - host: api.example.com
+    http:
+      paths:
+      - path: /api/v1/orders
+        pathType: Prefix
+        backend:
+          service:
+            name: order-service
+            port:
+              number: 8080</code></pre>
+                        <button class="absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-2.5 py-1.5 rounded-md text-xs font-mono flex items-center gap-1.5 shadow" onclick="copySnippet(this)">
+                            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                            </svg>
+                            <span>Copy</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Key Architectural Takeaways Box (OS Kernel & Context Lineage) -->
+                <div class="bg-space-850 p-6 border border-slate-800/80 rounded-xl space-y-4 text-xs font-sans shadow-lg">
+                    <span class="font-bold text-slate-200 font-display block text-sm border-b border-slate-800 pb-2">Key Architectural Takeaways</span>
+                    <ul class="space-y-3 list-disc list-inside text-slate-400 leading-relaxed">
+                        <li>
+                            <strong class="text-slate-300">sk_buff Zero-Copy Pointer Manipulation:</strong> 
+                            The Linux kernel never re-allocates memory when moving data packet structures across network layers. It adjusts offsets (head, data, tail, end) inside <code class="text-2xs font-mono text-sky-400">struct sk_buff</code> to prepend/strip TCP/IP/MAC headers in place.
+                        </li>
+                        <li>
+                            <strong class="text-slate-300">NAPI Interrupt Mitigation:</strong> 
+                            To prevent high packet rates from overwhelming CPUs with hardware interrupts, Linux switches to polled ring-buffer draining (<code class="text-2xs font-mono text-sky-400">ksoftirqd</code>) under load, preventing hardware livelocks.
+                        </li>
+                        <li>
+                            <strong class="text-slate-300">Context & Header Lineage:</strong> 
+                            The request lifecycle uses standard header metadata (<code class="text-2xs font-mono text-sky-400">X-Forwarded-For</code> for IP origin, <code class="text-2xs font-mono text-sky-400">traceparent</code> for W3C distributed tracing context) to maintain continuous observability lineage across distinct gateways, proxies, and runtimes.
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 6: LLD Mesh & Context -->
+            <section id="lld-mesh" class="scroll-mt-24 md:scroll-mt-10 space-y-8">
+                <div class="border-b border-slate-800/80 pb-4">
+                    <div class="flex items-center space-x-2 text-xs font-bold text-purple-400 uppercase tracking-widest font-mono">
+                        <span>Low-Level Design</span>
+                        <span>•</span>
+                        <span>Mesh & Context Propagation</span>
+                    </div>
+                    <h2 class="text-3xl font-extrabold font-display text-slate-100 mt-1">6. LLD: Service Mesh & Context Propagation</h2>
+                    <p class="text-slate-400 mt-2 text-sm max-w-4xl font-sans leading-relaxed">
+                        As requests enter microservice containers, internal traffic routers intercept connections. 
+                        This section breaks down how sidecar proxies capture network interfaces transparently and propagate context across borders.
+                    </p>
+                </div>
+
+                <!-- Metaphor Callout -->
+                <div class="bg-space-800/40 p-5 border border-purple-500/20 rounded-xl space-y-2 text-xs font-sans">
+                    <span class="font-bold text-purple-400 font-display block uppercase tracking-wider text-[10px]">💡 Core Metaphor: The Relay Baton</span>
+                    <p class="text-slate-300 leading-relaxed">
+                        Think of W3C distributed tracing context propagation as passing a <strong>Relay Baton</strong> in a running race.
+                        The first runner (Client/Gateway) creates the baton and writes the **Trace ID** (the team identifier). As they pass it to the next runner (Envoy proxy, Application controller, Database query driver), each runner appends their own **Span ID** (representing their individual leg of the race) and timestamp without changing the team's Trace ID. 
+                        By passing this baton in HTTP headers (<code class="font-mono text-2xs text-purple-300">traceparent</code>), we trace a continuous request path across independent microservice nodes.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Envoy Sidecar Interception -->
+                    <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl shadow-xl flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold font-display text-purple-400 mb-4 flex items-center gap-2">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                                Envoy Sidecar Interception (iptables)
+                            </h3>
+                            <div class="space-y-4 font-sans">
+                                <div class="flex gap-3">
+                                    <span class="flex-shrink-0 flex items-center justify-center h-6 w-6 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-400 font-bold text-xs mt-0.5">1</span>
+                                    <div class="text-sm">
+                                        <strong class="text-slate-200">iptables Packet Capture</strong>
+                                        <p class="text-xs text-slate-400 mt-1 leading-relaxed">PREROUTING rules capture inbound TCP packets and route them into the local Envoy listener on port `15006` transparently.</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-3">
+                                    <span class="flex-shrink-0 flex items-center justify-center h-6 w-6 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-400 font-bold text-xs mt-0.5">2</span>
+                                    <div class="text-sm">
+                                        <strong class="text-slate-200">mTLS Verification & Handover</strong>
+                                        <p class="text-xs text-slate-400 mt-1 leading-relaxed">Envoy evaluates certificates and decrypts TLS. Decrypted packets are forwarded to application containers via loopback (`127.0.0.1`).</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Trace Context Propagation -->
+                    <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl shadow-xl flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold font-display text-rose-400 flex items-center gap-2">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+                                    W3C Trace Context Propagation
+                                </h3>
+                                <span class="text-xs font-mono px-2 py-1 bg-slate-900 border border-slate-800 rounded text-slate-400">Spec Detail</span>
+                            </div>
+                            <div class="space-y-4 text-xs">
+                                <div class="space-y-1.5">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-slate-400 font-semibold">1. traceparent Header:</span>
+                                        <button class="text-2xs font-mono text-slate-500 hover:text-sky-400 transition-colors" onclick="copyDirectText('00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01', this)">Copy</button>
+                                    </div>
+                                    <code class="block bg-space-900 p-3 rounded-lg text-purple-300 font-mono border border-slate-800/50 break-all select-all">00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01</code>
+                                    <p class="text-[10px] text-slate-500 leading-relaxed pl-1 font-mono">
+                                        Format: [version]-[trace_id (32 hex characters)]-[parent_span_id (16 hex characters)]-[trace_flags (01 represents sampled)]
+                                    </p>
+                                </div>
+                                <div class="space-y-1.5">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-slate-400 font-semibold">2. tracestate Header:</span>
+                                        <button class="text-2xs font-mono text-slate-500 hover:text-sky-400 transition-colors" onclick="copyDirectText('congo=t61rcWkgMzE,rojo=123231', this)">Copy</button>
+                                    </div>
+                                    <code class="block bg-space-900 p-3 rounded-lg text-purple-300 font-mono border border-slate-800/50 break-all select-all">congo=t61rcWkgMzE,rojo=123231</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Tab 3 Container: Telemetry & Observability Engine -->
+        <!-- Section Group: Telemetry Engine -->
+            
+            <!-- Section 7: LLD App & OpenTelemetry -->
+            <section id="lld-app" class="scroll-mt-24 md:scroll-mt-10 space-y-6">
+                <div class="border-b border-slate-800/80 pb-4">
+                    <div class="flex items-center space-x-2 text-xs font-bold text-sky-400 uppercase tracking-widest font-mono">
+                        <span>Low-Level Design</span>
+                        <span>•</span>
+                        <span>App Middleware</span>
+                    </div>
+                    <h2 class="text-3xl font-extrabold font-display text-slate-100 mt-1">7. LLD: App Middleware & OpenTelemetry</h2>
+                    <p class="text-slate-400 mt-2 text-sm max-w-4xl font-sans leading-relaxed">
+                        Inside the application process, routing middlewares execute the request lifecycle. 
+                        This section details how diagnostic tools hook into application runtimes to translate API transactions into observable telemetry records.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl flex flex-col justify-between shadow-xl">
+                        <div>
+                            <h3 class="text-lg font-semibold font-display text-sky-400 mb-4 flex items-center gap-2">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m0 0l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1 2 1M4 7v3.5l4 2 4-2V7M20 7v3.5l-4 2-4-2V7" /></svg>
+                                Application Integration Mechanics
+                            </h3>
+                            <ul class="space-y-4 text-sm text-slate-300 font-sans">
+                                <li class="flex items-start gap-3">
+                                    <span class="flex-shrink-0 flex items-center justify-center h-5 w-5 rounded-full bg-sky-500/10 text-sky-400 font-bold text-xs mt-0.5">1</span>
+                                    <div>
+                                        <strong class="text-slate-200">Middleware Instrumentation</strong>
+                                        <p class="text-xs text-slate-400 mt-0.5 leading-relaxed">OpenTelemetry framework SDK hooks track internal routing path latency and request execution cycles automatically.</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <span class="flex-shrink-0 flex items-center justify-center h-5 w-5 rounded-full bg-sky-500/10 text-sky-400 font-bold text-xs mt-0.5">2</span>
+                                    <div>
+                                        <strong class="text-slate-200">Context Extraction</strong>
+                                        <p class="text-xs text-slate-400 mt-0.5 leading-relaxed font-sans">Active tracing modules read W3C headers on request entry, creating parent-child spans to track downstream API dependencies.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl flex flex-col justify-between shadow-xl">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold font-display text-emerald-400">Exposition Endpoint Format (`/metrics`)</h3>
+                                <span class="text-xs font-mono px-2 py-1 bg-slate-900 border border-slate-800 rounded text-slate-400">Prometheus Plaintext</span>
+                            </div>
+                            <div class="relative group">
+                                <pre class="bg-space-900 p-4 rounded-lg text-xs text-slate-300 overflow-x-auto border border-slate-800/50"><code class="language-plaintext"># HELP http_requests_total Total number of HTTP requests
+# TYPE http_requests_total counter
+http_requests_total{method="GET",status="200",handler="/api/orders"} 14205
+http_requests_total{method="POST",status="500",handler="/api/orders"} 12
+
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total 1542.34</code></pre>
+                                <button class="absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-2.5 py-1.5 rounded-md text-xs font-mono flex items-center gap-1.5 shadow" onclick="copySnippet(this)">
+                                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                                    </svg>
+                                    <span>Copy</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl shadow-xl">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-base font-semibold font-display text-sky-400 flex items-center gap-2">
+                            <span class="w-1.5 h-3 bg-sky-400 rounded-sm"></span>
+                            Application Internal Middleware Pipeline
+                        </h3>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-mono bg-space-900 px-2 py-0.5 rounded text-slate-500 hidden sm:inline-block">Execution Flow</span>
+                            <button class="expand-diagram-btn text-xs font-mono bg-space-900 hover:bg-space-700 text-sky-400 hover:text-white px-2.5 py-1 rounded-lg border border-slate-700/60 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                                </svg>
+                                Expand Diagram
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto py-2">
+                        <div class="mermaid flex justify-center min-w-[650px]">
+flowchart LR
+    HTTP["HTTP Request"] --> M1["1. Exception Handler"]
+    M1 --> M2["2. OpenTelemetry Tracing"]
+    M2 --> M3["3. Authentication and Auth"]
+    M3 --> M4["4. Routing Controller Action"]
+    M4 --> DB["5. External Call DB or HTTP"]
+    DB --> Response["Render Response JSON"]
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 8: LLD Prometheus -->
+            <section id="lld-prometheus" class="scroll-mt-24 md:scroll-mt-10 space-y-8">
+                <div class="border-b border-slate-800/80 pb-4">
+                    <div class="flex items-center space-x-2 text-xs font-bold text-sky-400 uppercase tracking-widest font-mono">
+                        <span>Low-Level Design</span>
+                        <span>•</span>
+                        <span>Prometheus Scraper</span>
+                    </div>
+                    <h2 class="text-3xl font-extrabold font-display text-slate-100 mt-1">8. LLD: Prometheus Metrics Engine</h2>
+                    <p class="text-slate-400 mt-2 text-sm max-w-4xl font-sans leading-relaxed">
+                        Aggregating numeric indicators allows real-time cluster alerting. This section details how Prometheus retrieves data from exposed metrics endpoints and stores it inside time-series databases.
+                    </p>
+                </div>
+
+                <!-- Scraping Logic Details -->
+                <div class="bg-space-800/40 p-5 border border-sky-500/20 rounded-xl space-y-2 text-xs font-sans">
+                    <span class="font-bold text-sky-400 font-display block uppercase tracking-wider text-[10px]">💡 Push vs. Pull Collection Models</span>
+                    <p class="text-slate-300 leading-relaxed font-sans">
+                        Many monitoring systems use **Push models**, where application nodes push telemetry data directly to a central collector. 
+                        However, if a cluster faces a traffic spike, hundreds of application pods concurrently pushing metrics can easily overload the collection servers.
+                    </p>
+                    <p class="text-slate-300 leading-relaxed font-sans">
+                        Prometheus uses a **Pull model**: it pulls metrics from exposed application endpoints at configured scrape intervals. 
+                        This acts as an automatic **backpressure filter**. If application containers struggle under high traffic, Prometheus scrapes at its own set pace, protecting the central monitoring database from traffic spikes.
+                    </p>
+                </div>
+
+                <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl shadow-xl">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold font-display text-purple-400 flex items-center gap-2">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89M9 11l3 3L22 4" /></svg>
+                            Prometheus Target Scrape Sequence
+                        </h3>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-mono bg-space-900 px-2 py-0.5 rounded text-slate-500 hidden sm:inline-block">Sequence Diagram</span>
+                            <button class="expand-diagram-btn text-xs font-mono bg-space-900 hover:bg-space-700 text-sky-400 hover:text-white px-2.5 py-1 rounded-lg border border-slate-700/60 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                                </svg>
+                                Expand Diagram
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto py-4">
+                        <div class="mermaid flex justify-center min-w-[650px]">
+sequenceDiagram
+    autonumber
+    participant P as "Prometheus Server"
+    participant A as "Application Metrics Endpoint"
+    participant N as "Node Exporter System Endpoint"
+
+    loop Scrape Interval Every 15s
+        P->>A: HTTP GET metrics
+        A-->>P: 200 OK Application Metrics Output
+        P->>N: HTTP GET metrics
+        N-->>P: 200 OK System Metrics Output
+        P->>P: Ingest and Persist to TSDB Storage
+    end
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl shadow-xl">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold font-display text-sky-400 flex items-center gap-2">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                            Sample Declarative Configuration (`prometheus.yml`)
+                        </h3>
+                        <span class="text-xs font-mono px-2 py-1 bg-slate-900 border border-slate-800 rounded text-slate-400">YAML</span>
+                    </div>
+                    <div class="relative group">
+                        <pre class="bg-space-900 p-4 rounded-lg text-xs text-slate-300 overflow-x-auto border border-slate-800/50"><code class="language-yaml">global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'dotnet-microservices'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['order-service:8080', 'user-service:8080']
+
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['k8s-node-01:9100', 'k8s-node-02:9100']</code></pre>
+                        <button class="absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-2.5 py-1.5 rounded-md text-xs font-mono flex items-center gap-1.5 shadow" onclick="copySnippet(this)">
+                            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                            </svg>
+                            <span>Copy</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 9: LLD Grafana & Alerts -->
+            <section id="lld-grafana" class="scroll-mt-24 md:scroll-mt-10 space-y-6">
+                <div class="border-b border-slate-800/80 pb-4">
+                    <div class="flex items-center space-x-2 text-xs font-bold text-amber-400 uppercase tracking-widest font-mono">
+                        <span>Low-Level Design</span>
+                        <span>•</span>
+                        <span>Alerts & Queries</span>
+                    </div>
+                    <h2 class="text-3xl font-extrabold font-display text-slate-100 mt-1">9. LLD: Grafana & Alerting</h2>
+                    <p class="text-slate-400 mt-2 text-sm max-w-4xl font-sans leading-relaxed">
+                        Gathering raw metrics is useless without proactive alert evaluation rules. This section details how Prometheus and Grafana evaluate PromQL rules against thresholds to trigger notifications.
+                        For business context mapping, see the SLO target calculations in <a href="#roadmap-slo" onclick="switchTabAndScroll('roadmap', 'roadmap-slo'); return false;" class="text-sky-400 hover:underline">Section 11: SLO Formulations</a>.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl shadow-xl flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold font-display text-amber-400 flex items-center gap-2">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                    Key PromQL Query Expressions
+                                </h3>
+                                <a href="https://prometheus.io/docs/prometheus/latest/querying/basics/" target="_blank" class="text-xs font-mono text-slate-400 hover:text-white transition-colors">Query Guide &rarr;</a>
+                            </div>
+                            <div class="space-y-4 text-xs">
+                                <div class="space-y-1.5">
+                                    <div class="flex justify-between items-center">
+                                        <p class="text-slate-400 font-semibold">1. HTTP Request Rate (per sec over 5m window):</p>
+                                        <button class="text-2xs font-mono text-slate-500 hover:text-sky-400 transition-colors" onclick="copyDirectText('rate(http_requests_total[5m])', this)">Copy</button>
+                                    </div>
+                                    <code class="block bg-space-900 p-3 rounded-lg text-sky-300 font-mono border border-slate-800/50 break-all select-all">rate(http_requests_total[5m])</code>
+                                </div>
+                                <div class="space-y-1.5">
+                                    <div class="flex justify-between items-center">
+                                        <p class="text-slate-400 font-semibold">2. Percentage 5xx Error Rate:</p>
+                                        <button class="text-2xs font-mono text-slate-500 hover:text-sky-400 transition-colors" onclick="copyDirectText('sum(rate(http_requests_total{status=~&quot;5..&quot;}[5m])) / sum(rate(http_requests_total[5m])) * 100', this)">Copy</button>
+                                    </div>
+                                    <code class="block bg-space-900 p-3 rounded-lg text-sky-300 font-mono border border-slate-800/50 break-all select-all">sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m])) * 100</code>
+                                </div>
+                                <div class="space-y-1.5">
+                                    <div class="flex justify-between items-center">
+                                        <p class="text-slate-400 font-semibold">3. High CPU Usage Threshold (&gt; 85%):</p>
+                                        <button class="text-2xs font-mono text-slate-500 hover:text-sky-400 transition-colors" onclick="copyDirectText('100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=&quot;idle&quot;}[5m])) * 100) &gt; 85', this)">Copy</button>
+                                    </div>
+                                    <code class="block bg-space-900 p-3 rounded-lg text-sky-300 font-mono border border-slate-800/50 break-all select-all">100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl shadow-xl flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold font-display text-rose-400 mb-4 flex items-center gap-2">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                Alert Evaluation Flow
+                            </h3>
+                            <div class="space-y-4 font-sans">
+                                <div class="flex gap-3">
+                                    <span class="flex-shrink-0 flex items-center justify-center h-6 w-6 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 font-bold text-xs mt-0.5">1</span>
+                                    <div class="text-sm">
+                                        <strong class="text-slate-200">Evaluation Phase</strong>
+                                        <p class="text-xs text-slate-400 mt-1 leading-relaxed">Grafana or Prometheus Alertmanager evaluates defined PromQL rule queries periodically against TSDB variables (e.g. every 1 minute).</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-3">
+                                    <span class="flex-shrink-0 flex items-center justify-center h-6 w-6 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 font-bold text-xs mt-0.5">2</span>
+                                    <div class="text-sm">
+                                        <strong class="text-slate-200">Pending Grace Window</strong>
+                                        <p class="text-xs text-slate-400 mt-1 leading-relaxed">Upon limit violation, state switches to <code class="text-amber-400 font-mono">Pending</code>. Keeps alert active without alerting immediately for configured times (<code class="font-mono text-2xs text-slate-400">for: 2m</code>) to filter transient metric noise.</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-3">
+                                    <span class="flex-shrink-0 flex items-center justify-center h-6 w-6 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 font-bold text-xs mt-0.5">3</span>
+                                    <div class="text-sm">
+                                        <strong class="text-slate-200">Firing Notification</strong>
+                                        <p class="text-xs text-slate-400 mt-1 leading-relaxed">If query violates limits post grace interval, changes to <code class="text-red-400 font-mono">Firing</code>. Dispatches payload templates to integrations (PagerDuty, Webhook, Slack, email).</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 10: LLD Logging & ELK -->
+            <section id="lld-elk" class="scroll-mt-24 md:scroll-mt-10 space-y-8">
+                <div class="border-b border-slate-800/80 pb-4">
+                    <div class="flex items-center space-x-2 text-xs font-bold text-emerald-400 uppercase tracking-widest font-mono">
+                        <span>Low-Level Design</span>
+                        <span>•</span>
+                        <span>ELK Stack</span>
+                    </div>
+                    <h2 class="text-3xl font-extrabold font-display text-slate-100 mt-1">10. LLD: Logging & ELK Stack</h2>
+                    <p class="text-slate-400 mt-2 text-sm max-w-4xl font-sans leading-relaxed">
+                        To debug issues, we need detailed trace logs. This section maps how structured application logs flow through log forwarders and indexers to become searchable documents inside Elasticsearch.
+                        For query-level logging setups, see database logging configurations in <a href="#roadmap-db" onclick="switchTabAndScroll('roadmap', 'roadmap-db'); return false;" class="text-sky-400 hover:underline">Section 12: Database Observability</a>.
+                    </p>
+                </div>
+
+                <!-- Pipeline Diagram -->
+                <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl shadow-xl shadow-space-900/50">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold font-display text-emerald-400 flex items-center gap-2">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                            Log Processing Lifecycle Architecture
+                        </h3>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-mono bg-space-900 px-2 py-0.5 rounded text-slate-500 hidden sm:inline-block">Flow Diagram</span>
+                            <button class="expand-diagram-btn text-xs font-mono bg-space-900 hover:bg-space-700 text-sky-400 hover:text-white px-2.5 py-1 rounded-lg border border-slate-700/60 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                                </svg>
+                                Expand Diagram
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto py-4">
+                        <div class="mermaid flex justify-center min-w-[650px]">
+flowchart LR
+    App["Application Serilog"] -->|"Structured JSON stdout"| LogShipper["Fluentbit Filebeat"]
+    LogShipper -->|"Batch Push"| Logstash["Logstash Ingest Node"]
+    Logstash -->|"Index Documents"| ES["Elasticsearch Cluster"]
+    ES -->|"KQL Search and Visualizations"| Kibana["Kibana Console"]
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Component Explanations -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl shadow-xl">
+                        <h4 class="font-bold text-slate-200 font-display mb-3">Ingestion Elements</h4>
+                        <p class="text-xs text-slate-400 leading-relaxed font-sans">
+                            Instead of writing log files to local disk (which introduces disk write overhead and risks running out of storage), applications serialize diagnostic events in structured JSON format directly to the standard output stream (<code class="bg-space-900 p-1 text-emerald-400 rounded">stdout</code>). 
+                            A container daemon (Fluentbit or Filebeat) acts as a high-performance shipping agent: it monitors output streams, batches entries to reduce connection overhead, and pushes them to indexers.
+                        </p>
+                    </div>
+                    <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl shadow-xl">
+                        <h4 class="font-bold text-slate-200 font-display mb-3">Index & Storage Strategy</h4>
+                        <p class="text-xs text-slate-400 leading-relaxed font-sans">
+                            Logstash filters and mutates incoming logs. Elasticsearch indexes them into time-based structures (e.g. <code class="bg-space-900 p-1 text-sky-400 rounded">logs-dotnet-app-YYYY.MM.DD</code>). 
+                            To optimize storage costs, **Index Lifecycle Management (ILM)** policies automatically transition older indices: they move logs from expensive, fast SSD hot storage to cheaper, slow cold disks, eventually deleting them after 30 days.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Tab 4 Container: Advanced Roadmap Tab -->
+        <!-- Section Group: Advanced Roadmap -->
+            
+            <!-- Section 11: SLO / SLI Calculations -->
+            <section id="roadmap-slo" class="scroll-mt-24 md:scroll-mt-10 space-y-6">
+                <div class="border-b border-slate-800/80 pb-4">
+                    <div class="flex items-center space-x-2 text-xs font-bold text-sky-400 uppercase tracking-widest font-mono">
+                        <span>Advanced Roadmap</span>
+                        <span>•</span>
+                        <span>Availability & SLIs</span>
+                    </div>
+                    <h2 class="text-3xl font-extrabold font-display text-slate-100 mt-1">11. SLO, SLI & SLA Formulations</h2>
+                    <p class="text-slate-400 mt-2 text-sm max-w-4xl font-sans leading-relaxed">
+                        To run highly reliable applications, developers must establish mathematical contracts to evaluate service quality, error budgets, and system availability profiles.
+                    </p>
+                </div>
+
+                <!-- Error Budget Metaphor -->
+                <div class="bg-space-800/40 p-5 border border-sky-500/20 rounded-xl space-y-2 text-xs font-sans">
+                    <span class="font-bold text-sky-400 font-display block uppercase tracking-wider text-[10px]">💡 Core Metaphor: The Error Budget</span>
+                    <p class="text-slate-300 leading-relaxed">
+                        Think of a Service Level Objective (SLO) **Error Budget** like a **Financial Budget**. 
+                        If your SLO target requires 99.9% availability, you are allowed up to 0.1% downtime (your error budget). 
+                        This budget represents the maximum allowed instability. You can choose to spend this budget on releasing risky new features, or save it to ensure application stability. 
+                        If you exhaust your budget, feature releases are immediately blocked to prioritize stability fixes.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Standard Glossary -->
+                    <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl shadow-xl space-y-4">
+                        <h3 class="text-lg font-semibold font-display text-sky-400 flex items-center gap-2">
+                            <span class="w-1.5 h-3 bg-sky-400 rounded-sm"></span>
+                            Contractual Vocabulary
+                        </h3>
+                        <ul class="space-y-4 text-xs text-slate-300 border-l-2 border-sky-500/20 pl-4 font-sans">
+                            <li>
+                                <strong class="text-slate-200">SLI (Service Level Indicator)</strong>
+                                <p class="text-slate-400 mt-1 leading-relaxed">The quantitative measure of service performance. E.g., HTTP response latency in milliseconds or ratio of successful HTTP status codes.</p>
+                            </li>
+                            <li>
+                                <strong class="text-slate-200">SLO (Service Level Objective)</strong>
+                                <p class="text-slate-400 mt-1 leading-relaxed">Target threshold values set for SLIs over a specific measurement window (e.g. 30 days). E.g., Availability must be &ge; 99.9%.</p>
+                            </li>
+                            <li>
+                                <strong class="text-slate-200">SLA (Service Level Agreement)</strong>
+                                <p class="text-slate-400 mt-1 leading-relaxed">The legal/financial commitment to customers if SLO targets are breached. Includes compensation parameters.</p>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- PromQL SLO Formulas -->
+                    <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl shadow-xl flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold font-display text-amber-400 flex items-center gap-2">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                                    PromQL SLO Formulations
+                                </h3>
+                            </div>
+                            <div class="space-y-4 text-xs">
+                                <div class="space-y-1.5">
+                                    <div class="flex justify-between items-center">
+                                        <p class="text-slate-400 font-semibold">1. Standard Service Availability % (Excluding 5xx errors):</p>
+                                        <button class="text-2xs font-mono text-slate-500 hover:text-sky-400 transition-colors" onclick="copyDirectText('sum(rate(http_requests_total{status!~&quot;5..&quot;}[5m])) / sum(rate(http_requests_total[5m])) * 100', this)">Copy</button>
+                                    </div>
+                                    <code class="block bg-space-900 p-3 rounded-lg text-sky-300 font-mono border border-slate-800/50 break-all select-all">sum(rate(http_requests_total{status!~"5.."}[5m])) / sum(rate(http_requests_total[5m])) * 100</code>
+                                </div>
+                                <div class="space-y-1.5">
+                                    <div class="flex justify-between items-center">
+                                        <p class="text-slate-400 font-semibold">2. Latency SLO Target (99% requests &lt; 500ms):</p>
+                                        <button class="text-2xs font-mono text-slate-500 hover:text-sky-400 transition-colors" onclick="copyDirectText('histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))', this)">Copy</button>
+                                    </div>
+                                    <code class="block bg-space-900 p-3 rounded-lg text-sky-300 font-mono border border-slate-800/50 break-all select-all">histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 12: Database & Cache Observability -->
+            <section id="roadmap-db" class="scroll-mt-24 md:scroll-mt-10 space-y-6">
+                <div class="border-b border-slate-800/80 pb-4">
+                    <div class="flex items-center space-x-2 text-xs font-bold text-emerald-400 uppercase tracking-widest font-mono">
+                        <span>Advanced Roadmap</span>
+                        <span>•</span>
+                        <span>DB & Cache Telemetry</span>
+                    </div>
+                    <h2 class="text-3xl font-extrabold font-display text-slate-100 mt-1">12. Database & Cache Observability</h2>
+                    <p class="text-slate-400 mt-2 text-sm max-w-4xl font-sans leading-relaxed">
+                        Database queries represent one of the most common causes of request latency. 
+                        This section details how slow queries are logged and how cache performance is tracked.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Postgres Logging Config -->
+                    <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl shadow-xl flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-base font-semibold font-display text-emerald-400 flex items-center gap-2">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s-8-1.79-8-4" /></svg>
+                                    PostgreSQL Slow Query Ingestion Contract
+                                </h3>
+                                <span class="text-xs font-mono px-2 py-1 bg-slate-900 border border-slate-800 rounded text-slate-400">postgresql.conf</span>
+                            </div>
+                            <div class="relative group">
+                                <pre class="bg-space-900 p-4 rounded-lg text-xs text-slate-300 overflow-x-auto border border-slate-800/50"><code class="language-ini"># Log statements exceeding 250 milliseconds
+log_min_duration_statement = 250
+
+# Log statement details including bind parameters
+log_statement = 'none'
+log_duration = off
+log_line_prefix = '%t [%p]: [%l-1] user=%u,db=%d,app=%a,client=%h '</code></pre>
+                                <button class="absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-2.5 py-1.5 rounded-md text-xs font-mono flex items-center gap-1.5 shadow" onclick="copySnippet(this)">
+                                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                                    </svg>
+                                    <span>Copy</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Redis and Pool Metrics -->
+                    <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl shadow-xl space-y-4">
+                        <h3 class="text-base font-semibold font-display text-sky-400 flex items-center gap-2">
+                            <span class="w-1.5 h-3 bg-sky-400 rounded-sm"></span>
+                            Key Performance Indicators (KPIs)
+                        </h3>
+                        <div class="space-y-3 text-xs">
+                            <div class="p-3 bg-space-900 border border-slate-800/60 rounded-lg font-sans">
+                                <strong class="text-slate-200 block mb-1">pg_stat_activity (Postgres Connections)</strong>
+                                <p class="text-slate-400 leading-relaxed">Track ratios of active versus idle connections. Spikes in idle transactions indicates application connection leak failures.</p>
+                            </div>
+                            <div class="p-3 bg-space-900 border border-slate-800/60 rounded-lg font-sans">
+                                <strong class="text-slate-200 block mb-1">Redis Keyspace Statistics</strong>
+                                <p class="text-slate-400 leading-relaxed">Calculate Hit Ratios: <code class="text-emerald-400">keyspace_hits / (keyspace_hits + keyspace_misses)</code>. Drops in hit ratio indicates cache expiration storms.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 13: Synthetics & RUM -->
+            <section id="roadmap-rum" class="scroll-mt-24 md:scroll-mt-10 space-y-6">
+                <div class="border-b border-slate-800/80 pb-4">
+                    <div class="flex items-center space-x-2 text-xs font-bold text-purple-400 uppercase tracking-widest font-mono">
+                        <span>Advanced Roadmap</span>
+                        <span>•</span>
+                        <span>Frontend & Synthetics</span>
+                    </div>
+                    <h2 class="text-3xl font-extrabold font-display text-slate-100 mt-1">13. Synthetics & Real User Monitoring (RUM)</h2>
+                    <p class="text-slate-400 mt-2 text-sm max-w-4xl font-sans leading-relaxed">
+                        To measure user experience accurately, we must monitor frontend performance. 
+                        This section contrasts simulated user synthetics with raw browser client telemetry.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl space-y-3 font-sans shadow-xl">
+                        <span class="text-2xs font-bold font-mono px-2 py-1 bg-sky-500/10 border border-sky-500/20 text-sky-400 rounded-md">SYNTHETICS</span>
+                        <h4 class="font-bold text-slate-200 font-display">Active Probing Baseline</h4>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            Uptime pinger daemons periodically (e.g. every 30 seconds) execute mock scenarios (HTTP GET `/healthz`, multi-step login flows) from multiple global regions. This guarantees a clean performance baseline independent of direct human network load.
+                        </p>
+                    </div>
+
+                    <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl space-y-3 font-sans shadow-xl">
+                        <span class="text-2xs font-bold font-mono px-2 py-1 bg-purple-500/10 border border-purple-500/20 text-purple-400 rounded-md">REAL USER MONITORING (RUM)</span>
+                        <h4 class="font-bold text-slate-200 font-display">Core Web Vitals Ingestion</h4>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            Web browser scripts capture metrics (Largest Contentful Paint LCP, First Input Delay FID, Cumulative Layout Shift CLS) directly from end-user devices. This data highlights performance issues caused by public CDN distribution, local ISPs, and client hardware.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 14: Continuous Profiling -->
+            <section id="roadmap-profiling" class="scroll-mt-24 md:scroll-mt-10 space-y-6">
+                <div class="border-b border-slate-800/80 pb-4">
+                    <div class="flex items-center space-x-2 text-xs font-bold text-rose-400 uppercase tracking-widest font-mono">
+                        <span>Advanced Roadmap</span>
+                        <span>•</span>
+                        <span>Production Profiling</span>
+                    </div>
+                    <h2 class="text-3xl font-extrabold font-display text-slate-100 mt-1">14. Continuous Production Profiling</h2>
+                    <p class="text-slate-400 mt-2 text-sm max-w-4xl font-sans leading-relaxed">
+                        Sometimes queries and logs don't reveal the root cause of high latency. 
+                        This section details how Continuous Profilers isolate CPU instruction leaks directly inside production environments.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl shadow-xl space-y-4">
+                        <h3 class="text-base font-semibold font-display text-rose-400 flex items-center gap-2">
+                            <span class="w-1.5 h-3 bg-rose-400 rounded-sm"></span>
+                            Continuous Profiling Mechanics
+                        </h3>
+                        <p class="text-xs text-slate-400 leading-relaxed font-sans">
+                            Unlike traditional profiling tools that introduce massive CPU overhead, modern continuous profilers (e.g., Pyroscope, Parca) use lightweight, kernel-level **eBPF (Extended Berkeley Packet Filter)** hooks. They sample CPU instruction registers and memory heap allocations thousands of times per second with less than 1% overhead, generating persistent flame graphs.
+                        </p>
+                    </div>
+
+                    <div class="bg-space-800 p-6 border border-slate-800/80 rounded-xl shadow-xl space-y-3">
+                        <h4 class="font-bold text-slate-200 font-display">Flame Graph Visualization</h4>
+                        <div class="p-4 bg-space-900 border border-slate-800/60 rounded-lg space-y-2 font-mono text-2xs">
+                            <div class="w-full bg-rose-500/80 text-white p-1 text-center font-bold">Main Loop (100% CPU)</div>
+                            <div class="flex gap-1">
+                                <div class="w-2/3 bg-amber-500/80 text-white p-1 text-center font-bold">ProcessOrder (66%)</div>
+                                <div class="w-1/3 bg-orange-500/80 text-white p-1 text-center font-bold">WriteLogs (33%)</div>
+                            </div>
+                            <div class="flex gap-1">
+                                <div class="w-1/2 bg-yellow-500/80 text-slate-900 p-1 text-center font-bold">DbSave (50%)</div>
+                                <div class="w-1/6 bg-yellow-600/80 text-white p-1 text-center font-bold">JsonSer (16%)</div>
+                                <div class="w-1/3 bg-orange-600/80 text-white p-1 text-center font-bold">DiskIO (33%)</div>
+                            </div>
+                        </div>
+                        <p class="text-[10px] text-slate-500 leading-relaxed mt-2 font-sans">
+                            Explanation: Horizontal width indicates execution duration/memory allocations. Stacking depth shows call hierarchy.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+    </main>
+
+    <!-- Interactive Diagram Zoom Modal -->
+    <div id="diagram-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden flex-col transition-opacity duration-300">
+        <!-- Modal Top Bar -->
+        <div class="flex items-center justify-between px-6 py-4 bg-space-800 border-b border-slate-800 shrink-0">
+            <div class="flex items-center space-x-3">
+                <span class="w-2.5 h-2.5 rounded-full bg-sky-400 animate-pulse"></span>
+                <h3 id="modal-diagram-title" class="text-base font-bold font-display text-white">Architecture Diagram Zoom View</h3>
+            </div>
+            
+            <!-- Zoom Controls & Close Button -->
+            <div class="flex items-center space-x-3">
+                <div class="flex items-center bg-space-900 border border-slate-700/80 rounded-lg p-1 space-x-1 text-xs font-mono">
+                    <button id="zoom-out-btn" class="p-1.5 text-slate-300 hover:text-white hover:bg-space-700 rounded transition-colors" title="Zoom Out (-)">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+                    </button>
+                    <span id="zoom-level-text" class="px-2 text-sky-400 font-semibold min-w-[50px] text-center">100%</span>
+                    <button id="zoom-in-btn" class="p-1.5 text-slate-300 hover:text-white hover:bg-space-700 rounded transition-colors" title="Zoom In (+)">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    </button>
+                    <button id="zoom-reset-btn" class="px-2 py-1 text-slate-400 hover:text-white hover:bg-space-700 rounded transition-colors text-3xs" title="Reset Scale">
+                        Reset
+                    </button>
+                </div>
+                
+                <button id="close-modal-btn" class="p-2 text-slate-400 hover:text-white hover:bg-red-500/20 hover:border-red-500/50 rounded-lg border border-slate-700 transition-colors">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal Body Container -->
+        <div id="modal-diagram-wrapper" class="flex-1 overflow-auto p-8 flex items-center justify-center cursor-grab active:cursor-grabbing select-none bg-space-950/80">
+            <div id="modal-diagram-canvas" class="transition-transform duration-150 origin-center max-w-full">
+                <!-- Cloned SVG goes here -->
+            </div>
+        </div>
+        
+        <div class="px-6 py-2 bg-space-900 border-t border-slate-800/80 text-3xs text-slate-400 font-mono flex items-center justify-between">
+            <span>Tip: Click diagram or button to expand • Mouse Wheel to Zoom • Press Esc to Close</span>
+            <span>Render Engine: Mermaid.js SVG</span>
+        </div>
+    </div>
+
+    <!-- JavaScript Actions -->
+    <script>
+        // Mobile Sidebar Drawer Toggle
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+        const mobileToggleBtn = document.getElementById('mobile-menu-toggle');
+        const hamburgerIcon = document.getElementById('hamburger-icon');
+
+        function toggleSidebar() {
+            const isOpen = !sidebar.classList.contains('-translate-x-full');
+            if (isOpen) {
+                sidebar.classList.add('-translate-x-full');
+                backdrop.classList.add('hidden');
+                if (hamburgerIcon) hamburgerIcon.setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
+            } else {
+                sidebar.classList.remove('-translate-x-full');
+                backdrop.classList.remove('hidden');
+                if (hamburgerIcon) hamburgerIcon.setAttribute('d', 'M6 18L18 6M6 6l12 12');
+            }
+        }
+
+        if (mobileToggleBtn) mobileToggleBtn.addEventListener('click', toggleSidebar);
+        if (backdrop) backdrop.addEventListener('click', toggleSidebar);
+
+        // Sidebar active link scroll-spy using scroll listener on main-content container
+        const mainContent = document.getElementById('main-content');
+        const sections = document.querySelectorAll('main section[id]');
+        const navItems = document.querySelectorAll('#nav-container .nav-item');
+        const navContainer = document.getElementById('nav-container');
+
+        let isNavClicking = false;
+
+        function updateScrollSpy() {
+            if (isNavClicking) return;
+            
+            const mainTop = mainContent.getBoundingClientRect().top;
+            let currentActiveId = null;
+
+            sections.forEach(section => {
+                const rect = section.getBoundingClientRect();
+                // Section is active if top boundary is near top of viewport or bottom extends past top
+                if (rect.top - mainTop <= 180 && rect.bottom - mainTop > 60) {
+                    currentActiveId = section.getAttribute('id');
+                }
+            });
+
+            if (!currentActiveId && sections.length > 0) {
+                currentActiveId = sections[0].getAttribute('id');
+            }
+
+            navItems.forEach(item => {
+                const href = item.getAttribute('href');
+                if (href === '#' + currentActiveId) {
+                    if (!item.classList.contains('nav-active')) {
+                        item.classList.add('nav-active');
+                        // Auto-scroll left panel to keep active item in view
+                        item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                    }
+                } else {
+                    item.classList.remove('nav-active');
+                }
+            });
+        }
+
+        if (mainContent) {
+            mainContent.addEventListener('scroll', updateScrollSpy);
+            // Initial call on page load
+            setTimeout(updateScrollSpy, 300);
+        }
+
+        // Smooth scroll on sidebar nav item click
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const href = item.getAttribute('href');
+                if (href && href.startsWith('#')) {
+                    const targetEl = document.querySelector(href);
+                    if (targetEl) {
+                        isNavClicking = true;
+                        navItems.forEach(i => i.classList.remove('nav-active'));
+                        item.classList.add('nav-active');
+                        item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                        
+                        targetEl.scrollIntoView({ behavior: 'smooth' });
+                        if (window.innerWidth < 768) toggleSidebar();
+                        setTimeout(() => { isNavClicking = false; }, 800);
+                    }
+                }
+            });
+        });
+
+        // Interactive Search Filter
+        const searchInput = document.getElementById('search-input');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase().trim();
+                sections.forEach(sec => {
+                    const text = sec.innerText.toLowerCase();
+                    if (!term || text.includes(term)) {
+                        sec.style.display = 'block';
+                    } else {
+                        sec.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        // SLO Calculator Interactive Logic
+        function updateSloMath() {
+            const availInput = document.getElementById('slo-avail-input');
+            const reqInput = document.getElementById('slo-req-input');
+            
+            if (!availInput || !reqInput) return;
+
+            const targetAvail = parseFloat(availInput.value) || 99.9;
+            const totalRequests = parseInt(reqInput.value) || 1000000;
+
+            const allowedErrorRatio = (100 - targetAvail) / 100;
+            const allowedFailedRequests = Math.floor(totalRequests * allowedErrorRatio);
+            const maxDowntimeMinutesPerMonth = (30 * 24 * 60) * allowedErrorRatio;
+
+            const errorResEl = document.getElementById('slo-error-budget-res');
+            const downtimeResEl = document.getElementById('slo-downtime-res');
+
+            if (errorResEl) errorResEl.innerText = allowedFailedRequests.toLocaleString();
+            if (downtimeResEl) downtimeResEl.innerText = maxDowntimeMinutesPerMonth.toFixed(2) + ' mins/mo';
+        }
+
+        const availIn = document.getElementById('slo-avail-input');
+        const reqIn = document.getElementById('slo-req-input');
+        if (availIn) availIn.addEventListener('input', updateSloMath);
+        if (reqIn) reqIn.addEventListener('input', updateSloMath);
+
+        // DIAGRAM MODAL LIGHTBOX & ZOOM CONTROLS
+        const diagramModal = document.getElementById('diagram-modal');
+        const modalDiagramTitle = document.getElementById('modal-diagram-title');
+        const modalDiagramCanvas = document.getElementById('modal-diagram-canvas');
+        const modalWrapper = document.getElementById('modal-diagram-wrapper');
+        const zoomLevelText = document.getElementById('zoom-level-text');
+        
+        let currentScale = 1.0;
+
+        function updateModalTransform() {
+            modalDiagramCanvas.style.transform = `scale(${currentScale})`;
+            zoomLevelText.innerText = Math.round(currentScale * 100) + '%';
+        }
+
+        function openDiagramModal(cardEl) {
+            const titleEl = cardEl.querySelector('h3');
+            const svgEl = cardEl.querySelector('.mermaid svg');
+
+            if (!svgEl) return;
+
+            modalDiagramTitle.innerText = titleEl ? titleEl.innerText.trim() : 'Architecture Diagram Zoom View';
+            modalDiagramCanvas.innerHTML = '';
+            
+            const clonedSvg = svgEl.cloneNode(true);
+            clonedSvg.style.maxWidth = 'none';
+            clonedSvg.style.width = '100%';
+            clonedSvg.style.height = 'auto';
+            clonedSvg.style.minWidth = '900px';
+
+            modalDiagramCanvas.appendChild(clonedSvg);
+            
+            currentScale = 1.25;
+            updateModalTransform();
+            
+            diagramModal.classList.remove('hidden');
+            diagramModal.classList.add('flex');
+        }
+
+        function closeDiagramModal() {
+            diagramModal.classList.add('hidden');
+            diagramModal.classList.remove('flex');
+        }
+
+        // Attach click listeners to expand buttons and mermaid diagram cards
+        document.addEventListener('click', (e) => {
+            const expandBtn = e.target.closest('.expand-diagram-btn');
+            if (expandBtn) {
+                const card = expandBtn.closest('.bg-space-800');
+                if (card) openDiagramModal(card);
+                return;
+            }
+            // Allow clicking directly on mermaid diagram to open modal
+            const mermaidWrapper = e.target.closest('.mermaid');
+            if (mermaidWrapper) {
+                const card = mermaidWrapper.closest('.bg-space-800');
+                if (card) openDiagramModal(card);
+            }
+        });
+
+        // Zoom button controls
+        document.getElementById('zoom-in-btn').addEventListener('click', () => {
+            currentScale = Math.min(3.5, currentScale + 0.25);
+            updateModalTransform();
+        });
+
+        document.getElementById('zoom-out-btn').addEventListener('click', () => {
+            currentScale = Math.max(0.5, currentScale - 0.25);
+            updateModalTransform();
+        });
+
+        document.getElementById('zoom-reset-btn').addEventListener('click', () => {
+            currentScale = 1.0;
+            updateModalTransform();
+        });
+
+        document.getElementById('close-modal-btn').addEventListener('click', closeDiagramModal);
+
+        // Close on backdrop click
+        diagramModal.addEventListener('click', (e) => {
+            if (e.target === diagramModal || e.target === modalWrapper) {
+                closeDiagramModal();
+            }
+        });
+
+        // Mouse wheel zoom inside modal wrapper
+        modalWrapper.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            if (e.deltaY < 0) {
+                currentScale = Math.min(3.5, currentScale + 0.15);
+            } else {
+                currentScale = Math.max(0.5, currentScale - 0.15);
+            }
+            updateModalTransform();
+        }, { passive: false });
+
+        // Close on Escape key
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !diagramModal.classList.contains('hidden')) {
+                closeDiagramModal();
+            }
+        });
+
+        // Copy Code Snippets
+        function copySnippet(button) {
+            const container = button.previousElementSibling;
+            const codeEl = container.querySelector('code');
+            const originalText = codeEl.innerText.trim();
+
+            navigator.clipboard.writeText(originalText).then(() => {
+                const label = button.querySelector('span');
+                const svg = button.querySelector('svg');
+                label.innerText = 'Copied!';
+                button.classList.add('bg-emerald-800/80', 'text-emerald-200');
+                svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />';
+                setTimeout(() => {
+                    label.innerText = 'Copy';
+                    button.classList.remove('bg-emerald-800/80', 'text-emerald-200');
+                    svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

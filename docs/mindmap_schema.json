@@ -1,6 +1,30 @@
 {
-  "title": "Senior & Lead Full-Stack Engineering Mind Map",
-  "version": "2.0.0",
+  "title": "Senior & Lead Full-Stack & System Design Engineering Mind Map",
+  "version": "3.0.0",
+  "umbrellas": [
+    {
+      "id": "fullstack-developer",
+      "name": "Full-Stack Developer",
+      "icon": "💻",
+      "description": "Comprehensive engineering tracks covering Backend (.NET), Frontend (JS/TS, Angular, React), Cloud & DevOps, Security, and AI.",
+      "domains": [
+        "dotnet-backend",
+        "frontend-engineering",
+        "cloud-devops",
+        "security-data",
+        "ai-engineering"
+      ]
+    },
+    {
+      "id": "system-design-hub",
+      "name": "System Design & Architecture Hub",
+      "icon": "🏗️",
+      "description": "Dedicated interactive system design track with HLD/LLD framework, capacity calculators, architectural primitives, and real-world case studies.",
+      "domains": [
+        "system-design-mastery"
+      ]
+    }
+  ],
   "learningPaths": [
     {
       "id": "lead-fullstack",
@@ -13,6 +37,17 @@
         "cloud-devops",
         "security-data",
         "ai-engineering"
+      ]
+    },
+    {
+      "id": "system-design-mastery-path",
+      "name": "Staff System Design & Architecture Path",
+      "description": "Interactive deep dive into HLD/LLD, Back-of-envelope Math, Architectural Primitives, Consistent Hashing, and Real-World Case Studies.",
+      "sequence": [
+        "system-design-mastery",
+        "distributed-systems",
+        "cloud-devops",
+        "security-data"
       ]
     },
     {
@@ -40,6 +75,51 @@
     }
   ],
   "domains": [
+    {
+      "id": "system-design-mastery",
+      "name": "System Design & Architecture Hub",
+      "icon": "🏗️",
+      "badge": "Staff Level",
+      "description": "Interactive HLD/LLD Framework, Live Back-of-the-Envelope Capacity Estimator, Architectural Primitives, and Real-World Case Studies.",
+      "guidePath": "docs/system_design/hld_framework.html",
+      "subtopics": [
+        {
+          "id": "sd-fundamentals",
+          "name": "System Design Fundamentals & First Principles",
+          "level": "Foundation",
+          "status": "Ready",
+          "guide": "docs/system_design/fundamentals.html"
+        },
+        {
+          "id": "hld-lld-calculator",
+          "name": "4-Step HLD Framework & Live Capacity Calculator",
+          "level": "Lead",
+          "status": "Ready",
+          "guide": "docs/system_design/hld_framework.html"
+        },
+        {
+          "id": "sd-primitives-simulators",
+          "name": "Architectural Primitives (Token Bucket & Consistent Hashing)",
+          "level": "Staff",
+          "status": "Ready",
+          "guide": "docs/system_design/architectural_primitives.html"
+        },
+        {
+          "id": "sd-case-studies",
+          "name": "Real-World Case Studies (TinyURL, WhatsApp, Netflix)",
+          "level": "Staff",
+          "status": "Ready",
+          "guide": "docs/system_design/case_studies.html"
+        },
+        {
+          "id": "sd-observability-request-flow",
+          "name": "Enterprise Request Flow & Observability Stack (OTel, Prometheus, ELK)",
+          "level": "Staff",
+          "status": "Ready",
+          "guide": "docs/system_design/observability_request_flow.html"
+        }
+      ]
+    },
     {
       "id": "dotnet-backend",
       "name": "Backend & .NET Core",
@@ -87,8 +167,8 @@
     },
     {
       "id": "distributed-systems",
-      "name": "Distributed Systems & System Design",
-      "icon": "🏗️",
+      "name": "Distributed Systems & Infrastructure",
+      "icon": "⚡",
       "badge": "Architecture",
       "description": "Microservices, DDD, CQRS, Saga & Outbox Patterns, Resiliency, High Level & Low Level Design.",
       "guidePath": "guides/02_distributed_systems/README.md",
@@ -116,7 +196,7 @@
         },
         {
           "id": "hld-lld",
-          "name": "System Design: Scalability, Caching, Rate Limiting",
+          "name": "Distributed Resilience Framework",
           "level": "Lead",
           "status": "Ready",
           "guide": "guides/02_distributed_systems/04_hld_lld_framework.md"

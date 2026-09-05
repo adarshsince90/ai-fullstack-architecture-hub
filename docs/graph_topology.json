@@ -1,10 +1,10 @@
 {
   "title": "AI Full-Stack Architecture Hub - Multi-Connected Graph Topology",
-  "generatedAt": "2026-08-13T14:29:36.053Z",
+  "generatedAt": "2026-08-13T20:32:02.300Z",
   "stats": {
-    "totalNodes": 146,
-    "totalLinks": 165,
-    "structuralLinks": 145,
+    "totalNodes": 152,
+    "totalLinks": 171,
+    "structuralLinks": 151,
     "crossLinks": 20
   },
   "taxonomyCategories": {
@@ -48,6 +48,97 @@
         "archLayer": "Application/Domain Layer"
       },
       "val": 35
+    },
+    {
+      "id": "domain-system-design-mastery",
+      "name": "System Design & Architecture Hub",
+      "level": "Domain Pillar",
+      "badge": "Staff Level",
+      "icon": "🏗️",
+      "description": "Interactive HLD/LLD Framework, Live Back-of-the-Envelope Capacity Estimator, Architectural Primitives, and Real-World Case Studies.",
+      "guidePath": "docs/system_design/hld_framework.html",
+      "clusterId": "system-design-mastery",
+      "taxonomies": {
+        "sdlcPhase": "Design & Architecture",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 24
+    },
+    {
+      "id": "topic-sd-fundamentals",
+      "name": "System Design Fundamentals & First Principles",
+      "level": "Foundation",
+      "badge": "Ready",
+      "description": "System Design Fundamentals & First Principles within System Design & Architecture Hub",
+      "guidePath": "docs/system_design/fundamentals.html",
+      "clusterId": "system-design-mastery",
+      "taxonomies": {
+        "sdlcPhase": "Design & Architecture",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "topic-hld-lld-calculator",
+      "name": "4-Step HLD Framework & Live Capacity Calculator",
+      "level": "Lead",
+      "badge": "Ready",
+      "description": "4-Step HLD Framework & Live Capacity Calculator within System Design & Architecture Hub",
+      "guidePath": "docs/system_design/hld_framework.html",
+      "clusterId": "system-design-mastery",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "topic-sd-primitives-simulators",
+      "name": "Architectural Primitives (Token Bucket & Consistent Hashing)",
+      "level": "Staff",
+      "badge": "Ready",
+      "description": "Architectural Primitives (Token Bucket & Consistent Hashing) within System Design & Architecture Hub",
+      "guidePath": "docs/system_design/architectural_primitives.html",
+      "clusterId": "system-design-mastery",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "topic-sd-case-studies",
+      "name": "Real-World Case Studies (TinyURL, WhatsApp, Netflix)",
+      "level": "Staff",
+      "badge": "Ready",
+      "description": "Real-World Case Studies (TinyURL, WhatsApp, Netflix) within System Design & Architecture Hub",
+      "guidePath": "docs/system_design/case_studies.html",
+      "clusterId": "system-design-mastery",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 14
+    },
+    {
+      "id": "topic-sd-observability-request-flow",
+      "name": "Enterprise Request Flow & Observability Stack (OTel, Prometheus, ELK)",
+      "level": "Staff",
+      "badge": "Ready",
+      "description": "Enterprise Request Flow & Observability Stack (OTel, Prometheus, ELK) within System Design & Architecture Hub",
+      "guidePath": "docs/system_design/observability_request_flow.html",
+      "clusterId": "system-design-mastery",
+      "taxonomies": {
+        "sdlcPhase": "Development",
+        "techDomain": "Backend",
+        "archLayer": "Application/Domain Layer"
+      },
+      "val": 14
     },
     {
       "id": "domain-dotnet-backend",
@@ -517,15 +608,15 @@
     },
     {
       "id": "domain-distributed-systems",
-      "name": "Distributed Systems & System Design",
+      "name": "Distributed Systems & Infrastructure",
       "level": "Domain Pillar",
       "badge": "Architecture",
-      "icon": "🏗️",
+      "icon": "⚡",
       "description": "Microservices, DDD, CQRS, Saga & Outbox Patterns, Resiliency, High Level & Low Level Design.",
       "guidePath": "guides/02_distributed_systems/README.md",
       "clusterId": "distributed-systems",
       "taxonomies": {
-        "sdlcPhase": "Design & Architecture",
+        "sdlcPhase": "Development",
         "techDomain": "System Design",
         "archLayer": "Application/Domain Layer"
       },
@@ -536,7 +627,7 @@
       "name": "Microservices Decompositions & API Gateways",
       "level": "Architecture",
       "badge": "Ready",
-      "description": "Microservices Decompositions & API Gateways within Distributed Systems & System Design",
+      "description": "Microservices Decompositions & API Gateways within Distributed Systems & Infrastructure",
       "guidePath": "guides/02_distributed_systems/01_microservices_decomposition.md",
       "clusterId": "distributed-systems",
       "taxonomies": {
@@ -611,7 +702,7 @@
       "name": "Domain-Driven Design (DDD) & CQRS",
       "level": "Architecture",
       "badge": "Ready",
-      "description": "Domain-Driven Design (DDD) & CQRS within Distributed Systems & System Design",
+      "description": "Domain-Driven Design (DDD) & CQRS within Distributed Systems & Infrastructure",
       "guidePath": "guides/02_distributed_systems/02_ddd_cqrs_event_sourcing.md",
       "clusterId": "distributed-systems",
       "taxonomies": {
@@ -686,7 +777,7 @@
       "name": "Saga Pattern, Outbox & Eventual Consistency",
       "level": "Advanced",
       "badge": "Ready",
-      "description": "Saga Pattern, Outbox & Eventual Consistency within Distributed Systems & System Design",
+      "description": "Saga Pattern, Outbox & Eventual Consistency within Distributed Systems & Infrastructure",
       "guidePath": "guides/02_distributed_systems/03_saga_outbox_resiliency.md",
       "clusterId": "distributed-systems",
       "taxonomies": {
@@ -758,14 +849,14 @@
     },
     {
       "id": "topic-hld-lld",
-      "name": "System Design: Scalability, Caching, Rate Limiting",
+      "name": "Distributed Resilience Framework",
       "level": "Lead",
       "badge": "Ready",
-      "description": "System Design: Scalability, Caching, Rate Limiting within Distributed Systems & System Design",
+      "description": "Distributed Resilience Framework within Distributed Systems & Infrastructure",
       "guidePath": "guides/02_distributed_systems/04_hld_lld_framework.md",
       "clusterId": "distributed-systems",
       "taxonomies": {
-        "sdlcPhase": "Design & Architecture",
+        "sdlcPhase": "Development",
         "techDomain": "System Design",
         "archLayer": "Application/Domain Layer"
       },
@@ -776,11 +867,11 @@
       "name": "1. The 45-Minute System Design Interview Blueprint",
       "level": "Deep Concept",
       "badge": "Granular",
-      "description": "Section in System Design: Scalability, Caching, Rate Limiting",
+      "description": "Section in Distributed Resilience Framework",
       "guidePath": "guides/02_distributed_systems/04_hld_lld_framework.md",
       "clusterId": "distributed-systems",
       "taxonomies": {
-        "sdlcPhase": "Design & Architecture",
+        "sdlcPhase": "Development",
         "techDomain": "System Design",
         "archLayer": "Application/Domain Layer"
       },
@@ -791,11 +882,11 @@
       "name": "2. Enterprise Caching Strategies",
       "level": "Deep Concept",
       "badge": "Granular",
-      "description": "Section in System Design: Scalability, Caching, Rate Limiting",
+      "description": "Section in Distributed Resilience Framework",
       "guidePath": "guides/02_distributed_systems/04_hld_lld_framework.md",
       "clusterId": "distributed-systems",
       "taxonomies": {
-        "sdlcPhase": "Design & Architecture",
+        "sdlcPhase": "Development",
         "techDomain": "System Design",
         "archLayer": "Application/Domain Layer"
       },
@@ -806,11 +897,11 @@
       "name": "3. Database Sharding & Consistent Hashing",
       "level": "Deep Concept",
       "badge": "Granular",
-      "description": "Section in System Design: Scalability, Caching, Rate Limiting",
+      "description": "Section in Distributed Resilience Framework",
       "guidePath": "guides/02_distributed_systems/04_hld_lld_framework.md",
       "clusterId": "distributed-systems",
       "taxonomies": {
-        "sdlcPhase": "Design & Architecture",
+        "sdlcPhase": "Development",
         "techDomain": "System Design",
         "archLayer": "Application/Domain Layer"
       },
@@ -821,11 +912,11 @@
       "name": "4. Distributed Rate Limiting Algorithms",
       "level": "Deep Concept",
       "badge": "Granular",
-      "description": "Section in System Design: Scalability, Caching, Rate Limiting",
+      "description": "Section in Distributed Resilience Framework",
       "guidePath": "guides/02_distributed_systems/04_hld_lld_framework.md",
       "clusterId": "distributed-systems",
       "taxonomies": {
-        "sdlcPhase": "Design & Architecture",
+        "sdlcPhase": "Development",
         "techDomain": "System Design",
         "archLayer": "Application/Domain Layer"
       },
@@ -836,11 +927,11 @@
       "name": "5. CAP Theorem vs PACELC Theorem",
       "level": "Deep Concept",
       "badge": "Granular",
-      "description": "Section in System Design: Scalability, Caching, Rate Limiting",
+      "description": "Section in Distributed Resilience Framework",
       "guidePath": "guides/02_distributed_systems/04_hld_lld_framework.md",
       "clusterId": "distributed-systems",
       "taxonomies": {
-        "sdlcPhase": "Design & Architecture",
+        "sdlcPhase": "Development",
         "techDomain": "System Design",
         "archLayer": "Application/Domain Layer"
       },
@@ -2232,6 +2323,42 @@
     }
   ],
   "links": [
+    {
+      "source": "root-web-app-dev",
+      "target": "domain-system-design-mastery",
+      "type": "structural",
+      "label": "Pillar Branch"
+    },
+    {
+      "source": "domain-system-design-mastery",
+      "target": "topic-sd-fundamentals",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "domain-system-design-mastery",
+      "target": "topic-hld-lld-calculator",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "domain-system-design-mastery",
+      "target": "topic-sd-primitives-simulators",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "domain-system-design-mastery",
+      "target": "topic-sd-case-studies",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
+    {
+      "source": "domain-system-design-mastery",
+      "target": "topic-sd-observability-request-flow",
+      "type": "structural",
+      "label": "Topic Branch"
+    },
     {
       "source": "root-web-app-dev",
       "target": "domain-dotnet-backend",

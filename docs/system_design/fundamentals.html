@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Design Fundamentals & First Principles</title>
+  <link rel="stylesheet" href="../../styles.css">
+  <style>
+    .sd-container { padding: 24px; max-width: 1200px; margin: 0 auto; font-family: 'Inter', sans-serif; color: #e2e8f0; }
+    .sd-card { background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 24px; margin-bottom: 24px; backdrop-filter: blur(12px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37); }
+    .sd-title { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 700; color: #38bdf8; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
+    .sd-badge { font-size: 0.75rem; padding: 4px 10px; background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; border-radius: 20px; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-top: 20px; }
+    .concept-box { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 20px; transition: all 0.2s ease; }
+    .concept-box:hover { border-color: #38bdf8; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+    .concept-header { font-size: 1.15rem; font-weight: 700; color: #38bdf8; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .concept-desc { font-size: 0.9rem; color: #cbd5e1; line-height: 1.6; }
+    .concept-tag { font-size: 0.7rem; font-family: 'Fira Code', monospace; background: rgba(255,255,255,0.06); padding: 3px 8px; border-radius: 4px; color: #94a3b8; }
+  </style>
+</head>
+<body>
+  <div class="sd-container">
+    <div class="sd-card">
+      <div class="sd-title">
+        <span>📖 System Design Fundamentals & First Principles</span>
+        <span class="sd-badge">Core Mastery</span>
+      </div>
+      <p style="color: #94a3b8; line-height: 1.6;">
+        Before designing complex microservice platforms or real-world apps (like Uber or Netflix), you must master the 
+        <strong>core architectural building blocks and first principles</strong>. These concepts explain how distributed systems scale, handle network failures, and trade speed for consistency.
+      </p>
+
+      <div class="concept-grid">
+        
+        <!-- Concept 1: Vertical vs Horizontal Scaling -->
+        <div class="concept-box">
+          <div class="concept-header">
+            <span>1. Vertical vs Horizontal Scaling</span>
+            <span class="concept-tag">Scale Up / Out</span>
+          </div>
+          <div class="concept-desc">
+            <strong>Scale Up (Vertical)</strong>: Adding more RAM, CPU cores, or SSD storage to a single machine.<br>
+            <em>Trade-off:</em> Simple, no network partitioning overhead, but hard hardware cost limits and single point of failure (SPOF).<br><br>
+            <strong>Scale Out (Horizontal)</strong>: Adding more server nodes in parallel behind a Load Balancer.<br>
+            <em>Trade-off:</em> Infinite capacity scaling, high fault tolerance, but requires stateless app tier and distributed session storage.
+          </div>
+        </div>
+
+        <!-- Concept 2: Latency vs Throughput -->
+        <div class="concept-box">
+          <div class="concept-header">
+            <span>2. Latency vs Throughput</span>
+            <span class="concept-tag">Performance</span>
+          </div>
+          <div class="concept-desc">
+            <strong>Latency</strong>: The time required for a single operation to complete (measured in milliseconds, e.g., $15\text{ms}$ DB read).<br><br>
+            <strong>Throughput</strong>: The number of operations processed per unit of time (measured in QPS or TPS).<br><br>
+            <em>First Principle:</em> Optimizing throughput (e.g., message queue batching) often slightly increases latency for individual requests.
+          </div>
+        </div>
+
+        <!-- Concept 3: CAP Theorem -->
+        <div class="concept-box">
+          <div class="concept-header">
+            <span>3. CAP Theorem</span>
+            <span class="concept-tag">Consistency vs Availability</span>
+          </div>
+          <div class="concept-desc">
+            In any distributed data store during a network <strong>Partition (P)</strong>, you can only choose one:<br>
+            • <strong>CP (Consistency)</strong>: Block or reject reads/writes to prevent returning stale data (e.g., PostgreSQL primary, HBase).<br>
+            • <strong>AP (Availability)</strong>: Return available data immediately, accepting that some replicas might be stale (e.g., Cassandra, DynamoDB).
+          </div>
+        </div>
+
+        <!-- Concept 4: PACELC Theorem -->
+        <div class="concept-box">
+          <div class="concept-header">
+            <span>4. PACELC Theorem</span>
+            <span class="concept-tag">Else (Normal Operation)</span>
+          </div>
+          <div class="concept-desc">
+            Extends CAP theorem to describe normal operations when there is <em>no</em> partition:<br>
+            <strong>If Partition (P)</strong>: Choose Availability (A) or Consistency (C).<br>
+            <strong>Else (E)</strong>: Choose Latency (L) or Consistency (C).<br><br>
+            <em>Example:</em> DynamoDB is PA/EL (fast latency under normal run), while MongoDB is PC/EC (strict consistency even during normal run).
+          </div>
+        </div>
+
+        <!-- Concept 5: Database Partitioning & Sharding -->
+        <div class="concept-box">
+          <div class="concept-header">
+            <span>5. DB Sharding & Partitioning</span>
+            <span class="concept-tag">Data Scale</span>
+          </div>
+          <div class="concept-desc">
+            Splitting a giant database table across multiple database nodes.<br>
+            • <strong>Horizontal Partitioning (Sharding)</strong>: Distributing table rows across shards using a <em>Shard Key</em> (e.g., <code>user_id % N</code>).<br>
+            • <strong>Vertical Partitioning</strong>: Splitting columns across tables (e.g., User Profile vs User Billing Data).
+          </div>
+        </div>
+
+        <!-- Concept 6: Caching Mechanics & Eviction -->
+        <div class="concept-box">
+          <div class="concept-header">
+            <span>6. Distributed Caching Topologies</span>
+            <span class="concept-tag">In-Memory Speed</span>
+          </div>
+          <div class="concept-desc">
+            Caching stores hot data in fast RAM (e.g., Redis) to prevent slow disk I/O.<br>
+            • <strong>Cache-Aside</strong>: Application checks cache first; loads from DB on miss.<br>
+            • <strong>Write-Through</strong>: Application writes to cache, which synchronously updates DB.<br>
+            • <strong>Write-Back</strong>: Application writes to cache; cache asynchronously updates DB in background batches.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</body>
+</html>
