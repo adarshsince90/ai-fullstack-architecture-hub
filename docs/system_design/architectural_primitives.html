@@ -6,28 +6,40 @@
   <title>Architectural Primitives & Interactive Simulators</title>
   <link rel="stylesheet" href="../../styles.css">
   <style>
-    .sd-container { padding: 24px; max-width: 1200px; margin: 0 auto; font-family: 'Inter', sans-serif; color: #e2e8f0; }
-    .sd-card { background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 24px; margin-bottom: 24px; backdrop-filter: blur(12px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37); }
-    .sd-title { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 700; color: #38bdf8; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
-    .sd-badge { font-size: 0.75rem; padding: 4px 10px; background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; border-radius: 20px; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.05em; }
+    body {
+      background: var(--bg-primary);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      margin: 0;
+      padding: 0;
+    }
+    .sd-container { padding: 24px; max-width: 1200px; margin: 0 auto; color: var(--text-main); }
+    .sd-card { background: var(--bg-card); border: var(--glass-border); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 24px; backdrop-filter: var(--glass-blur); box-shadow: var(--glass-shadow); }
+    .sd-title { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--primary); margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
+    .sd-badge { font-size: 0.75rem; padding: 4px 10px; background: var(--badge-bg); border: 1px solid var(--badge-border); border-radius: 20px; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+    .sd-intro { color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; font-size: 0.95rem; }
 
     /* Interactive Token Bucket Visualizer */
-    .tb-visualizer { background: #0f172a; border: 1px solid #334155; border-radius: 12px; padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .tb-visualizer { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     @media (max-width: 768px) { .tb-visualizer { grid-template-columns: 1fr; } }
-    .bucket-container { position: relative; height: 200px; width: 140px; margin: 0 auto; border: 4px solid #38bdf8; border-top: none; border-radius: 0 0 20px 20px; background: rgba(56, 189, 248, 0.05); display: flex; flex-direction: column-reverse; padding: 6px; gap: 4px; overflow: hidden; }
-    .token-pill { height: 16px; background: linear-gradient(90deg, #38bdf8, #818cf8); border-radius: 8px; box-shadow: 0 0 8px rgba(56, 189, 248, 0.8); }
+    .bucket-container { position: relative; height: 200px; width: 140px; margin: 0 auto; border: 4px solid var(--primary); border-top: none; border-radius: 0 0 20px 20px; background: var(--bg-accent-subtle); display: flex; flex-direction: column-reverse; padding: 6px; gap: 4px; overflow: hidden; }
+    .token-pill { height: 16px; background: linear-gradient(90deg, var(--primary), var(--accent-cyan)); border-radius: 8px; box-shadow: 0 0 8px var(--primary-glow); }
     
     .tb-controls { display: flex; flex-direction: column; gap: 12px; justify-content: center; }
-    .btn-action { padding: 10px 16px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
-    .btn-fire { background: #4ade80; color: #0f172a; }
-    .btn-fire:hover { background: #22c55e; }
-    .btn-burst { background: #f59e0b; color: #0f172a; }
-    .btn-burst:hover { background: #d97706; }
+    .btn-action { padding: 10px 16px; border: none; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+    .btn-fire { background: var(--accent-emerald); color: #0f172a; }
+    .btn-fire:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-burst { background: var(--accent-amber); color: #0f172a; }
+    .btn-burst:hover { opacity: 0.9; transform: translateY(-1px); }
 
     /* Ring Visualizer */
     .ring-container { display: flex; justify-content: center; align-items: center; position: relative; height: 280px; }
-    canvas { background: #0f172a; border-radius: 50%; border: 1px solid #334155; }
+    canvas { background: var(--bg-secondary); border-radius: 50%; border: 1px solid var(--border-color); box-shadow: var(--shadow-md); }
   </style>
+  <script>
+    const currentTheme = window.parent?.app?.activeTheme || localStorage.getItem('hub_theme') || 'obsidian-dark';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+  </script>
 </head>
 <body>
   <div class="sd-container">
@@ -38,7 +50,7 @@
         <span>⚡ Interactive Token Bucket Rate Limiter</span>
         <span class="sd-badge">Live Simulator</span>
       </div>
-      <p style="color: #94a3b8; font-size: 0.95rem;">
+      <p class="sd-intro">
         The Token Bucket algorithm refills tokens at a fixed rate $R$. Incoming requests consume 1 token. 
         If the bucket is empty, the request is throttled ($429 \text{ Too Many Requests}$).
       </p>
@@ -48,7 +60,7 @@
           <div class="bucket-container" id="token-bucket">
             <!-- Tokens injected dynamically -->
           </div>
-          <div style="margin-top: 10px; font-family: 'Fira Code', monospace; color: #38bdf8;">
+          <div style="margin-top: 10px; font-family: var(--font-mono); color: var(--primary); font-weight: 700;">
             Capacity: <span id="tb-count">5</span> / 8 Tokens
           </div>
         </div>
@@ -56,7 +68,7 @@
         <div class="tb-controls">
           <button class="btn-action btn-fire" onclick="sendRequest()">🚀 Send 1 Request</button>
           <button class="btn-action btn-burst" onclick="sendBurst()">💥 Send Burst (5 Requests)</button>
-          <div style="font-size: 0.85rem; color: #94a3b8; line-height: 1.5; background: #1e293b; padding: 12px; border-radius: 8px;" id="tb-status">
+          <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; background: var(--bg-card); border: 1px solid var(--border-color); padding: 12px; border-radius: var(--radius-md);" id="tb-status">
             System status: Idle. Tokens refilling at 1 token / sec.
           </div>
         </div>
@@ -69,7 +81,7 @@
         <span>⭕ Interactive Consistent Hashing Ring</span>
         <span class="sd-badge">Node Remapping</span>
       </div>
-      <p style="color: #94a3b8; font-size: 0.95rem;">
+      <p class="sd-intro">
         In Consistent Hashing, keys and servers are mapped to a $360^\circ$ hash ring. 
         Adding or removing a server node only remaps keys belonging to the immediate clockwise neighbor.
       </p>
@@ -79,8 +91,8 @@
       </div>
 
       <div style="display: flex; justify-content: center; gap: 12px; margin-top: 16px;">
-        <button class="btn-action" style="background: #38bdf8; color: #0f172a;" onclick="addServerNode()">➕ Add Server Node</button>
-        <button class="btn-action" style="background: #ef4444; color: #ffffff;" onclick="removeServerNode()">➖ Remove Server Node</button>
+        <button class="btn-action" style="background: var(--primary); color: #ffffff;" onclick="addServerNode()">➕ Add Server Node</button>
+        <button class="btn-action" style="background: var(--accent-rose); color: #ffffff;" onclick="removeServerNode()">➖ Remove Server Node</button>
       </div>
     </div>
 
@@ -106,9 +118,9 @@
       const status = document.getElementById('tb-status');
       if (tokens > 0) {
         tokens--;
-        status.innerHTML = `<span style="color:#4ade80;">✅ Request Allowed!</span> 1 token consumed. Remaining: ${tokens}`;
+        status.innerHTML = `<span style="color:var(--accent-emerald); font-weight:700;">✅ Request Allowed!</span> 1 token consumed. Remaining: ${tokens}`;
       } else {
-        status.innerHTML = `<span style="color:#ef4444;">⛔ Request Throttled (429)!</span> Bucket empty.`;
+        status.innerHTML = `<span style="color:var(--accent-rose); font-weight:700;">⛔ Request Throttled (429)!</span> Bucket empty.`;
       }
       renderBucket();
     }
@@ -117,11 +129,11 @@
       const status = document.getElementById('tb-status');
       if (tokens >= 5) {
         tokens -= 5;
-        status.innerHTML = `<span style="color:#f59e0b;">⚡ Burst Allowed!</span> 5 tokens consumed. Remaining: ${tokens}`;
+        status.innerHTML = `<span style="color:var(--accent-amber); font-weight:700;">⚡ Burst Allowed!</span> 5 tokens consumed. Remaining: ${tokens}`;
       } else {
         const consumed = tokens;
         tokens = 0;
-        status.innerHTML = `<span style="color:#ef4444;">⚠️ Partial Burst!</span> Allowed ${consumed} requests, throttled ${5 - consumed}.`;
+        status.innerHTML = `<span style="color:var(--accent-rose); font-weight:700;">⚠️ Partial Burst!</span> Allowed ${consumed} requests, throttled ${5 - consumed}.`;
       }
       renderBucket();
     }
@@ -144,6 +156,12 @@
       const ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+      const computedStyles = getComputedStyle(document.body);
+      const primaryColor = computedStyles.getPropertyValue('--primary').trim() || '#38bdf8';
+      const emeraldColor = computedStyles.getPropertyValue('--accent-emerald').trim() || '#10b981';
+      const purpleColor = computedStyles.getPropertyValue('--accent-purple').trim() || '#8b5cf6';
+      const ringBg = computedStyles.getPropertyValue('--bg-secondary').trim() || '#0f172a';
+
       const centerX = canvas.width / 2;
       const centerY = canvas.height / 2;
       const radius = 90;
@@ -151,7 +169,7 @@
       // Outer Ring
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-      ctx.strokeStyle = '#38bdf8';
+      ctx.strokeStyle = primaryColor;
       ctx.lineWidth = 4;
       ctx.stroke();
 
@@ -163,9 +181,9 @@
 
         ctx.beginPath();
         ctx.arc(x, y, 10, 0, 2 * Math.PI);
-        ctx.fillStyle = idx % 2 === 0 ? '#4ade80' : '#a855f7';
+        ctx.fillStyle = idx % 2 === 0 ? emeraldColor : purpleColor;
         ctx.fill();
-        ctx.strokeStyle = '#ffffff';
+        ctx.strokeStyle = ringBg;
         ctx.lineWidth = 2;
         ctx.stroke();
       });
@@ -187,6 +205,9 @@
     }
 
     drawRing();
+
+    // Redraw ring on theme switch
+    window.addEventListener('message', () => drawRing());
   </script>
 </body>
 </html>

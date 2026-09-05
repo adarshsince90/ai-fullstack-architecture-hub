@@ -14,7 +14,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=1.2.0">
+  <link rel="stylesheet" href="styles.css?v=1.3.0">
   <!-- Markdown Renderer for dynamic guide viewing -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
@@ -36,14 +36,35 @@
         </div>
       </div>
 
-      <!-- Top Global Search Box (Centered) -->
-      <div class="search-box">
-        <input type="text" id="topic-search" placeholder="🔍 Search any topic, pattern, or keyword..."
-          oninput="app.filterTopics(this.value)">
+      <!-- Top Global Search Box (Centered) with Quick Command Palette Trigger -->
+      <div class="search-box" onclick="app.openCommandPalette()" title="Press ⌘K or Ctrl+K to open Command Palette">
+        <input type="text" id="topic-search" placeholder="🔍 Search topics, guides, patterns... (⌘K)" readonly>
+        <span class="search-shortcut-badge">⌘K</span>
       </div>
 
-      <!-- Top Right Header Actions with Hover Text Expansion -->
+      <!-- Top Right Header Actions with Hover Text Expansion & Theme Switcher -->
       <div class="header-actions">
+        <!-- Header Interview Readiness Mastery Gauge -->
+        <div class="header-mastery-gauge" id="header-mastery-gauge" onclick="app.toggleMasteryPopover(event)" title="Click to view domain interview mastery breakdown">
+          <div class="mastery-progress-pill">
+            <span class="mastery-gauge-icon">🎯</span>
+            <span class="mastery-gauge-text">Mastery: <span class="mastery-gauge-pct" id="header-mastery-pct">0%</span></span>
+            <div class="mastery-gauge-bar">
+              <div class="mastery-gauge-fill" id="header-mastery-fill" style="width: 0%;"></div>
+            </div>
+          </div>
+          <!-- Popover Breakdown per Domain -->
+          <div class="mastery-popover" id="mastery-popover">
+            <div class="mastery-popover-header">
+              <span class="mastery-popover-title">🎯 Interview Readiness</span>
+              <span class="mastery-popover-stat" id="mastery-popover-total">0 / 0 Done</span>
+            </div>
+            <div class="mastery-popover-list" id="mastery-popover-list">
+              <!-- Rendered dynamically by app.js -->
+            </div>
+          </div>
+        </div>
+
         <button class="btn btn-primary nav-btn-icon" id="mindmap-toggle-btn" onclick="app.showMindmapView()" title="Learning Paths">
           <span class="nav-icon">🧭</span><span class="nav-text">Learning Paths</span>
         </button>
@@ -59,6 +80,62 @@
         <button class="btn btn-outline nav-btn-icon" id="simulators-btn" onclick="app.showSimulatorsView()" title="Simulators">
           <span class="nav-icon">⚡</span><span class="nav-text">Simulators</span>
         </button>
+
+        <!-- Dynamic 5-Theme Switcher Component -->
+        <div class="theme-switcher-container" id="theme-switcher-container">
+          <button class="btn btn-outline nav-btn-icon theme-toggle-btn" id="theme-menu-btn" onclick="app.toggleThemeDropdown(event)" title="Switch UI Theme (5 Themes)">
+            <span class="nav-icon" id="theme-active-icon">🌌</span>
+            <span class="nav-text" id="theme-active-name">Theme</span>
+          </button>
+          <div class="theme-dropdown-menu" id="theme-dropdown-menu">
+            <div class="theme-dropdown-header">
+              <span class="theme-dropdown-title">🎨 Theme Studio</span>
+              <span class="theme-dropdown-sub">Zero-lag CSS design tokens</span>
+            </div>
+            <div class="theme-options-list">
+              <button class="theme-option-item active" data-theme-id="obsidian-dark" onclick="app.setTheme('obsidian-dark')">
+                <span class="theme-swatch" style="background: linear-gradient(135deg, #070b14 50%, #06b6d4 100%);"></span>
+                <div class="theme-option-info">
+                  <span class="theme-option-name">🌌 Obsidian Cyber</span>
+                  <span class="theme-option-type">Dark Modern • Default</span>
+                </div>
+                <span class="theme-check">✓</span>
+              </button>
+              <button class="theme-option-item" data-theme-id="slate-light" onclick="app.setTheme('slate-light')">
+                <span class="theme-swatch" style="background: linear-gradient(135deg, #ffffff 50%, #2563eb 100%);"></span>
+                <div class="theme-option-info">
+                  <span class="theme-option-name">☀️ Slate Studio</span>
+                  <span class="theme-option-type">Clean Light • High Contrast</span>
+                </div>
+                <span class="theme-check">✓</span>
+              </button>
+              <button class="theme-option-item" data-theme-id="alpine-nord" onclick="app.setTheme('alpine-nord')">
+                <span class="theme-swatch" style="background: linear-gradient(135deg, #242933 50%, #88c0d0 100%);"></span>
+                <div class="theme-option-info">
+                  <span class="theme-option-name">🌲 Alpine Nord</span>
+                  <span class="theme-option-type">Polar Night • Low Eye Fatigue</span>
+                </div>
+                <span class="theme-check">✓</span>
+              </button>
+              <button class="theme-option-item" data-theme-id="warm-sepia" onclick="app.setTheme('warm-sepia')">
+                <span class="theme-swatch" style="background: linear-gradient(135deg, #fbf8f2 50%, #c25e00 100%);"></span>
+                <div class="theme-option-info">
+                  <span class="theme-option-name">☕ Warm Paper</span>
+                  <span class="theme-option-type">Sepia Minimalist • Reading Mode</span>
+                </div>
+                <span class="theme-check">✓</span>
+              </button>
+              <button class="theme-option-item" data-theme-id="tokyo-midnight" onclick="app.setTheme('tokyo-midnight')">
+                <span class="theme-swatch" style="background: linear-gradient(135deg, #0c0a17 50%, #ec4899 100%);"></span>
+                <div class="theme-option-info">
+                  <span class="theme-option-name">🌆 Tokyo Midnight</span>
+                  <span class="theme-option-type">Vibrant Synthwave • Neon Dark</span>
+                </div>
+                <span class="theme-check">✓</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -98,6 +175,31 @@
             <span class="gnav-text">Simulators</span>
           </button>
         </div>
+
+        <!-- Sidebar Theme Switcher (Accessible in Full & Mobile Drawers) -->
+        <div class="gnav-theme-section">
+          <div class="gnav-theme-title">
+            <span>🎨 Theme</span>
+            <span id="gnav-theme-name" style="font-size: 0.65rem; color: var(--primary);">Obsidian Cyber</span>
+          </div>
+          <div class="gnav-theme-grid">
+            <button class="gnav-theme-btn active" data-gnav-theme="obsidian-dark" onclick="app.setTheme('obsidian-dark')" title="Obsidian Cyber">
+              <span class="gnav-theme-icon">🌌</span>
+            </button>
+            <button class="gnav-theme-btn" data-gnav-theme="slate-light" onclick="app.setTheme('slate-light')" title="Slate Studio (Light)">
+              <span class="gnav-theme-icon">☀️</span>
+            </button>
+            <button class="gnav-theme-btn" data-gnav-theme="alpine-nord" onclick="app.setTheme('alpine-nord')" title="Alpine Nord">
+              <span class="gnav-theme-icon">🌲</span>
+            </button>
+            <button class="gnav-theme-btn" data-gnav-theme="warm-sepia" onclick="app.setTheme('warm-sepia')" title="Warm Sepia (Light)">
+              <span class="gnav-theme-icon">☕</span>
+            </button>
+            <button class="gnav-theme-btn" data-gnav-theme="tokyo-midnight" onclick="app.setTheme('tokyo-midnight')" title="Tokyo Midnight">
+              <span class="gnav-theme-icon">🌆</span>
+            </button>
+          </div>
+        </div>
       </aside>
 
       <!-- Main Dynamic Container -->
@@ -110,9 +212,9 @@
 
       <!-- SYSTEM DESIGN HUB VIEW -->
       <section id="system-design-hub-view" class="view-section" style="display: none;">
-        <div class="paths-banner" style="background: linear-gradient(135deg, rgba(15,23,42,0.9), rgba(30,41,59,0.9)); border: 1px solid rgba(56,189,248,0.3); border-radius: 16px; padding: 24px; margin-bottom: 24px;">
+        <div class="paths-banner sd-hub-banner">
           <div class="section-badge">🏗️ STAFF SYSTEM DESIGN HUB</div>
-          <h2 class="banner-title" style="color: #38bdf8; font-size: 2rem;">System Design & Architecture Hub</h2>
+          <h2 class="banner-title" style="color: var(--primary); font-size: 2rem;">System Design & Architecture Hub</h2>
           <p class="section-desc">First-principles basics, interactive capacity calculators, architectural primitives, real-world case studies, and enterprise request flow & observability stack.</p>
           
           <div class="sd-hub-tabs" style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
@@ -124,7 +226,7 @@
           </div>
         </div>
 
-        <div id="system-design-frame-container" style="width: 100%; min-height: 850px; border-radius: 16px; overflow: hidden; background: #0f172a; border: 1px solid rgba(255,255,255,0.1);">
+        <div id="system-design-frame-container" style="width: 100%; min-height: 850px; border-radius: 16px; overflow: hidden; background: var(--bg-card); border: var(--glass-border); box-shadow: var(--glass-shadow);">
           <iframe id="sd-module-iframe" src="docs/system_design/fundamentals.html" style="width: 100%; height: 850px; border: none;"></iframe>
         </div>
       </section>
@@ -228,8 +330,12 @@
       <!-- 2. IN-DEPTH GUIDE VIEWER -->
       <section id="guide-viewer-section" class="view-section" style="display: none;">
         <div class="guide-toolbar">
+          <div class="guide-reading-progress" id="guide-reading-progress"></div>
           <button class="btn btn-sm btn-outline" id="guide-back-btn" onclick="app.goBackFromGuide()">← Back</button>
-          <div class="guide-meta-title" id="guide-title-display">Reading Guide</div>
+          <div class="guide-meta-group">
+            <div class="guide-meta-title" id="guide-title-display">Reading Guide</div>
+            <span class="guide-read-time" id="guide-read-time-display">⏱️ 5 min read</span>
+          </div>
           <button class="btn btn-sm btn-accent" id="guide-sim-btn" style="display: none;">⚡ Launch Simulator</button>
           <a class="btn btn-sm btn-outline" id="raw-guide-link" target="_blank">Open Raw Markdown</a>
         </div>
@@ -603,11 +709,32 @@
         </div>
       </div>
     </div>
+  <!-- Phase 2: Global Universal Command Palette (⌘K / Ctrl+K) -->
+  <div class="command-palette-overlay" id="command-palette-modal" onclick="app.closeCommandPaletteOnBackdrop(event)">
+    <div class="command-palette-dialog" role="dialog" aria-modal="true" aria-label="Universal Command Palette">
+      <div class="cmd-header">
+        <span class="cmd-icon">🔍</span>
+        <input type="text" class="cmd-input" id="cmd-palette-input" placeholder="Type to search guides, system design cases, templates, or commands..." autocomplete="off" spellcheck="false">
+        <button class="cmd-close-btn" onclick="app.closeCommandPalette()" title="Close (Esc)">✕</button>
+      </div>
+      <div class="cmd-body" id="cmd-results-list">
+        <!-- Dynamically rendered by app.js -->
+      </div>
+      <div class="cmd-footer">
+        <div class="cmd-footer-shortcuts">
+          <span><kbd class="cmd-kbd">↑</kbd><kbd class="cmd-kbd">↓</kbd> Navigate</span>
+          <span><kbd class="cmd-kbd">↵</kbd> Select</span>
+          <span><kbd class="cmd-kbd">Esc</kbd> Close</span>
+          <span><kbd class="cmd-kbd">Alt+T</kbd> Cycle Theme</span>
+        </div>
+        <div class="cmd-footer-theme">Hub v1.3</div>
+      </div>
+    </div>
   </div>
 
-  <script src="config.js?v=1.2.1"></script>
-  <script src="scripts/graph_engine.js?v=1.2.1"></script>
-  <script src="app.js?v=1.2.1"></script>
+  <script src="config.js?v=1.3.0"></script>
+  <script src="scripts/graph_engine.js?v=1.3.0"></script>
+  <script src="app.js?v=1.3.0"></script>
 </body>
 
 </html>
